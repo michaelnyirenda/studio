@@ -65,7 +65,7 @@ export default function Home() {
       description: "Access a confidential HIV screening tool to assess risk and receive guidance on next steps.",
       link: "/hiv-screening",
       icon: <ShieldCheck className="h-7 w-7 text-primary" />,
-      imageSrc: "https://placehold.co/600x400.png",
+      imageSrc: "https://images.unsplash.com/photo-1575998064976-9df66085cc83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxISVZ8ZW58MHx8fHwxNzQ4OTY0MTI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       imageAlt: "Symbolic representation of health and protection",
       imageHint: "health screening"
     },
@@ -85,4 +85,3 @@ export default function Home() {
     </div>
   );
 }
-
