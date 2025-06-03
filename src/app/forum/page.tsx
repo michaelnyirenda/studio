@@ -23,18 +23,22 @@ export default function ForumPage() {
           mockPosts.map(post => (
             <Card key={post.id} className="shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out">
               <CardHeader>
-                <CardTitle className="text-xl font-headline text-primary">{post.title}</CardTitle>
+                <Link href={`/forum/posts/${post.id}`} passHref>
+                  <CardTitle className="text-xl font-headline text-primary hover:underline cursor-pointer">
+                    {post.title}
+                  </CardTitle>
+                </Link>
                 <CardDescription className="text-sm text-muted-foreground pt-1">
                   By {post.author} on {post.date}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="line-clamp-3 text-foreground/90">{post.content}</p>
-                {/* In a real app, you might have a "Read More" link here that navigates to a full post page:
                 <Link href={`/forum/posts/${post.id}`} passHref>
-                  <Button variant="link" className="p-0 h-auto mt-2 text-accent">Read More</Button>
-                </Link> 
-                */}
+                  <Button variant="link" className="p-0 h-auto mt-2 text-accent hover:underline">
+                    Read More
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))
