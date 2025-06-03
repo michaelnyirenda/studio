@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,9 +43,9 @@ function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, image
 export default function Home() {
   const features: FeatureCardProps[] = [
     {
-      title: "Forum Post Creation",
-      description: "Share educational content, spark discussions, and engage with the community by creating rich forum posts.",
-      link: "/forum/create",
+      title: "Community Forum",
+      description: "Browse discussions, share insights, and engage with the community. Create new posts via the forum page.",
+      link: "/forum",
       icon: <BookOpenText className="h-7 w-7 text-primary" />,
       imageSrc: "https://placehold.co/600x400.png",
       imageAlt: "Abstract representation of a forum discussion",

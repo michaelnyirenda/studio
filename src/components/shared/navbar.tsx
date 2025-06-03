@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { BookOpenText, Users, ShieldCheck, Home } from 'lucide-react';
@@ -16,7 +17,7 @@ export default function Navbar() {
             </Link>
           </Button>
           <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80 hover:text-accent" asChild>
-            <Link href="/forum/create">
+            <Link href="/forum">
               <BookOpenText className="mr-2 h-5 w-5" /> Forum
             </Link>
           </Button>
