@@ -11,12 +11,11 @@ export default function HivScreeningPage() {
       />
       <div className="my-6 flex justify-center">
         <Image 
-          src="https://placehold.co/600x400.png" 
-          alt="Cartoon of health worker performing a screening" 
+          src="https://images.unsplash.com/photo-1536064479547-7ee40b74b807?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8aGVhbHRoJTIwd29ya2VyfGVufDB8fHx8MTc0ODkyMjQ1NXww&ixlib=rb-4.1.0&q=80&w=1080" 
+          alt="Health worker performing a screening" 
           width={600} 
           height={400}
-          className="rounded-lg shadow-md"
-          data-ai-hint="health screening cartoon" 
+          className="rounded-lg shadow-md object-cover"
         />
       </div>
       <ScreeningForm />
