@@ -56,7 +56,7 @@ export default function Home() {
       description: "Easily record and manage attendance for educational sessions, workshops, and community lessons.",
       link: "/attendance",
       icon: <Users className="h-7 w-7 text-primary" />,
-      imageSrc: "https://placehold.co/600x400.png",
+      imageSrc: "https://images.unsplash.com/photo-1604134967494-8a9ed3adea0d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjbGFzc3Jvb218ZW58MHx8fHwxNzQ4OTY0MDE3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       imageAlt: "Stylized image of people in a classroom setting",
       imageHint: "classroom learning"
     },
