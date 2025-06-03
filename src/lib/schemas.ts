@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 
 export const ForumPostSchema = z.object({
@@ -14,7 +15,7 @@ const AttendeeSchema = z.object({
 });
 
 export const AttendanceSchema = z.object({
-  lessonName: z.string().min(3, { message: "Lesson name must be at least 3 characters." }),
+  lessonName: z.string({ required_error: "Please select a lesson/event." }).min(1, { message: "Please select a lesson/event." }),
   date: z.date({ required_error: "Please select a date for the lesson." }),
   attendees: z.array(AttendeeSchema).min(1, { message: "At least one attendee is required." }),
 });

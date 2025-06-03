@@ -1,3 +1,4 @@
+
 "use client";
 
 import type * as z from 'zod';
@@ -18,6 +19,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { submitAttendanceAction } from '@/app/attendance/actions';
 import { AttendanceSchema, type AttendanceFormData } from '@/lib/schemas';
@@ -25,6 +33,7 @@ import { CalendarIcon, Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { mockPosts } from '@/lib/mock-data';
 
 export default function AttendanceForm() {
   const { toast } = useToast();
@@ -33,7 +42,7 @@ export default function AttendanceForm() {
   const form = useForm<AttendanceFormData>({
     resolver: zodResolver(AttendanceSchema),
     defaultValues: {
-      lessonName: '',
+      lessonName: undefined, // Changed for Select component
       date: new Date(),
       attendees: [{ name: '', present: false }],
     },
@@ -54,7 +63,7 @@ export default function AttendanceForm() {
           description: result.message,
         });
         form.reset({ 
-            lessonName: '', 
+            lessonName: undefined, 
             date: new Date(), 
             attendees: [{ name: '', present: false }] 
         });
@@ -97,9 +106,20 @@ export default function AttendanceForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-lg">Lesson/Event Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Introduction to Web Development" {...field} />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a lesson/event" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {mockPosts.map(post => (
+                        <SelectItem key={post.id} value={post.title}>
+                          {post.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
