@@ -49,7 +49,7 @@ export default function ForumPage() {
       <Link href="/forum/create" passHref>
         <Button
           aria-label="Create new post"
-          className="fixed bottom-8 right-8 h-16 w-16 rounded-full shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground z-50 flex items-center justify-center"
+          className="fixed bottom-24 right-8 h-16 w-16 rounded-full shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground z-50 flex items-center justify-center"
           size="icon"
         >
           <Plus className="h-8 w-8" />
