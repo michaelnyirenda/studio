@@ -11,9 +11,9 @@ export interface MockPost {
 export const mockPosts: MockPost[] = [
   { 
     id: '1', 
-    title: 'Getting Started with EduNexus Platform', 
-    content: 'Welcome to EduNexus! This platform is designed to foster community engagement and learning. Explore the features and share your knowledge.', 
-    author: 'EduNexus Admin', 
+    title: 'Getting Started with iCare Platform', 
+    content: 'Welcome to iCare! This platform is designed to foster community engagement and learning. Explore the features and share your knowledge.', 
+    author: 'iCare Admin', 
     date: 'July 29, 2024' 
   },
   { 
