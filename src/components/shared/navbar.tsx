@@ -1,38 +1,27 @@
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { BookOpenText, Users, ShieldCheck, Home } from 'lucide-react';
 
 export default function Navbar() {
+  const navItems = [
+    { href: "/", label: "Home", icon: <Home className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
+    { href: "/forum", label: "Forum", icon: <BookOpenText className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
+    { href: "/attendance", label: "Attendance", icon: <Users className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
+    { href: "/hiv-screening", label: "Screening", icon: <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
+  ];
+
   return (
-    <header className="bg-primary text-primary-foreground shadow-md">
-      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold font-headline hover:text-accent transition-colors">
-          EduNexus
-        </Link>
-        <div className="space-x-2">
-          <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80 hover:text-accent" asChild>
-            <Link href="/">
-              <Home className="mr-2 h-5 w-5" /> Home
-            </Link>
-          </Button>
-          <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80 hover:text-accent" asChild>
-            <Link href="/forum">
-              <BookOpenText className="mr-2 h-5 w-5" /> Forum
-            </Link>
-          </Button>
-          <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80 hover:text-accent" asChild>
-            <Link href="/attendance">
-              <Users className="mr-2 h-5 w-5" /> Attendance
-            </Link>
-          </Button>
-          <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80 hover:text-accent" asChild>
-            <Link href="/hiv-screening">
-              <ShieldCheck className="mr-2 h-5 w-5" /> HIV Screening
-            </Link>
-          </Button>
-        </div>
-      </nav>
-    </header>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-primary text-primary-foreground border-t border-primary-foreground/10 shadow-[0_-2px_6px_rgba(0,0,0,0.1)]">
+      <div className="mx-auto flex h-16 max-w-md items-stretch justify-around">
+        {navItems.map((item) => (
+          <Link key={item.href} href={item.href} passHref legacyBehavior>
+            <a className="flex flex-1 flex-col items-center justify-center text-center px-1 py-2 text-primary-foreground hover:bg-primary/80 hover:text-accent focus:outline-none focus:bg-primary/80 focus:text-accent rounded-none transition-colors">
+              {item.icon}
+              <span className="text-xs truncate pt-0.5">{item.label}</span>
+            </a>
+          </Link>
+        ))}
+      </div>
+    </nav>
   );
 }
