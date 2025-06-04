@@ -31,7 +31,7 @@ We hope you find this platform valuable!`,
     date: 'July 29, 2024',
     imageUrl: 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBlbmdhZ2VtZW50fGVufDB8fHx8MTc0OTAxMjM0NXww&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'community engagement',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' 
+    videoUrl: 'https://youtu.be/NnfkVsVnl3s?si=ZjKcWKiSUULn4bjW' 
   },
   { 
     id: '2', 
@@ -98,3 +98,4 @@ export const mockReferrals: MockReferral[] = [
     status: 'Follow-up Scheduled',
   },
 ];
+
