@@ -31,3 +31,9 @@ export const HivScreeningSchema = z.object({
 });
 
 export type HivScreeningFormData = z.infer<typeof HivScreeningSchema>;
+
+export const UpdateReferralFormSchema = z.object({
+  status: z.enum(['Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
+  notes: z.string().max(1000, { message: "Notes must be 1000 characters or less." }).optional(),
+});
+export type UpdateReferralFormData = z.infer<typeof UpdateReferralFormSchema>;

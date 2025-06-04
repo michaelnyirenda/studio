@@ -5,8 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { mockReferrals, type MockReferral } from '@/lib/mock-data';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button'; // Import Button
-import { Edit3 } from 'lucide-react'; // Import an icon for the button
+import UpdateReferralDialog from '@/components/referrals/update-referral-dialog';
 
 function getStatusVariant(status: MockReferral['status']): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (status) {
@@ -68,10 +67,7 @@ export default function ReferralsPage() {
                 </CardContent>
                 <CardFooter className="flex justify-between items-center pt-4">
                   <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
-                  <Button variant="outline" size="sm" className="text-accent border-accent hover:bg-accent/10">
-                    <Edit3 className="mr-2 h-4 w-4" />
-                    Update
-                  </Button>
+                  <UpdateReferralDialog referral={referral} />
                 </CardFooter>
               </Card>
             ))}
