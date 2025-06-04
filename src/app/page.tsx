@@ -47,7 +47,7 @@ export default function Home() {
       description: "Browse discussions, share insights, and engage with the community. Create new posts via the forum page.",
       link: "/forum",
       icon: <BookOpenText className="h-7 w-7 text-primary" />,
-      imageSrc: "https://images.unsplash.com/photo-1520627977056-c307aeb9a625?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxmb3J1bXxlbnwwfHx8fDE3NDg5NjM0ODV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      imageSrc: "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21tdW5pdHl8ZW58MHx8fHwxNzQ5MDIxNzgyfDA&ixlib=rb-4.1.0&q=80&w=1080",
       imageAlt: "Abstract representation of a forum discussion",
       imageHint: "discussion community"
     },
