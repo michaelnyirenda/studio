@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { mockReferrals, type MockReferral } from '@/lib/mock-data';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button'; // Import Button
+import { Edit3 } from 'lucide-react'; // Import an icon for the button
 
 function getStatusVariant(status: MockReferral['status']): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (status) {
@@ -15,7 +17,7 @@ function getStatusVariant(status: MockReferral['status']): 'default' | 'secondar
     case 'Follow-up Scheduled':
       return 'secondary';
     case 'Closed':
-      return 'default'; // Or a success-like variant if available/customized
+      return 'default'; 
     default:
       return 'default';
   }
@@ -38,7 +40,7 @@ export default function ReferralsPage() {
           </p>
         </div>
       ) : (
-        <ScrollArea className="h-[calc(100vh-220px)] mt-8"> {/* Adjust height as needed */}
+        <ScrollArea className="h-[calc(100vh-250px)] mt-8 mb-16"> {/* Adjusted height for potential FAB */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pr-4">
             {mockReferrals.map((referral) => (
               <Card key={referral.id} className="shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out flex flex-col">
@@ -54,7 +56,7 @@ export default function ReferralsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <p className="text-sm font-semibold text-foreground/90 mb-1">Referral Details:</p>
+                  <p className="text-sm font-semibold text-foreground/90 mb-1">Referral Reason:</p>
                   <p className="text-sm text-foreground/80 line-clamp-4">{referral.referralMessage}</p>
                   {referral.notes && (
                     <>
@@ -64,9 +66,12 @@ export default function ReferralsPage() {
                     </>
                   )}
                 </CardContent>
-                <CardFooter>
-                  {/* Add actions here if needed, e.g., <Button>Update Status</Button> */}
+                <CardFooter className="flex justify-between items-center pt-4">
                   <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
+                  <Button variant="outline" size="sm" className="text-accent border-accent hover:bg-accent/10">
+                    <Edit3 className="mr-2 h-4 w-4" />
+                    Update
+                  </Button>
                 </CardFooter>
               </Card>
             ))}
