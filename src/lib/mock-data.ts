@@ -14,8 +14,8 @@ export interface MockPost {
 export const mockPosts: MockPost[] = [
   { 
     id: '1', 
-    title: 'Getting Started with iCare Platform', 
-    content: `Welcome to iCare! This platform is designed to foster community engagement and learning.
+    title: 'Getting Started with #BeFree Platform', 
+    content: `Welcome to #BeFree! This platform is designed to foster community engagement and learning.
 Explore the features and share your knowledge. You can embed images and videos in your posts to make them more engaging.
 
 This is an example of a paragraph.
@@ -27,7 +27,7 @@ Key Features to Explore:
 - HIV Screening: Access confidential screening.
 
 We hope you find this platform valuable!`,
-    author: 'iCare Admin', 
+    author: '#BeFree Admin', 
     date: 'July 29, 2024',
     imageUrl: 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBlbmdhZ2VtZW50fGVufDB8fHx8MTc0OTAxMjM0NXww&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'community engagement',
