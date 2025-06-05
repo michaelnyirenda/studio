@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/shared/page-header";
-import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck } from 'lucide-react'; // Replaced Users with ClipboardList
+import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 
 interface FeatureCardProps {
