@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/shared/page-header";
-import { ArrowRight, BookOpenText, Users, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck } from 'lucide-react'; // Replaced Users with ClipboardList
 import Image from 'next/image';
 
 interface FeatureCardProps {
@@ -52,13 +52,13 @@ export default function Home() {
       imageHint: "discussion community"
     },
     {
-      title: "Attendance Capture",
-      description: "Easily record and manage attendance for educational sessions, workshops, and community lessons.",
-      link: "/attendance",
-      icon: <Users className="h-7 w-7 text-primary" />,
-      imageSrc: "https://images.unsplash.com/photo-1604134967494-8a9ed3adea0d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjbGFzc3Jvb218ZW58MHx8fHwxNzQ4OTY0MDE3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      imageAlt: "Stylized image of people in a classroom setting",
-      imageHint: "classroom learning"
+      title: "Track Referrals", // Changed title
+      description: "View and manage referrals generated from HIV screenings and other community programs.", // Changed description
+      link: "/referrals", // Changed link
+      icon: <ClipboardList className="h-7 w-7 text-primary" />, // Changed icon
+      imageSrc: "https://placehold.co/600x400.png", // Changed imageSrc to placeholder
+      imageAlt: "Image representing referral tracking and management", // Changed imageAlt
+      imageHint: "referrals tracking" // Changed imageHint
     },
     {
       title: "HIV Screening",
