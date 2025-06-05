@@ -52,13 +52,13 @@ export default function Home() {
       imageHint: "discussion community"
     },
     {
-      title: "Track Referrals", // Changed title
-      description: "View and manage referrals generated from HIV screenings and other community programs.", // Changed description
-      link: "/referrals", // Changed link
-      icon: <ClipboardList className="h-7 w-7 text-primary" />, // Changed icon
-      imageSrc: "https://placehold.co/600x400.png", // Changed imageSrc to placeholder
-      imageAlt: "Image representing referral tracking and management", // Changed imageAlt
-      imageHint: "referrals tracking" // Changed imageHint
+      title: "Track Referrals", 
+      description: "View and manage referrals generated from HIV screenings and other community programs.", 
+      link: "/referrals", 
+      icon: <ClipboardList className="h-7 w-7 text-primary" />, 
+      imageSrc: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWxlbmRhcnxlbnwwfHx8fDE3NDkxMjcwNDl8MA&ixlib=rb-4.1.0&q=80&w=1080", 
+      imageAlt: "Image representing referral tracking and management", 
+      imageHint: "referrals tracking" 
     },
     {
       title: "HIV Screening",
