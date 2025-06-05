@@ -52,15 +52,6 @@ export default function Home() {
       imageHint: "discussion community"
     },
     {
-      title: "Track Referrals", 
-      description: "View and manage referrals generated from HIV screenings and other community programs.", 
-      link: "/referrals", 
-      icon: <ClipboardList className="h-7 w-7 text-primary" />, 
-      imageSrc: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWxlbmRhcnxlbnwwfHx8fDE3NDkxMjcwNDl8MA&ixlib=rb-4.1.0&q=80&w=1080", 
-      imageAlt: "Image representing referral tracking and management", 
-      imageHint: "referrals tracking" 
-    },
-    {
       title: "HIV Screening",
       description: "Access a confidential HIV screening tool to assess risk and receive guidance on next steps.",
       link: "/hiv-screening",
@@ -68,6 +59,15 @@ export default function Home() {
       imageSrc: "https://images.unsplash.com/photo-1575998064976-9df66085cc83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxISVZ8ZW58MHx8fHwxNzQ4OTY0MTI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       imageAlt: "Symbolic representation of health and protection",
       imageHint: "health screening"
+    },
+    {
+      title: "Track Referrals", 
+      description: "View and manage referrals generated from HIV screenings and other community programs.", 
+      link: "/referrals", 
+      icon: <ClipboardList className="h-7 w-7 text-primary" />, 
+      imageSrc: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWxlbmRhcnxlbnwwfHx8fDE3NDkxMjcwNDl8MA&ixlib=rb-4.1.0&q=80&w=1080", 
+      imageAlt: "Image representing referral tracking and management", 
+      imageHint: "referrals tracking" 
     },
   ];
 
