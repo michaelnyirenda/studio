@@ -8,21 +8,6 @@ export const ForumPostSchema = z.object({
 
 export type ForumPostFormData = z.infer<typeof ForumPostSchema>;
 
-const AttendeeSchema = z.object({
-  id: z.string().optional(), // For potential future use with dynamic fields
-  name: z.string().min(2, { message: "Attendee name must be at least 2 characters." }),
-  present: z.boolean().default(false),
-});
-
-export const AttendanceSchema = z.object({
-  lessonName: z.string({ required_error: "Please select a lesson/event." }).min(1, { message: "Please select a lesson/event." }),
-  date: z.date({ required_error: "Please select a date for the lesson." }),
-  attendees: z.array(AttendeeSchema).min(1, { message: "At least one attendee is required." }),
-});
-
-export type AttendanceFormData = z.infer<typeof AttendanceSchema>;
-
-
 export const HivScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
