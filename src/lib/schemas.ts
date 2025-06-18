@@ -22,3 +22,14 @@ export const UpdateReferralFormSchema = z.object({
   notes: z.string().max(1000, { message: "Notes must be 1000 characters or less." }).optional(),
 });
 export type UpdateReferralFormData = z.infer<typeof UpdateReferralFormSchema>;
+
+
+export const ChatMessageSchema = z.object({
+  message: z.string().min(1, { message: "Message cannot be empty." }).max(1000, { message: "Message must be 1000 characters or less." }),
+});
+export type ChatMessageFormData = z.infer<typeof ChatMessageSchema>;
+
+export const ChatResponseSchema = z.object({
+  response: z.string(),
+});
+export type ChatResponseType = z.infer<typeof ChatResponseSchema>;
