@@ -157,7 +157,7 @@ export default function Home() {
       imageHint: "discussion community"
     },
      {
-      title: "HIV Screening",
+      title: "Screening",
       description: "Access a confidential HIV screening tool to assess risk and receive guidance on next steps.",
       link: "/hiv-screening",
       icon: <ShieldCheck className="h-7 w-7 text-primary" />,
@@ -194,3 +194,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
