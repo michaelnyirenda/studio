@@ -1,7 +1,10 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from '@/components/shared/navbar';
+import { RoleProvider } from '@/contexts/role-context';
+import AdminToggleButton from '@/components/shared/admin-toggle-button';
 
 export const metadata: Metadata = {
   title: '#BeFree',
@@ -21,12 +24,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
-        {/* Navbar is now at the bottom */}
-        <main className="flex-grow container mx-auto px-4 pt-8 pb-20"> {/* Added pb-20 for bottom nav */}
-          {children}
-        </main>
-        <Toaster />
-        <Navbar /> {/* Moved Navbar to the end of body */}
+        <RoleProvider>
+          <AdminToggleButton />
+          <main className="flex-grow container mx-auto px-4 pt-8 pb-20"> {/* Added pb-20 for bottom nav */}
+            {children}
+          </main>
+          <Toaster />
+          <Navbar /> {/* Moved Navbar to the end of body */}
+        </RoleProvider>
       </body>
     </html>
   );

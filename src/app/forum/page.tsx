@@ -1,12 +1,18 @@
 
+"use client";
+
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { mockPosts } from '@/lib/mock-data';
+import { useRole } from '@/contexts/role-context';
 
 export default function ForumPage() {
+  const { role } = useRole();
+  const isAdmin = role === 'admin';
+
   return (
     <div className="container mx-auto py-8 px-4 relative">
       <PageHeader
@@ -45,19 +51,17 @@ export default function ForumPage() {
         )}
       </div>
 
-      {/* 
-      Floating Action Button for creating posts - Hidden for general users in this view.
-      Admins can access /forum/create directly.
-      <Link href="/forum/create" passHref>
-        <Button
-          aria-label="Create new post"
-          className="fixed bottom-24 right-8 h-16 w-16 rounded-full shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground z-50 flex items-center justify-center"
-          size="icon"
-        >
-          <Plus className="h-8 w-8" />
-        </Button>
-      </Link>
-      */}
+      {isAdmin && (
+        <Link href="/forum/create" passHref>
+          <Button
+            aria-label="Create new post"
+            className="fixed bottom-24 right-8 h-16 w-16 rounded-full shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground z-50 flex items-center justify-center"
+            size="icon"
+          >
+            <Plus className="h-8 w-8" />
+          </Button>
+        </Link>
+      )}
     </div>
   );
 }
