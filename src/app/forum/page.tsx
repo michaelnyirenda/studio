@@ -45,7 +45,9 @@ export default function ForumPage() {
         )}
       </div>
 
-      {/* Floating Action Button */}
+      {/* 
+      Floating Action Button for creating posts - Hidden for general users in this view.
+      Admins can access /forum/create directly.
       <Link href="/forum/create" passHref>
         <Button
           aria-label="Create new post"
@@ -55,6 +57,7 @@ export default function ForumPage() {
           <Plus className="h-8 w-8" />
         </Button>
       </Link>
+      */}
     </div>
   );
 }
