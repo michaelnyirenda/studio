@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { BookOpenText, ShieldCheck, Home, ClipboardList } from 'lucide-react';
+import { BookOpenText, ShieldCheck, Home, ClipboardList, MessageSquare } from 'lucide-react';
 
 export default function Navbar() {
   const navItems = [
@@ -8,6 +8,7 @@ export default function Navbar() {
     { href: "/forum", label: "Forum", icon: <BookOpenText className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
     { href: "/hiv-screening", label: "Screening", icon: <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
     { href: "/referrals", label: "Referrals", icon: <ClipboardList className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
+    { href: "/chat", label: "Chat", icon: <MessageSquare className="h-6 w-6 sm:h-7 sm:w-7 mb-0.5" /> },
   ];
 
   return (
