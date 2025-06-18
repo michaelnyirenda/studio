@@ -19,7 +19,7 @@ export default function AdminToggleButton() {
             variant="ghost"
             size="icon"
             onClick={toggleRole}
-            className="fixed top-4 right-4 z-50 h-10 w-10 rounded-full bg-card text-card-foreground shadow-md hover:bg-card/90"
+            className="fixed top-4 right-4 z-50 h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
             aria-label={isAdmin ? "Switch to User Mode" : "Switch to Admin Mode"}
           >
             {isAdmin ? <UserCog className="h-5 w-5" /> : <User className="h-5 w-5" />}
