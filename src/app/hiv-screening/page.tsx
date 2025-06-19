@@ -84,7 +84,7 @@ export default function ScreeningPage() {
           description="Assess your risk for HIV and receive guidance on next steps. Confidential and informative."
           icon={<ShieldCheck className="h-10 w-10 text-primary mb-3" />}
           onSelect={() => handleSelectScreening('hiv')}
-          imageSrc="https://images.unsplash.com/photo-1605107054093-42789854c465?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxISVYlMjB0ZXN0fGVufDB8fHx8MTc1MDI4MTM3Nnww&ixlib=rb-4.1.0&q=80&w=1080"
+          imageSrc="https://images.unsplash.com/photo-1576074892931-753d42b5d831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMnx8aGl2JTIwfGVufDB8fHx8MTc1MDMxMjc1MHww&ixlib=rb-4.1.0&q=80&w=1080"
           imageAlt="HIV rapid test kit"
           imageHint="HIV test"
         />
