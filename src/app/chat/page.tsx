@@ -219,7 +219,7 @@ export default function ChatPage() {
               )}
             </h2>
           </CardHeader>
-          <ScrollArea className="flex-grow p-4 space-y-6" ref={scrollAreaRef}> {/* Updated space-y-4 to space-y-6 */}
+          <ScrollArea className="flex-grow p-4 space-y-8" ref={scrollAreaRef}> {/* Updated space-y-6 to space-y-8 */}
             {!activeChatUserId && role === 'admin' && (
               <p className="text-center text-muted-foreground py-10">
                 Please select a user from the list to view their chat.
@@ -308,3 +308,5 @@ export default function ChatPage() {
     </div>
   );
 }
+
+    
