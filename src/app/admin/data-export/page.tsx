@@ -49,7 +49,6 @@ export default function DataExportPage() {
                 <SelectItem value="referral_data">Referral Data</SelectItem>
                 <SelectItem value="forum_posts">Forum Posts Data</SelectItem>
                 <SelectItem value="user_accounts">User Accounts Data</SelectItem>
-                <SelectItem value="attendance_records">Attendance Records</SelectItem>
               </SelectContent>
             </Select>
           </div>
