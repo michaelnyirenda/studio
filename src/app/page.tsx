@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/shared/page-header";
 import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, LineChart, Users, MessageSquareText, ShieldAlert, UserCog, BarChart3, Search } from 'lucide-react';
@@ -80,7 +80,7 @@ function AdminDashboardContent() {
     {
       title: "Screening Data",
       description: "View aggregated screening results, trends, and detailed analytics.",
-      link: "/admin/reports", // This is now the dedicated screening data page
+      link: "/admin/reports", 
       icon: <BarChart3 className="h-5 w-5 text-muted-foreground" />
     },
     {
