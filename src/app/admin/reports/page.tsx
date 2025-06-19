@@ -9,12 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
-import { BarChart, LineChart, Users, Filter, Download } from 'lucide-react';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, BarChart as ShadBarChart, CartesianGrid, XAxis, YAxis, Bar } from '@/components/ui/chart';
+import { BarChart as LucideBarChart, LineChart as LucideLineChart, Users, Filter, Download } from 'lucide-react'; 
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart as ShadBarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts'; 
 import type { ChartConfig } from '@/components/ui/chart';
-import { mockReferrals } from '@/lib/mock-data'; // Using referrals as proxy for screening users
+import { mockReferrals } from '@/lib/mock-data'; 
 
-// Mock chart data
 const overallChartData = [
   { month: "Jan", hiv: 18, gbv: 12, prep: 20 },
   { month: "Feb", hiv: 25, gbv: 15, prep: 22 },
@@ -32,13 +32,13 @@ const chartConfig: ChartConfig = {
 
 const mockScreeningData = mockReferrals.map((referral, index) => ({
   id: referral.id,
-  userName: referral.patientName.replace(/\s+\((HIV|GBV|PrEP)\)/, ''), // Extract name
+  userName: referral.patientName.replace(/\s+\((HIV|GBV|PrEP)\)/, ''), 
   date: referral.referralDate,
   screeningType: referral.patientName.includes('(HIV)') ? 'HIV' : referral.patientName.includes('(GBV)') ? 'GBV' : 'PrEP',
   keyResult: referral.status === 'Pending Review' ? 'High Risk / Positive Indicators' : 'Moderate Risk',
-  referred: referral.status !== 'Closed' ? 'Yes' : 'No', // Example logic
-  age: 25 + (index * 3) % 15, // Mock age
-  gender: index % 2 === 0 ? 'Female' : 'Male', // Mock gender
+  referred: referral.status !== 'Closed' ? 'Yes' : 'No', 
+  age: 25 + (index * 3) % 15, 
+  gender: index % 2 === 0 ? 'Female' : 'Male', 
 }));
 
 
@@ -62,7 +62,7 @@ export default function ScreeningDataPage() {
           <Card className="shadow-lg mb-6">
             <CardHeader>
               <CardTitle className="text-xl font-medium text-primary flex items-center">
-                <BarChart className="mr-2 h-6 w-6" /> Screening Trends (All Types)
+                <LucideBarChart className="mr-2 h-6 w-6" /> Screening Trends (All Types)
               </CardTitle>
               <CardDescription>Monthly screening counts across HIV, GBV, and PrEP categories.</CardDescription>
             </CardHeader>
@@ -131,7 +131,7 @@ export default function ScreeningDataPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockScreeningData.slice(0, 5).map((screening) => ( // Display first 5 for brevity
+                    {mockScreeningData.slice(0, 5).map((screening) => ( 
                       <TableRow key={screening.id}>
                         <TableCell>{screening.userName}</TableCell>
                         <TableCell>{screening.date}</TableCell>
@@ -158,7 +158,7 @@ export default function ScreeningDataPage() {
               <CardDescription>Detailed metrics for HIV screenings. (Mock UI)</CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <LineChart className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
+              <LucideLineChart className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
               <p className="text-muted-foreground">HIV screening specific charts and data will appear here.</p>
             </CardContent>
           </Card>
@@ -170,7 +170,7 @@ export default function ScreeningDataPage() {
               <CardDescription>Detailed metrics for GBV screenings. (Mock UI)</CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <BarChart className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
+              <LucideBarChart className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
               <p className="text-muted-foreground">GBV screening specific charts and data will appear here.</p>
             </CardContent>
           </Card>
