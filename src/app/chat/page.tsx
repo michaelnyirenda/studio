@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 interface Message {
   id: string;
   text: string;
-  sender: 'user' | 'ai'; // 'user' is the patient/end-user, 'ai' is the admin/AI response
+  sender: 'user' | 'ai'; 
   timestamp: Date;
 }
 
@@ -33,7 +33,8 @@ interface ChatSession {
   messages: Message[];
 }
 
-const initialMockChatSessions: ChatSession[] = [
+// Function to generate initial mock chat sessions to be called on client
+const generateInitialMockChatSessions = (): ChatSession[] => [
   {
     userId: 'john-doe',
     userName: 'John Doe',
@@ -74,11 +75,12 @@ const initialMockChatSessions: ChatSession[] = [
   },
 ];
 
+
 export default function ChatPage() {
   const { toast } = useToast();
   const { role } = useRole();
-  const [mockChatSessions, setMockChatSessions] = useState<ChatSession[]>(initialMockChatSessions);
-  const [activeChatUserId, setActiveChatUserId] = useState<string | null>(role === 'user' ? 'john-doe' : null);
+  const [mockChatSessions, setMockChatSessions] = useState<ChatSession[]>([]); // Initialize with empty array
+  const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -86,6 +88,12 @@ export default function ChatPage() {
     resolver: zodResolver(ChatMessageSchema),
     defaultValues: { message: '' },
   });
+
+  // Generate initial mock sessions on client mount
+  useEffect(() => {
+    setMockChatSessions(generateInitialMockChatSessions());
+  }, []);
+
 
   const currentChatSession = useMemo(() => {
     if (!activeChatUserId) return null;
@@ -96,14 +104,19 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (role === 'user') {
-      setActiveChatUserId('john-doe');
-    } else {
-       // If admin and no chat selected, select the first one or none
+      // Ensure 'john-doe' exists before setting, especially if mockChatSessions loads async
+      if (mockChatSessions.some(session => session.userId === 'john-doe')) {
+        setActiveChatUserId('john-doe');
+      } else if (mockChatSessions.length > 0 && !activeChatUserId ) {
+         // Fallback if john-doe is not available but trying to set a default for user
+         setActiveChatUserId(mockChatSessions[0].userId);
+      }
+    } else { // admin role
        if (!activeChatUserId && mockChatSessions.length > 0) {
-         // setActiveChatUserId(mockChatSessions[0].userId); // Optionally select the first chat by default
+         // setActiveChatUserId(mockChatSessions[0].userId); // Optionally select the first chat for admin by default
        }
     }
-  }, [role, activeChatUserId, mockChatSessions]);
+  }, [role, mockChatSessions, activeChatUserId]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -118,7 +131,7 @@ export default function ChatPage() {
     }
     setIsSending(true);
 
-    const newMessageSender = role === 'admin' ? 'ai' : 'user'; // Admin sends as 'ai', user sends as 'user'
+    const newMessageSender = role === 'admin' ? 'ai' : 'user'; 
     const userMessage: Message = {
       id: `${newMessageSender}-${Date.now()}`,
       text: values.message,
@@ -135,14 +148,13 @@ export default function ChatPage() {
     );
     form.reset();
 
-    // AI responds regardless of who sent the message in this simulation
     const result = await sendChatMessageAction({ message: values.message });
 
     if (result.success && result.response) {
       const aiMessage: Message = {
         id: `ai-response-${Date.now()}`,
         text: result.response,
-        sender: 'ai', // AI's response is always from 'ai'
+        sender: 'ai', 
         timestamp: new Date(),
       };
       setMockChatSessions(prevSessions =>
@@ -158,7 +170,6 @@ export default function ChatPage() {
         description: result.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
-      // Rollback user message on failure
       setMockChatSessions(prevSessions =>
         prevSessions.map(session =>
           session.userId === activeChatUserId
@@ -187,6 +198,9 @@ export default function ChatPage() {
               </CardTitle>
             </CardHeader>
             <ScrollArea className="flex-grow">
+              {mockChatSessions.length === 0 && (
+                <p className="p-4 text-center text-sm text-muted-foreground">Loading chats...</p>
+              )}
               {mockChatSessions.map(session => (
                 <Button
                   key={session.userId}
@@ -219,8 +233,8 @@ export default function ChatPage() {
               )}
             </h2>
           </CardHeader>
-          <ScrollArea className="flex-grow p-4 space-y-8" ref={scrollAreaRef}> {/* Updated space-y-6 to space-y-8 */}
-            {!activeChatUserId && role === 'admin' && (
+          <ScrollArea className="flex-grow p-4 space-y-8" ref={scrollAreaRef}>
+            {!activeChatUserId && role === 'admin' && mockChatSessions.length > 0 && (
               <p className="text-center text-muted-foreground py-10">
                 Please select a user from the list to view their chat.
               </p>
@@ -230,16 +244,18 @@ export default function ChatPage() {
                 No messages in this chat yet. Start the conversation!
               </p>
             )}
+             {mockChatSessions.length === 0 && (role === 'user' || (role === 'admin' && !activeChatUserId)) && (
+              <p className="text-center text-muted-foreground py-10">Loading messages...</p>
+            )}
             {currentMessages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex items-end gap-2 ${
-                  (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai') // Admin's own messages
+                  (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai') 
                     ? 'justify-end' 
                     : 'justify-start'
                 }`}
               >
-                {/* Avatar for the other party */}
                 {((role === 'user' && msg.sender === 'ai') || (role === 'admin' && msg.sender === 'user')) && (
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
@@ -263,7 +279,6 @@ export default function ChatPage() {
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
-                 {/* Avatar for self */}
                 {((role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')) && (
                   <Avatar className="h-8 w-8">
                      <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
@@ -303,10 +318,13 @@ export default function ChatPage() {
               </Form>
             </CardFooter>
           )}
+           {!activeChatUserId && role === 'user' && mockChatSessions.length > 0 && (
+             <CardFooter className="p-4 border-t justify-center">
+                <p className="text-sm text-muted-foreground">Setting up your chat...</p>
+             </CardFooter>
+           )}
         </Card>
       </div>
     </div>
   );
 }
-
-    
