@@ -102,7 +102,7 @@ export default function ScreeningPage() {
           description="Determine if PrEP (Pre-Exposure Prophylaxis) is a suitable HIV prevention option for you."
           icon={<Pill className="h-10 w-10 text-primary mb-3" />}
           onSelect={() => handleSelectScreening('prep')}
-          imageSrc="https://images.unsplash.com/photo-1584308666744-848080a99157?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaGFybWFjeSUyMHBpbGxzfGVufDB8fHx8MTc1MDI4MTQzMnww&ixlib=rb-4.1.0&q=80&w=1080"
+          imageSrc="https://images.unsplash.com/photo-1625402534923-e8132f4b1de4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxOXx8bWVkaWNhdGlvbnxlbnwwfHx8fDE3NTAzMTI4NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080"
           imageAlt="Pills and medication"
           imageHint="medication pills"
         />
