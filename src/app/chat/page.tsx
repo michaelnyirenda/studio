@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 interface Message {
   id: string;
   text: string;
-  sender: 'user' | 'ai'; 
+  sender: 'user' | 'ai';
   timestamp: Date;
 }
 
@@ -131,7 +131,7 @@ export default function ChatPage() {
     }
     setIsSending(true);
 
-    const newMessageSender = role === 'admin' ? 'ai' : 'user'; 
+    const newMessageSender = role === 'admin' ? 'ai' : 'user';
     const userMessage: Message = {
       id: `${newMessageSender}-${Date.now()}`,
       text: values.message,
@@ -154,7 +154,7 @@ export default function ChatPage() {
       const aiMessage: Message = {
         id: `ai-response-${Date.now()}`,
         text: result.response,
-        sender: 'ai', 
+        sender: 'ai',
         timestamp: new Date(),
       };
       setMockChatSessions(prevSessions =>
@@ -180,7 +180,7 @@ export default function ChatPage() {
     }
     setIsSending(false);
   }
-  
+
   const pageTitle = role === 'admin' ? "Admin Chat Console" : "Chat with Support";
   const pageDescription = role === 'admin' ? "Respond to user queries and manage conversations." : "Connect with our support team for assistance.";
 
@@ -225,7 +225,7 @@ export default function ChatPage() {
              <h2 className="text-xl font-semibold text-primary flex items-center">
               {currentChatSession ? (
                 <>
-                  <MessageCircle className="mr-2 h-6 w-6"/> 
+                  <MessageCircle className="mr-2 h-6 w-6"/>
                   Chat with {currentChatSession.userName}
                 </>
               ) : (
@@ -233,61 +233,63 @@ export default function ChatPage() {
               )}
             </h2>
           </CardHeader>
-          <ScrollArea className="flex-grow p-4 space-y-8" ref={scrollAreaRef}>
-            {!activeChatUserId && role === 'admin' && mockChatSessions.length > 0 && (
-              <p className="text-center text-muted-foreground py-10">
-                Please select a user from the list to view their chat.
-              </p>
-            )}
-            {activeChatUserId && currentMessages.length === 0 && (
-              <p className="text-center text-muted-foreground py-10">
-                No messages in this chat yet. Start the conversation!
-              </p>
-            )}
-             {mockChatSessions.length === 0 && (role === 'user' || (role === 'admin' && !activeChatUserId)) && (
-              <p className="text-center text-muted-foreground py-10">Loading messages...</p>
-            )}
-            {currentMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex items-end gap-2 ${
-                  (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai') 
-                    ? 'justify-end' 
-                    : 'justify-start'
-                }`}
-              >
-                {((role === 'user' && msg.sender === 'ai') || (role === 'admin' && msg.sender === 'user')) && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
-                      {msg.sender === 'ai' ? <Bot size={18} /> : <User size={18} />}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
+          <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
+            <div className="space-y-8"> {/* Added wrapper div and moved space-y-8 here */}
+              {!activeChatUserId && role === 'admin' && mockChatSessions.length > 0 && (
+                <p className="text-center text-muted-foreground py-10">
+                  Please select a user from the list to view their chat.
+                </p>
+              )}
+              {activeChatUserId && currentMessages.length === 0 && (
+                <p className="text-center text-muted-foreground py-10">
+                  No messages in this chat yet. Start the conversation!
+                </p>
+              )}
+               {mockChatSessions.length === 0 && (role === 'user' || (role === 'admin' && !activeChatUserId)) && (
+                <p className="text-center text-muted-foreground py-10">Loading messages...</p>
+              )}
+              {currentMessages.map((msg) => (
                 <div
-                  className={`max-w-[70%] rounded-lg px-3 py-2 text-sm shadow ${
+                  key={msg.id}
+                  className={`flex items-end gap-2 ${
                     (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-card border'
+                      ? 'justify-end'
+                      : 'justify-start'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{msg.text}</p>
-                  <p className={`text-xs mt-1 ${
-                      (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')
-                        ? 'text-primary-foreground/70 text-right' 
-                        : 'text-muted-foreground/70 text-left'
-                    }`}>
-                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-                {((role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')) && (
-                  <Avatar className="h-8 w-8">
-                     <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
+                  {((role === 'user' && msg.sender === 'ai') || (role === 'admin' && msg.sender === 'user')) && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
                         {msg.sender === 'ai' ? <Bot size={18} /> : <User size={18} />}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-              </div>
-            ))}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div
+                    className={`max-w-[70%] rounded-lg px-3 py-2 text-sm shadow ${
+                      (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card border'
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap">{msg.text}</p>
+                    <p className={`text-xs mt-1 ${
+                        (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')
+                          ? 'text-primary-foreground/70 text-right'
+                          : 'text-muted-foreground/70 text-left'
+                      }`}>
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                  {((role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')) && (
+                    <Avatar className="h-8 w-8">
+                       <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
+                          {msg.sender === 'ai' ? <Bot size={18} /> : <User size={18} />}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              ))}
+            </div>
           </ScrollArea>
           {activeChatUserId && (
             <CardFooter className="p-4 border-t">
@@ -299,11 +301,11 @@ export default function ChatPage() {
                     render={({ field }) => (
                       <FormItem className="flex-grow">
                         <FormControl>
-                          <Input 
-                            placeholder={role === 'admin' ? `Reply to ${currentChatSession?.userName}...` : "Type your message..."} 
-                            {...field} 
-                            disabled={isSending || !activeChatUserId} 
-                            autoComplete="off" 
+                          <Input
+                            placeholder={role === 'admin' ? `Reply to ${currentChatSession?.userName}...` : "Type your message..."}
+                            {...field}
+                            disabled={isSending || !activeChatUserId}
+                            autoComplete="off"
                           />
                         </FormControl>
                         <FormMessage />
