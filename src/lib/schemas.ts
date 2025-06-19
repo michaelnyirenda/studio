@@ -14,8 +14,30 @@ export const HivScreeningSchema = z.object({
   sexualActivity: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option for sexual activity." }),
   testingHistory: z.enum(["never_tested", "tested_negative", "tested_positive", "prefer_not_to_say"], { required_error: "Please select an option for testing history." }),
 });
-
 export type HivScreeningFormData = z.infer<typeof HivScreeningSchema>;
+
+export const GbvScreeningSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  feltUnsafe: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option." }),
+  experiencedHarm: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option." }),
+  hasSafePlace: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option." }),
+  wantsSupportInfo: z.enum(["yes", "no"], { required_error: "Please select an option." }),
+});
+export type GbvScreeningFormData = z.infer<typeof GbvScreeningSchema>;
+
+export const PrEpScreeningSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  partnersLast6Months: z.enum(["0", "1", "2-4", "5+", "prefer_not_to_say"], { required_error: "Please select an option."}),
+  knowPartnerStatus: z.enum(["yes_all", "yes_some", "no", "prefer_not_to_say"], { required_error: "Please select an option."}),
+  consistentCondomUse: z.enum(["always", "sometimes", "rarely", "never", "prefer_not_to_say"], { required_error: "Please select an option."}),
+  stiLast6Months: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option."}),
+  currentPrevention: z.string().max(100, "Response is too long.").optional(),
+  wantsPrEpInfo: z.enum(["yes", "no"], { required_error: "Please select an option." }),
+});
+export type PrEpScreeningFormData = z.infer<typeof PrEpScreeningSchema>;
+
 
 export const UpdateReferralFormSchema = z.object({
   status: z.enum(['Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
@@ -33,3 +55,4 @@ export const ChatResponseSchema = z.object({
   response: z.string(),
 });
 export type ChatResponseType = z.infer<typeof ChatResponseSchema>;
+

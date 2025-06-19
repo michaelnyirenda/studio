@@ -23,8 +23,9 @@ And another line in the same paragraph.
 
 Key Features to Explore:
 - Community Forum: Engage in discussions.
-- Attendance Capture: Track participation.
 - HIV Screening: Access confidential screening.
+- PrEP Screening: Learn about PrEP.
+- GBV Screening: Access GBV support information.
 
 We hope you find this platform valuable!`,
     author: '#BeFree Admin', 
@@ -75,27 +76,35 @@ export interface MockReferral {
 
 export const mockReferrals: MockReferral[] = [
   {
-    id: 'ref1',
-    patientName: 'John Doe',
+    id: 'ref-hiv-john-doe-1627840000000', // Example static ID for predictability in user mode
+    patientName: 'John Doe (HIV)',
     referralDate: 'August 1, 2024',
     referralMessage: 'Dear John Doe, thank you for completing the screening. Given your sexual activity and no prior testing, a referral for HIV testing and counseling is recommended. Please consult a healthcare professional to discuss this further. Early testing is key for your health.',
     status: 'Pending Review',
-    notes: 'Patient seemed anxious during screening.',
+    notes: 'Patient seemed anxious during HIV screening.',
   },
   {
-    id: 'ref2',
-    patientName: 'Jane Smith',
+    id: 'ref-gbv-jane-smith-1627926400000',
+    patientName: 'Jane Smith (GBV)',
     referralDate: 'August 2, 2024',
-    referralMessage: 'Dear Jane Smith, thank you for completing the screening. We acknowledge your testing history. It\'s important to continue with regular medical follow-ups and adhere to any prescribed treatment. If you need support or further consultation, please reach out to a healthcare provider.',
+    referralMessage: 'Based on your GBV screening, the following guidance was provided: We are concerned that you have experienced harm. It is important to seek support. We can provide you with information on available resources.',
     status: 'Contacted',
-    notes: 'Patient was receptive during the call. Appointment scheduled for next week.',
+    notes: 'Patient was receptive during the call. Safety planning discussed, resources provided.',
   },
   {
-    id: 'ref3',
-    patientName: 'Alex Lee',
+    id: 'ref-prep-alex-lee-1628012800000',
+    patientName: 'Alex Lee (PrEP)',
     referralDate: 'August 3, 2024',
-    referralMessage: 'Dear Alex Lee, thank you for completing the screening. It\'s good that you are aware of your status. Remember that regular testing is advisable if you are sexually active. Please consult a healthcare professional about appropriate testing frequency for you.',
+    referralMessage: 'Based on your PrEP screening, the following guidance was provided: Based on your responses, you may have factors that increase your risk of HIV exposure. PrEP (Pre-Exposure Prophylaxis) is a highly effective medication to prevent HIV. We recommend discussing PrEP with a healthcare provider to see if it\'s right for you.',
     status: 'Follow-up Scheduled',
+    notes: 'PrEP consultation scheduled with Dr. Carter.',
+  },
+   {
+    id: 'ref-hiv-samuel-green-1628099200000',
+    patientName: 'Samuel Green (HIV)',
+    referralDate: 'August 4, 2024',
+    referralMessage: 'Dear Samuel Green, we acknowledge your testing history. It\'s important to continue with regular medical follow-ups and adhere to any prescribed treatment. If you need support or further consultation, please reach out to a healthcare provider.',
+    status: 'Closed',
+    notes: 'Patient confirmed linkage to care.',
   },
 ];
-
