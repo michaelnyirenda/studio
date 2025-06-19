@@ -29,8 +29,8 @@ interface Message {
 interface ChatSession {
   userId: string;
   userName: string;
-  messages: Message[];
   avatarFallback: string;
+  messages: Message[];
 }
 
 const initialMockChatSessions: ChatSession[] = [
@@ -219,7 +219,7 @@ export default function ChatPage() {
               )}
             </h2>
           </CardHeader>
-          <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
+          <ScrollArea className="flex-grow p-4 space-y-6" ref={scrollAreaRef}> {/* Updated space-y-4 to space-y-6 */}
             {!activeChatUserId && role === 'admin' && (
               <p className="text-center text-muted-foreground py-10">
                 Please select a user from the list to view their chat.
