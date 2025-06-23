@@ -193,8 +193,69 @@ export default function ScreeningForm() {
                 {renderQuestion("consumedAlcohol", "A10. In the past 12 months, have you been consuming alcohol?", [{value: 'any', label: 'Consumed any alcohol'}, {value: 'none', label: 'Did not consume any alcohol'}, {value: 'cant_remember', label: 'Cannot Remember'}, {value: 'refused', label: 'Refused to answer'}])}
                 {watchConsumedAlcohol === 'any' && renderQuestion("alcoholFrequency", "A11. In the past 12 Months, how often have you consumed alcohol?", [{value: 'every_day', label: 'Every day'}, {value: 'every_week', label: 'Every Week'}, {value: '2_3_times_month', label: '2-3 times a month'}, {value: 'once_month', label: 'Once a month'}, {value: 'special_occasions', label: 'Only on specific occasions (parties)'}, {value: 'never', label: 'Never consumed alcohol'}])}
                 
-                <FormField control={form.control} name="symptoms" render={() => ( <FormItem> <FormLabel className="text-lg">A12. Are you having any of the following symptoms for more than 2 weeks? (Tick all that apply)</FormLabel> <div className="space-y-2"> {symptomsItems.map((item) => ( <FormField key={item.id} control={form.control} name="symptoms" render={({ field }) => { const isChecked = field.value?.includes(item.id) || false; return ( <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0"> <FormControl> <Checkbox checked={isChecked} onCheckedChange={(checked) => { const currentVal = field.value || []; if (item.id === 'no') { return field.onChange(checked ? ['no'] : []); } else { const newArr = currentVal.filter(v => v !== 'no'); return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id)); } }} /> </FormControl> <FormLabel className="font-normal">{item.label}</FormLabel> </FormItem> ); }} /> ))} </div> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="pregnancyHistory" render={() => ( <FormItem> <FormLabel className="text-lg">A13. Have you ever been pregnant? (Tick all that apply)</FormLabel> <div className="space-y-2"> {pregnancyItems.map((item) => ( <FormField key={item.id} control={form.control} name="pregnancyHistory" render={({ field }) => { const isChecked = field.value?.includes(item.id) || false; return ( <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0"> <FormControl> <Checkbox checked={isChecked} onCheckedChange={(checked) => { const currentVal = field.value || []; if (item.id === 'never_pregnant') { return field.onChange(checked ? ['never_pregnant'] : []); } else { const newArr = currentVal.filter(v => v !== 'never_pregnant'); return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id)); } }} /> </FormControl> <FormLabel className="font-normal">{item.label}</FormLabel> </FormItem> ); }} /> ))} </div> <FormMessage /> </FormItem> )} />
+                <FormField
+                  control={form.control}
+                  name="symptoms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg">A12. Are you having any of the following symptoms for more than 2 weeks? (Tick all that apply)</FormLabel>
+                      <div className="space-y-2">
+                        {symptomsItems.map((item) => (
+                          <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item.id)}
+                                onCheckedChange={(checked) => {
+                                  const currentVal = field.value || [];
+                                  if (item.id === 'no') {
+                                    return field.onChange(checked ? ['no'] : []);
+                                  } else {
+                                    const newArr = currentVal.filter(v => v !== 'no');
+                                    return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">{item.label}</FormLabel>
+                          </FormItem>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="pregnancyHistory"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg">A13. Have you ever been pregnant? (Tick all that apply)</FormLabel>
+                      <div className="space-y-2">
+                        {pregnancyItems.map((item) => (
+                          <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item.id)}
+                                onCheckedChange={(checked) => {
+                                  const currentVal = field.value || [];
+                                  if (item.id === 'never_pregnant') {
+                                    return field.onChange(checked ? ['never_pregnant'] : []);
+                                  } else {
+                                    const newArr = currentVal.filter(v => v !== 'never_pregnant');
+                                    return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">{item.label}</FormLabel>
+                          </FormItem>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 {watchPregnancyHistory && !watchPregnancyHistory.includes('never_pregnant') && watchPregnancyHistory.length > 0 && renderQuestion("attendingAnc", "A14. If you are pregnant or had a child in the past 6 weeks, are you attending care?", [{value: 'attending_anc', label: 'Attending ANC/PMTCT'}, {value: 'attending_post_natal', label: 'Attending Post Natal Care'}, {value: 'eligible_not_attending', label: 'Eligible but not attending'}, {value: 'na', label: 'N/A'}])}
                 
@@ -202,7 +263,7 @@ export default function ScreeningForm() {
                 {watchIsOrphan === 'yes' && renderQuestion("orphanStatus", "If yes, please specify:", [{value: 'single', label: 'Single (lost one parent)'}, {value: 'double', label: 'Double (lost both parents)'}, {value: 'child_headed', label: 'Child-headed household (no adult carer)'}])}
 
                 {renderQuestion("hasDisability", "A16. Do you identify as a person living with a disability?", [{value: 'yes', label: 'Yes'}, {value: 'no', label: 'No'}])}
-                {watchHasDisability === 'yes' && renderQuestion("isDisabilityRegistered", "If yes, are you registered?", [{value: 'yes', label: 'Yes'}, {value: 'no', 'label': 'No'}])}
+                {watchHasDisability === 'yes' && renderQuestion("isDisabilityRegistered", "If yes, are you registered?", [{value: 'yes', label: 'No'}])}
              </div>
 
             {referralMessage && (
