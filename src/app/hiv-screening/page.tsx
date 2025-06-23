@@ -122,7 +122,7 @@ export default function ScreeningPage() {
           description="Screening for Sexually Transmitted Infections. Learn about symptoms and testing."
           icon={<TestTube2 className="h-10 w-10 text-primary mb-3" />}
           onSelect={() => handleSelectScreening('sti')}
-          imageSrc="https://images.unsplash.com/photo-1579154288024-4235284a148a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsYWJvcmF0b3J5JTIwdGVzdHxlbnwwfHx8fDE3NTAzMTI5NTB8MA&ixlib=rb-4.1.0&q=80&w=1080"
+          imageSrc="https://images.unsplash.com/photo-1625869736621-784a42674da4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxOHx8bWVkaWNhbCUyMHBhdGllbnR8ZW58MHx8fHwxNzUwNjY5NDQ2fDA&ixlib=rb-4.1.0&q=80&w=1080"
           imageAlt="Laboratory test tubes"
           imageHint="laboratory test"
         />
