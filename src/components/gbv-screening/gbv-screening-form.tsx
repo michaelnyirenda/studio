@@ -114,7 +114,7 @@ export default function GbvScreeningForm() {
                 <FormItem>
                   <FormLabel className="text-lg">Age</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Enter your age" {...field} onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)} />
+                    <Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

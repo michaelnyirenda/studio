@@ -155,7 +155,7 @@ export default function ScreeningForm() {
             {/* Basic Info */}
             <div className="space-y-4">
                <FormField control={form.control} name="name" render={({ field }) => (<FormItem><FormLabel className="text-lg">Full Name</FormLabel><FormControl><Input placeholder="Enter your full name" {...field} /></FormControl><FormMessage /></FormItem>)} />
-               <FormField control={form.control} name="age" render={({ field }) => (<FormItem><FormLabel className="text-lg">Age</FormLabel><FormControl><Input type="number" placeholder="Enter your age" {...field} onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)} /></FormControl><FormMessage /></FormItem>)} />
+               <FormField control={form.control} name="age" render={({ field }) => (<FormItem><FormLabel className="text-lg">Age</FormLabel><FormControl><Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)} /></FormControl><FormMessage /></FormItem>)} />
             </div>
             <Separator/>
              {/* HIV Testing History */}
@@ -193,31 +193,40 @@ export default function ScreeningForm() {
                 {renderQuestion("consumedAlcohol", "A10. In the past 12 months, have you been consuming alcohol?", [{value: 'any', label: 'Consumed any alcohol'}, {value: 'none', label: 'Did not consume any alcohol'}, {value: 'cant_remember', label: 'Cannot Remember'}, {value: 'refused', label: 'Refused to answer'}])}
                 {watchConsumedAlcohol === 'any' && renderQuestion("alcoholFrequency", "A11. In the past 12 Months, how often have you consumed alcohol?", [{value: 'every_day', label: 'Every day'}, {value: 'every_week', label: 'Every Week'}, {value: '2_3_times_month', label: '2-3 times a month'}, {value: 'once_month', label: 'Once a month'}, {value: 'special_occasions', label: 'Only on specific occasions (parties)'}, {value: 'never', label: 'Never consumed alcohol'}])}
                 
-                <FormField
+                 <FormField
                   control={form.control}
                   name="symptoms"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel className="text-lg">A12. Are you having any of the following symptoms for more than 2 weeks? (Tick all that apply)</FormLabel>
-                      <div className="space-y-2">
+                       <div className="space-y-2">
                         {symptomsItems.map((item) => (
-                          <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  const currentVal = field.value || [];
-                                  if (item.id === 'no') {
-                                    return field.onChange(checked ? ['no'] : []);
-                                  } else {
-                                    const newArr = currentVal.filter(v => v !== 'no');
-                                    return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">{item.label}</FormLabel>
-                          </FormItem>
+                           <FormField
+                            key={item.id}
+                            control={form.control}
+                            name="symptoms"
+                            render={({ field }) => {
+                              return (
+                                <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(item.id)}
+                                      onCheckedChange={(checked) => {
+                                        const currentVal = field.value || [];
+                                        if (item.id === 'no') {
+                                          return field.onChange(checked ? ['no'] : []);
+                                        } else {
+                                          const newArr = currentVal.filter(v => v !== 'no');
+                                          return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
+                                        }
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">{item.label}</FormLabel>
+                                </FormItem>
+                              )
+                            }}
+                          />
                         ))}
                       </div>
                       <FormMessage />
@@ -228,28 +237,37 @@ export default function ScreeningForm() {
                 <FormField
                   control={form.control}
                   name="pregnancyHistory"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
-                      <FormLabel className="text-lg">A13. Have you ever been pregnant? (Tick all that apply)</FormLabel>
-                      <div className="space-y-2">
+                       <FormLabel className="text-lg">A13. Have you ever been pregnant? (Tick all that apply)</FormLabel>
+                       <div className="space-y-2">
                         {pregnancyItems.map((item) => (
-                          <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  const currentVal = field.value || [];
-                                  if (item.id === 'never_pregnant') {
-                                    return field.onChange(checked ? ['never_pregnant'] : []);
-                                  } else {
-                                    const newArr = currentVal.filter(v => v !== 'never_pregnant');
-                                    return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">{item.label}</FormLabel>
-                          </FormItem>
+                           <FormField
+                            key={item.id}
+                            control={form.control}
+                            name="pregnancyHistory"
+                            render={({ field }) => {
+                              return (
+                                <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(item.id)}
+                                      onCheckedChange={(checked) => {
+                                        const currentVal = field.value || [];
+                                        if (item.id === 'never_pregnant') {
+                                          return field.onChange(checked ? ['never_pregnant'] : []);
+                                        } else {
+                                          const newArr = currentVal.filter(v => v !== 'never_pregnant');
+                                          return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
+                                        }
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">{item.label}</FormLabel>
+                                </FormItem>
+                              )
+                            }}
+                          />
                         ))}
                       </div>
                       <FormMessage />
