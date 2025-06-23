@@ -30,22 +30,27 @@ function getStatusVariant(status: MockReferral['status']): 'default' | 'secondar
 export default function ReferralsPage() {
   const { role } = useRole();
   const [referrals, setReferrals] = useState<MockReferral[]>(initialReferrals);
+  
+  // In a real app, this would come from an authentication context.
+  // We'll hardcode one of the mock users to simulate a logged-in user.
+  const MOCK_CURRENT_USER = 'John Doe (HIV)';
 
   const pendingUserReferral = useMemo(() => {
     if (role === 'user') {
-      return referrals.find(r => r.consentStatus === 'pending');
+      // Find the pending referral for the SPECIFIC user.
+      return referrals.find(r => r.patientName === MOCK_CURRENT_USER && r.consentStatus === 'pending');
     }
     return null;
   }, [role, referrals]);
 
   const displayReferrals = useMemo(() => {
     if (role === 'user') {
-      // Show agreed referrals, excluding the one pending consent
-      return referrals.filter(r => r.id !== pendingUserReferral?.id && r.consentStatus === 'agreed');
+      // For a user, show only their own agreed referrals.
+      return referrals.filter(r => r.patientName === MOCK_CURRENT_USER && r.consentStatus === 'agreed');
     }
-    // Admin sees all agreed referrals
+    // For an admin, show all agreed referrals from all users.
     return referrals.filter(r => r.consentStatus === 'agreed');
-  }, [role, referrals, pendingUserReferral]);
+  }, [role, referrals]);
   
   const handleConsentSubmit = (referralId: string, facility: string) => {
     setReferrals(prevReferrals =>
