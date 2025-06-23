@@ -46,6 +46,7 @@ export default function DataExportPage() {
                 <SelectItem value="hiv_screening">HIV Screening Data</SelectItem>
                 <SelectItem value="gbv_screening">GBV Screening Data</SelectItem>
                 <SelectItem value="prep_screening">PrEP Screening Data</SelectItem>
+                <SelectItem value="sti_screening">STI Screening Data</SelectItem>
                 <SelectItem value="referral_data">Referral Data</SelectItem>
                 <SelectItem value="forum_posts">Forum Posts Data</SelectItem>
                 <SelectItem value="user_accounts">User Accounts Data</SelectItem>

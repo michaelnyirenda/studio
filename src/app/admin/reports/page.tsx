@@ -9,37 +9,60 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
-import { BarChart as LucideBarChart, LineChart as LucideLineChart, Users, Filter, Download } from 'lucide-react'; 
+import { BarChart as LucideBarChart, LineChart as LucideLineChart, Users, Filter, Download, TestTube2 } from 'lucide-react'; 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart as ShadBarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts'; 
 import type { ChartConfig } from '@/components/ui/chart';
 import { mockReferrals } from '@/lib/mock-data'; 
 
 const overallChartData = [
-  { month: "Jan", hiv: 18, gbv: 12, prep: 20 },
-  { month: "Feb", hiv: 25, gbv: 15, prep: 22 },
-  { month: "Mar", hiv: 30, gbv: 18, prep: 25 },
-  { month: "Apr", hiv: 22, gbv: 20, prep: 28 },
-  { month: "May", hiv: 27, gbv: 22, prep: 30 },
-  { month: "Jun", hiv: 35, gbv: 25, prep: 33 },
+  { month: "Jan", hiv: 18, gbv: 12, prep: 20, sti: 8 },
+  { month: "Feb", hiv: 25, gbv: 15, prep: 22, sti: 11 },
+  { month: "Mar", hiv: 30, gbv: 18, prep: 25, sti: 14 },
+  { month: "Apr", hiv: 22, gbv: 20, prep: 28, sti: 18 },
+  { month: "May", hiv: 27, gbv: 22, prep: 30, sti: 16 },
+  { month: "Jun", hiv: 35, gbv: 25, prep: 33, sti: 20 },
 ];
 
 const chartConfig: ChartConfig = {
   hiv: { label: "HIV Screenings", color: "hsl(var(--chart-1))" },
   gbv: { label: "GBV Screenings", color: "hsl(var(--chart-2))" },
   prep: { label: "PrEP Screenings", color: "hsl(var(--chart-3))" },
+  sti: { label: "STI Screenings", color: "hsl(var(--chart-4))" },
 };
 
-const mockScreeningData = mockReferrals.map((referral, index) => ({
-  id: referral.id,
-  userName: referral.patientName.replace(/\s+\((HIV|GBV|PrEP)\)/, ''), 
-  date: referral.referralDate,
-  screeningType: referral.patientName.includes('(HIV)') ? 'HIV' : referral.patientName.includes('(GBV)') ? 'GBV' : 'PrEP',
-  keyResult: referral.status === 'Pending Review' ? 'High Risk / Positive Indicators' : 'Moderate Risk',
-  referred: referral.status !== 'Closed' ? 'Yes' : 'No', 
-  age: 25 + (index * 3) % 15, 
-  gender: index % 2 === 0 ? 'Female' : 'Male', 
-}));
+const getScreeningType = (index: number) => {
+  const typeIndex = index % 4;
+  switch (typeIndex) {
+    case 0: return 'HIV';
+    case 1: return 'GBV';
+    case 2: return 'PrEP';
+    case 3: return 'STI';
+    default: return 'HIV';
+  }
+};
+
+const mockScreeningData = mockReferrals.flatMap((referral, index) => {
+  const baseData = {
+    id: referral.id,
+    userName: referral.patientName.replace(/\s+\((HIV|GBV|PrEP|STI)\)/, ''), 
+    date: referral.referralDate,
+    keyResult: referral.status === 'Pending Review' ? 'High Risk / Positive Indicators' : 'Moderate Risk',
+    referred: referral.status !== 'Closed' ? 'Yes' : 'No', 
+    age: 25 + (index * 3) % 15, 
+    gender: index % 2 === 0 ? 'Female' : 'Male', 
+  };
+  
+  // Create a record for each type for varied data
+  return ['HIV', 'GBV', 'PrEP', 'STI'].map((type, typeIndex) => ({
+      ...baseData,
+      id: `${referral.id}-${type}`,
+      screeningType: type,
+      // Make some data unique per type
+      userName: `${baseData.userName}`, 
+      keyResult: (index + typeIndex) % 3 === 0 ? 'High Risk / Positive Indicators' : ((index + typeIndex) % 3 === 1 ? 'Moderate Risk' : 'Low Risk'),
+  }));
+}).slice(0, 10); // Limit total mock data
 
 
 export default function ScreeningDataPage() {
@@ -51,11 +74,12 @@ export default function ScreeningDataPage() {
       />
       
       <Tabs defaultValue="overall_summary" className="mt-8">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6">
           <TabsTrigger value="overall_summary">Overall Summary</TabsTrigger>
           <TabsTrigger value="hiv_analytics">HIV Analytics</TabsTrigger>
           <TabsTrigger value="gbv_analytics">GBV Analytics</TabsTrigger>
           <TabsTrigger value="prep_analytics">PrEP Analytics</TabsTrigger>
+          <TabsTrigger value="sti_analytics">STI Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overall_summary">
@@ -64,7 +88,7 @@ export default function ScreeningDataPage() {
               <CardTitle className="text-xl font-medium text-primary flex items-center">
                 <LucideBarChart className="mr-2 h-6 w-6" /> Screening Trends (All Types)
               </CardTitle>
-              <CardDescription>Monthly screening counts across HIV, GBV, and PrEP categories.</CardDescription>
+              <CardDescription>Monthly screening counts across all categories.</CardDescription>
             </CardHeader>
             <CardContent>
                <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
@@ -81,6 +105,7 @@ export default function ScreeningDataPage() {
                   <Bar dataKey="hiv" fill="var(--color-hiv)" radius={4} />
                   <Bar dataKey="gbv" fill="var(--color-gbv)" radius={4} />
                   <Bar dataKey="prep" fill="var(--color-prep)" radius={4} />
+                  <Bar dataKey="sti" fill="var(--color-sti)" radius={4} />
                 </ShadBarChart>
               </ChartContainer>
             </CardContent>
@@ -102,6 +127,7 @@ export default function ScreeningDataPage() {
                     <SelectItem value="hiv">HIV</SelectItem>
                     <SelectItem value="gbv">GBV</SelectItem>
                     <SelectItem value="prep">PrEP</SelectItem>
+                    <SelectItem value="sti">STI</SelectItem>
                   </SelectContent>
                 </Select>
                  <Select defaultValue="any_result">
@@ -135,7 +161,14 @@ export default function ScreeningDataPage() {
                       <TableRow key={screening.id}>
                         <TableCell>{screening.userName}</TableCell>
                         <TableCell>{screening.date}</TableCell>
-                        <TableCell><Badge variant={screening.screeningType === 'HIV' ? 'default' : screening.screeningType === 'GBV' ? 'destructive' : 'secondary'}>{screening.screeningType}</Badge></TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            screening.screeningType === 'HIV' ? 'default' : 
+                            screening.screeningType === 'GBV' ? 'destructive' : 
+                            screening.screeningType === 'PrEP' ? 'secondary' : 
+                            'outline'
+                          }>{screening.screeningType}</Badge>
+                        </TableCell>
                         <TableCell>{screening.keyResult}</TableCell>
                         <TableCell>{screening.referred}</TableCell>
                         <TableCell className="text-right">
@@ -184,6 +217,18 @@ export default function ScreeningDataPage() {
             <CardContent className="text-center">
               <Users className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
               <p className="text-muted-foreground">PrEP screening specific charts and data will appear here.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+         <TabsContent value="sti_analytics">
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>STI Screening Analytics</CardTitle>
+              <CardDescription>Detailed metrics for STI screenings. (Mock UI)</CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <TestTube2 className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
+              <p className="text-muted-foreground">STI screening specific charts and data will appear here.</p>
             </CardContent>
           </Card>
         </TabsContent>

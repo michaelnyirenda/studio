@@ -38,6 +38,15 @@ export const PrEpScreeningSchema = z.object({
 });
 export type PrEpScreeningFormData = z.infer<typeof PrEpScreeningSchema>;
 
+export const StiScreeningSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  symptoms: z.enum(['yes', 'no', 'unsure'], { required_error: "Please select an option." }),
+  partnerSymptoms: z.enum(['yes', 'no', 'unsure', 'unknown'], { required_error: "Please select an option." }),
+  wantsTesting: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
+});
+export type StiScreeningFormData = z.infer<typeof StiScreeningSchema>;
+
 
 export const UpdateReferralFormSchema = z.object({
   status: z.enum(['Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
@@ -55,4 +64,5 @@ export const ChatResponseSchema = z.object({
   response: z.string(),
 });
 export type ChatResponseType = z.infer<typeof ChatResponseSchema>;
+
 

@@ -6,11 +6,12 @@ import PageHeader from '@/components/shared/page-header';
 import ScreeningForm from '@/components/hiv-screening/screening-form';
 import GbvScreeningForm from '@/components/gbv-screening/gbv-screening-form';
 import PrEpScreeningForm from '@/components/prep-screening/prep-screening-form';
+import StiScreeningForm from '@/components/sti-screening/sti-screening-form';
 import ScreeningTypeCard from '@/components/hiv-screening/screening-type-card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, ShieldAlert, Pill, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Pill, ArrowLeft, TestTube2 } from 'lucide-react';
 
-type ScreeningType = 'hiv' | 'gbv' | 'prep' | null;
+type ScreeningType = 'hiv' | 'gbv' | 'prep' | 'sti' | null;
 
 export default function ScreeningPage() {
   const [selectedScreening, setSelectedScreening] = useState<ScreeningType>(null);
@@ -55,6 +56,16 @@ export default function ScreeningPage() {
             <PrEpScreeningForm />
           </>
         );
+      case 'sti':
+        return (
+          <>
+            <PageHeader
+              title="STI Screening"
+              description="This confidential screening helps assess your risk for Sexually Transmitted Infections and provides guidance on testing."
+            />
+            <StiScreeningForm />
+          </>
+        );
       default:
         return null;
     }
@@ -78,7 +89,7 @@ export default function ScreeningPage() {
         title="Select Screening Type"
         description="Choose the type of screening you would like to proceed with. All screenings are confidential."
       />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <ScreeningTypeCard
           title="HIV Screening"
           description="Assess your risk for HIV and receive guidance on next steps. Confidential and informative."
@@ -105,6 +116,15 @@ export default function ScreeningPage() {
           imageSrc="https://images.unsplash.com/photo-1625402534923-e8132f4b1de4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxOXx8bWVkaWNhdGlvbnxlbnwwfHx8fDE3NTAzMTI4NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080"
           imageAlt="Pills and medication"
           imageHint="medication pills"
+        />
+        <ScreeningTypeCard
+          title="STI Screening"
+          description="Screening for Sexually Transmitted Infections. Learn about symptoms and testing."
+          icon={<TestTube2 className="h-10 w-10 text-primary mb-3" />}
+          onSelect={() => handleSelectScreening('sti')}
+          imageSrc="https://images.unsplash.com/photo-1579154288024-4235284a148a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsYWJvcmF0b3J5JTIwdGVzdHxlbnwwfHx8fDE3NTAzMTI5NTB8MA&ixlib=rb-4.1.0&q=80&w=1080"
+          imageAlt="Laboratory test tubes"
+          imageHint="laboratory test"
         />
       </div>
     </div>
