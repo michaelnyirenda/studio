@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -7,7 +6,7 @@ import { RoleProvider } from '@/contexts/role-context';
 import AdminToggleButton from '@/components/shared/admin-toggle-button';
 
 export const metadata: Metadata = {
-  title: '#BeFree',
+  title: 'i-BreakFree',
   description: 'Educational Platform for community engagement and health awareness.',
 };
 

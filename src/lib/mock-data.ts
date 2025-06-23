@@ -14,8 +14,8 @@ export interface MockPost {
 export const mockPosts: MockPost[] = [
   { 
     id: '1', 
-    title: 'Getting Started with #BeFree Platform', 
-    content: `Welcome to #BeFree! This platform is designed to foster community engagement and learning.
+    title: 'Getting Started with i-BreakFree Platform', 
+    content: `Welcome to i-BreakFree! This platform is designed to foster community engagement and learning.
 Explore the features and share your knowledge. You can embed images and videos in your posts to make them more engaging.
 
 This is an example of a paragraph.
@@ -28,7 +28,7 @@ Key Features to Explore:
 - GBV Screening: Access GBV support information.
 
 We hope you find this platform valuable!`,
-    author: '#BeFree Admin', 
+    author: 'i-BreakFree Admin', 
     date: 'July 29, 2024',
     imageUrl: 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBlbmdhZ2VtZW50fGVufDB8fHx8MTc0OTAxMjM0NXww&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'community engagement',
@@ -105,7 +105,7 @@ export const mockReferrals: MockReferral[] = [
     referralMessage: 'Based on your PrEP screening, the following guidance was provided: Based on your responses, you may have factors that increase your risk of HIV exposure. PrEP (Pre-Exposure Prophylaxis) is a highly effective medication to prevent HIV. We recommend discussing PrEP with a healthcare provider to see if it\'s right for you.',
     status: 'Follow-up Scheduled',
     consentStatus: 'agreed',
-    facility: 'City Health Clinic',
+    facility: 'Clinic 3',
     services: ['PrEP', 'HTS'],
     notes: 'PrEP consultation scheduled with Dr. Carter.',
   },

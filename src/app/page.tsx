@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -180,7 +179,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center">
       <PageHeader
-        title="Welcome to #BeFree"
+        title="Welcome to i-BreakFree"
         description="Your integrated platform for education, community engagement, and health awareness."
       />
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 w-full max-w-6xl">

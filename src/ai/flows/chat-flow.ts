@@ -29,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'chatWithAdminPrompt',
   input: {schema: ChatFlowInputSchema},
   output: {schema: ChatFlowOutputSchema},
-  prompt: `You are a friendly and helpful support assistant for the #BeFree platform.
+  prompt: `You are a friendly and helpful support assistant for the i-BreakFree platform.
 Your role is to act like an admin or social worker.
 The user has sent you the following message:
 "{{{userMessage}}}"
