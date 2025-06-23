@@ -24,7 +24,7 @@ export default function ScreeningTypeCard({ title, description, icon, onSelect, 
       onClick={onSelect} 
       className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1.5"
     >
-      <div className="relative h-48 w-full">
+      <div className="relative h-48 w-full overflow-hidden">
         <Image
           src={imageSrc}
           alt={imageAlt}
