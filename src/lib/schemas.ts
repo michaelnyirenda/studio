@@ -191,18 +191,6 @@ export const ChatResponseSchema = z.object({
 });
 export type ChatResponseType = z.infer<typeof ChatResponseSchema>;
 
-
-export const AttendanceSchema = z.object({
-  lessonName: z.string({ required_error: "Please select a lesson." }),
-  date: z.date({ required_error: "Please select a date." }),
-  attendees: z.array(z.object({
-    name: z.string().min(1, "Name cannot be empty."),
-    present: z.boolean(),
-  })).min(1, "You must add at least one attendee."),
-});
-
-export type AttendanceFormData = z.infer<typeof AttendanceSchema>;
-
 export const ReferralConsentSchema = z.object({
   consent: z.literal<boolean>(true, { errorMap: () => ({ message: 'You must agree to be referred.'})}),
   facility: z.string({ required_error: "Please select a facility." }),
