@@ -23,61 +23,61 @@ export async function submitGbvScreeningAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
 
-  const { name, experiencedHarm, feltUnsafe, hasSafePlace, wantsSupportInfo } = validationResult.data;
+  const { name, suicideAttempt, seriousInjury, sexualViolenceTimeline } = validationResult.data;
 
   console.log("GBV Screening Data for", name, ":", validationResult.data);
   await new Promise(resolve => setTimeout(resolve, 1000)); 
 
-  let baseMessage = `Dear ${name}, thank you for completing the GBV screening. Your safety and well-being are important.`;
-  let recommendation = "";
-  let needsReferral = false;
+  let recommendations: string[] = [];
+  let notes: string[] = [];
+
+  const isHighRiskSuicide = suicideAttempt === 'yes';
+  const isHighRiskInjury = seriousInjury === 'yes';
+  const isHighRiskSexualViolence = sexualViolenceTimeline === 'le_72_hr' || sexualViolenceTimeline === 'gt_72_le_120_hr';
+  
+  const needsImmediateReferral = isHighRiskSuicide || isHighRiskInjury || isHighRiskSexualViolence;
+
+  if (isHighRiskSuicide) {
+    recommendations.push("You indicated thoughts of suicide or self-harm. Your safety is the top priority. We are immediately connecting you with support services.");
+    notes.push("High Risk: Suicide/self-harm thoughts indicated.");
+  }
+  if (isHighRiskInjury) {
+    recommendations.push("You indicated a serious injury. It is critical to get medical attention immediately. We are providing an urgent referral for medical care.");
+    notes.push("High Risk: Serious injury requires urgent medical attention.");
+  }
+  if (isHighRiskSexualViolence) {
+    recommendations.push("You indicated recent sexual violence. It's important to seek medical care (like PEP) and support services as soon as possible. We are generating an urgent referral for you.");
+    notes.push("High Risk: Recent sexual violence exposure (within 5 days).");
+  }
+
+  let fullReferralMessage: string;
   let referralObject: MockReferral | undefined = undefined;
 
-  if (experiencedHarm === "yes") {
-    recommendation = "We are concerned that you have experienced harm. It is important to seek support. ";
-    if (hasSafePlace === "no") {
-      recommendation += "Since you mentioned not having a safe place, we strongly recommend contacting a local support service or helpline immediately. ";
-    }
-    recommendation += "We can provide you with information on available resources.";
-    needsReferral = true;
-  } else if (feltUnsafe === "yes") {
-    recommendation = "Feeling unsafe is a serious concern. There are resources available to help you create a safety plan and find support. ";
-    needsReferral = true;
+  if (needsImmediateReferral) {
+    fullReferralMessage = `Dear ${name}, thank you for your honesty. Based on your answers, your safety and health may be at immediate risk. ${recommendations.join(' ')} Please follow the guidance of the support worker who will be in touch shortly.`;
   } else {
-    recommendation = "Thank you for sharing. Maintaining your safety and well-being is crucial. ";
+    fullReferralMessage = `Dear ${name}, thank you for completing the GBV screening. Your safety and well-being are important. We encourage you to connect with our support staff via the chat or explore resources in the forum if you need to talk.`;
+    notes.push("No immediate high-risk factors identified, but general support may be beneficial.");
   }
 
-  if (wantsSupportInfo === "yes" && !needsReferral) {
-    recommendation += "You indicated you'd like information on support services. We can provide you with resources. ";
-    needsReferral = true; // Consider this a referral for information
-  } else if (wantsSupportInfo === "yes" && needsReferral) {
-     recommendation += " You will also receive information on support services as requested."
-  }
-
-
-  if (recommendation === "Thank you for sharing. Maintaining your safety and well-being is crucial. " && wantsSupportInfo === "no") {
-     recommendation += "If you ever need support or information, please don't hesitate to reach out or use our chat feature."
-  }
+  // Always generate a referral object for this prototype to show the flow
+  const referralId = `ref-gbv-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   
-  const fullReferralMessage = `${baseMessage} ${recommendation}`;
-
-  if (needsReferral) {
-    const referralId = `ref-gbv-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
-    const currentDate = new Date().toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    referralObject = {
-      id: referralId,
-      patientName: name,
-      referralDate: currentDate,
-      referralMessage: `Based on your GBV screening, the following guidance was provided: ${recommendation}`,
-      status: 'Pending Review',
-      notes: 'GBV screening referral. Patient may require immediate support or resources.',
-    };
-    console.log("Generated GBV Referral Object:", referralObject);
-  }
+  referralObject = {
+    id: referralId,
+    patientName: name,
+    referralDate: currentDate,
+    referralMessage: fullReferralMessage,
+    status: needsImmediateReferral ? 'Pending Review' : 'Closed',
+    notes: notes.join(' '),
+  };
+  
+  console.log("Generated GBV Referral Object:", referralObject);
 
   return { 
     success: true, 

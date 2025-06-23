@@ -23,11 +23,11 @@ export const HivScreeningSchema = z.object({
   // A5
   hadSex: z.enum(['within_6_months', '6_to_12_months', 'more_than_12_months', 'never', 'refused'], { required_error: "Please select an option." }),
   // A6
-  usedCondoms: z.enum(['yes', 'no', 'cant_remember', 'refused'], { required_error: "Please select an option." }),
+  usedCondoms: z.enum(['yes', 'no', 'cant_remember', 'refused']).optional(),
   // A7
-  transactionalSex: z.enum(['yes', 'no', 'forced', 'refused'], { required_error: "Please select an option." }),
+  transactionalSex: z.enum(['yes', 'no', 'forced', 'refused']).optional(),
   // A8
-  multiplePartners: z.enum(['no', 'two', 'three_or_more', 'dont_remember', 'refused'], { required_error: "Please select an option." }),
+  multiplePartners: z.enum(['no', 'two', 'three_or_more', 'dont_remember', 'refused']).optional(),
   // A9
   partnerAgeDifferenceP1: z.enum(['0-3', '4-9', '10+', 'dont_know']).optional(),
   partnerAgeDifferenceP2: z.enum(['0-3', '4-9', '10+', 'dont_know']).optional(),
@@ -67,6 +67,15 @@ export const HivScreeningSchema = z.object({
             message: 'Treatment status is required if you tested positive.',
         });
     }
+     if (data.hadSex !== 'never' && !data.usedCondoms) {
+        ctx.addIssue({ code: 'custom', path: ['usedCondoms'], message: 'This question is required.' });
+    }
+    if (data.hadSex !== 'never' && !data.transactionalSex) {
+        ctx.addIssue({ code: 'custom', path: ['transactionalSex'], message: 'This question is required.' });
+    }
+    if (data.hadSex !== 'never' && !data.multiplePartners) {
+        ctx.addIssue({ code: 'custom', path: ['multiplePartners'], message: 'This question is required.' });
+    }
     if (data.consumedAlcohol === 'any' && !data.alcoholFrequency) {
         ctx.addIssue({
             code: 'custom',
@@ -95,23 +104,46 @@ export const HivScreeningSchema = z.object({
             message: 'This field is required based on your pregnancy history.',
         });
     }
-     if (data.hadSex !== 'never' && !data.partnerAgeDifferenceP1) {
-        ctx.addIssue({
-            code: 'custom',
-            path: ['partnerAgeDifferenceP1'],
-            message: 'Partner 1 age difference is required if you have had sex.',
-        });
-    }
 });
 export type HivScreeningFormData = z.infer<typeof HivScreeningSchema>;
+
+const emotionalViolenceOptions = z.enum(['mocked', 'controlled', 'no']);
+const physicalViolenceOptions = z.enum(['punched', 'threatened', 'no']);
+const sexualViolenceOptions = z.enum(['touched', 'forced', 'no']);
 
 export const GbvScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
-  feltUnsafe: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option." }),
-  experiencedHarm: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option." }),
-  hasSafePlace: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option." }),
-  wantsSupportInfo: z.enum(["yes", "no"], { required_error: "Please select an option." }),
+  
+  // C1
+  emotionalViolence: z.array(emotionalViolenceOptions).min(1, { message: "Please select at least one option for Emotional Violence." }),
+  // C2
+  suicideAttempt: z.enum(['yes', 'no']).optional(),
+  // C3
+  physicalViolence: z.array(physicalViolenceOptions).min(1, { message: "Please select at least one option for Physical Violence." }),
+  // C4
+  seriousInjury: z.enum(['yes', 'no']).optional(),
+  // C5
+  sexualViolence: z.array(sexualViolenceOptions).min(1, { message: "Please select at least one option for Sexual Violence." }),
+  // C6
+  sexualViolenceTimeline: z.enum(['le_72_hr', 'gt_72_le_120_hr', 'gt_120_hr', 'no_history']).optional(),
+}).superRefine((data, ctx) => {
+    // C2 is required if C1 is not 'no'
+    if (data.emotionalViolence.length > 0 && !data.emotionalViolence.includes('no') && !data.suicideAttempt) {
+        ctx.addIssue({ code: 'custom', path: ['suicideAttempt'], message: 'This question is required based on your previous answer.' });
+    }
+    // C4 is required if C3 is not 'no'
+    if (data.physicalViolence.length > 0 && !data.physicalViolence.includes('no') && !data.seriousInjury) {
+        ctx.addIssue({ code: 'custom', path: ['seriousInjury'], message: 'This question is required based on your previous answer.' });
+    }
+    // C6 is required if C5 is not 'no'
+    if (data.sexualViolence.length > 0 && !data.sexualViolence.includes('no') && !data.sexualViolenceTimeline) {
+        ctx.addIssue({ code: 'custom', path: ['sexualViolenceTimeline'], message: 'This question is required based on your previous answer.' });
+    }
+     // If C5 is 'no', then sexualViolenceTimeline must be 'no_history'
+    if (data.sexualViolence.includes('no') && data.sexualViolenceTimeline && data.sexualViolenceTimeline !== 'no_history') {
+       ctx.addIssue({ code: 'custom', path: ['sexualViolenceTimeline'], message: "This should be 'No History' if you selected 'No' for sexual violence." });
+    }
 });
 export type GbvScreeningFormData = z.infer<typeof GbvScreeningSchema>;
 
