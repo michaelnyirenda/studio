@@ -1,22 +1,20 @@
-
 "use client";
 
 import type { MockReferral } from '@/lib/mock-data';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import type * as z from 'zod';
 import { UpdateReferralFormSchema, type UpdateReferralFormData } from '@/lib/schemas';
 import { Edit3, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
+import { Separator } from '@/components/ui/separator';
 
 const serviceItems = [
   { id: 'HTS', label: 'HTS' },
@@ -90,8 +88,15 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
             ID: {referral.id} | Facility: {referral.facility || 'N/A'}
           </CardDescription>
         </DialogHeader>
+
+        <div className="py-2">
+            <p className="text-sm font-semibold text-foreground/90 mb-1">Referral Reason:</p>
+            <p className="text-sm text-muted-foreground">{referral.referralMessage}</p>
+        </div>
+        <Separator className="-mt-2 mb-2" />
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="status"
