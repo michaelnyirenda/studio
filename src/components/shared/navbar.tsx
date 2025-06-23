@@ -19,7 +19,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/80 backdrop-blur-sm">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/90 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-md items-stretch justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href;

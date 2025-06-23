@@ -33,7 +33,6 @@ interface ChatSession {
   messages: Message[];
 }
 
-// Function to generate initial mock chat sessions to be called on client
 const generateInitialMockChatSessions = (): ChatSession[] => [
   {
     userId: 'john-doe',
@@ -79,7 +78,7 @@ const generateInitialMockChatSessions = (): ChatSession[] => [
 export default function ChatPage() {
   const { toast } = useToast();
   const { role } = useRole();
-  const [mockChatSessions, setMockChatSessions] = useState<ChatSession[]>([]); // Initialize with empty array
+  const [mockChatSessions, setMockChatSessions] = useState<ChatSession[]>([]); 
   const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -89,7 +88,6 @@ export default function ChatPage() {
     defaultValues: { message: '' },
   });
 
-  // Generate initial mock sessions on client mount
   useEffect(() => {
     setMockChatSessions(generateInitialMockChatSessions());
   }, []);
@@ -104,17 +102,11 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (role === 'user') {
-      // Ensure 'john-doe' exists before setting, especially if mockChatSessions loads async
       if (mockChatSessions.some(session => session.userId === 'john-doe')) {
         setActiveChatUserId('john-doe');
       } else if (mockChatSessions.length > 0 && !activeChatUserId ) {
-         // Fallback if john-doe is not available but trying to set a default for user
          setActiveChatUserId(mockChatSessions[0].userId);
       }
-    } else { // admin role
-       if (!activeChatUserId && mockChatSessions.length > 0) {
-         // setActiveChatUserId(mockChatSessions[0].userId); // Optionally select the first chat for admin by default
-       }
     }
   }, [role, mockChatSessions, activeChatUserId]);
 
@@ -189,7 +181,7 @@ export default function ChatPage() {
     <div className="container mx-auto py-8 px-4 flex flex-col h-[calc(100vh-12rem)] sm:h-[calc(100vh-10rem)]">
       <PageHeader title={pageTitle} description={pageDescription} />
 
-      <div className={cn("flex-grow flex overflow-hidden gap-4", role === 'admin' ? "flex-row" : "flex-col")}>
+      <div className={cn("flex-grow flex overflow-hidden gap-6", role === 'admin' ? "flex-row" : "flex-col")}>
         {role === 'admin' && (
           <Card className="w-1/3 lg:w-1/4 shadow-lg flex flex-col">
             <CardHeader className="border-b">
@@ -205,15 +197,18 @@ export default function ChatPage() {
                 <Button
                   key={session.userId}
                   variant={activeChatUserId === session.userId ? "secondary" : "ghost"}
-                  className="w-full justify-start p-3 rounded-none border-b"
+                  className="w-full justify-start p-3 h-auto rounded-none border-b"
                   onClick={() => setActiveChatUserId(session.userId)}
                 >
-                  <Avatar className="h-8 w-8 mr-3">
+                  <Avatar className="h-10 w-10 mr-3">
                     <AvatarFallback className={cn(activeChatUserId === session.userId ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
                       {session.avatarFallback}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="truncate">{session.userName}</span>
+                  <div className="text-left">
+                    <p className="font-semibold truncate">{session.userName}</p>
+                    <p className="text-xs text-muted-foreground truncate">{session.messages[session.messages.length -1].text}</p>
+                  </div>
                 </Button>
               ))}
             </ScrollArea>
@@ -225,7 +220,7 @@ export default function ChatPage() {
              <h2 className="text-xl font-semibold text-primary flex items-center">
               {currentChatSession ? (
                 <>
-                  <MessageCircle className="mr-2 h-6 w-6"/>
+                  <MessageCircle className="mr-3 h-6 w-6"/>
                   Chat with {currentChatSession.userName}
                 </>
               ) : (
@@ -233,12 +228,14 @@ export default function ChatPage() {
               )}
             </h2>
           </CardHeader>
-          <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
-            <div className="space-y-8"> {/* Added wrapper div and moved space-y-8 here */}
+          <ScrollArea className="flex-grow p-4 bg-secondary/30" ref={scrollAreaRef}>
+            <div className="space-y-4">
               {!activeChatUserId && role === 'admin' && mockChatSessions.length > 0 && (
-                <p className="text-center text-muted-foreground py-10">
-                  Please select a user from the list to view their chat.
-                </p>
+                <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                  <Users className="w-16 h-16 mb-4"/>
+                  <p className="text-lg">Please select a user from the list</p>
+                  <p>to view their chat.</p>
+                </div>
               )}
               {activeChatUserId && currentMessages.length === 0 && (
                 <p className="text-center text-muted-foreground py-10">
@@ -259,20 +256,20 @@ export default function ChatPage() {
                 >
                   {((role === 'user' && msg.sender === 'ai') || (role === 'admin' && msg.sender === 'user')) && (
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
-                        {msg.sender === 'ai' ? <Bot size={18} /> : <User size={18} />}
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {msg.sender === 'ai' ? <Bot size={18} /> : currentChatSession?.avatarFallback}
                       </AvatarFallback>
                     </Avatar>
                   )}
                   <div
-                    className={`max-w-[70%] rounded-lg px-3 py-2 text-sm shadow ${
+                    className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-md ${
                       (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')
                         ? 'bg-primary text-primary-foreground'
-                        : 'bg-card border'
+                        : 'bg-card'
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{msg.text}</p>
-                    <p className={`text-xs mt-1 ${
+                    <p className={`text-xs mt-1.5 ${
                         (role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')
                           ? 'text-primary-foreground/70 text-right'
                           : 'text-muted-foreground/70 text-left'
@@ -282,7 +279,7 @@ export default function ChatPage() {
                   </div>
                   {((role === 'user' && msg.sender === 'user') || (role === 'admin' && msg.sender === 'ai')) && (
                     <Avatar className="h-8 w-8">
-                       <AvatarFallback className={msg.sender === 'ai' ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
+                       <AvatarFallback className="bg-accent text-accent-foreground">
                           {msg.sender === 'ai' ? <Bot size={18} /> : <User size={18} />}
                       </AvatarFallback>
                     </Avatar>
@@ -292,7 +289,7 @@ export default function ChatPage() {
             </div>
           </ScrollArea>
           {activeChatUserId && (
-            <CardFooter className="p-4 border-t">
+            <CardFooter className="p-4 border-t bg-card">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full items-center space-x-2">
                   <FormField
@@ -306,13 +303,14 @@ export default function ChatPage() {
                             {...field}
                             disabled={isSending || !activeChatUserId}
                             autoComplete="off"
+                            className="bg-background"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" size="icon" disabled={isSending || !activeChatUserId} className="bg-accent hover:bg-accent/90">
+                  <Button type="submit" size="icon" disabled={isSending || !activeChatUserId} className="bg-accent hover:bg-accent/90 h-10 w-10 shrink-0">
                     {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                     <span className="sr-only">Send</span>
                   </Button>

@@ -9,95 +9,78 @@ body {
 
 @layer base {
   :root {
-    --background: 20 50% 98%; /* Very light subtle peach/off-white #FFF8F5 */
-    --foreground: 20 10% 30%;   /* Dark warm gray #524D4A */
+    --background: 228 67% 94%; /* Light Blue (#E8EAF6) */
+    --foreground: 230 20% 25%;   /* Dark Blue-Gray */
 
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 20 10% 30%; /* Dark warm gray */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 230 20% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 20 10% 30%;
+    --popover-foreground: 230 20% 25%;
 
-    --primary: 15 30% 40%; /* Muted reddish-brown for elements like bottom nav bg #856259 */
-    --primary-foreground: 20 30% 95%; /* Light cream on primary #F7F2EF */
+    --primary: 231 48% 54%; /* Deep Blue (#3F51B5) */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 20 30% 92%; /* Lighter peach for secondary elements #F5EFEC */
-    --secondary-foreground: 20 10% 40%; /* Medium warm gray #736D6B */
+    --secondary: 230 50% 90%; /* Lighter Blue */
+    --secondary-foreground: 231 48% 54%; /* Deep Blue */
 
-    --muted: 20 30% 92%; /* same as secondary for now */
-    --muted-foreground: 20 10% 55%; /* Softer warm gray #948F8C */
+    --muted: 230 50% 90%; /* Same as secondary */
+    --muted-foreground: 230 20% 45%; /* Medium Blue-Gray */
 
-    --accent: 15 35% 50%;   /* Muted terracotta/reddish-brown for FAB, highlights #A67769 */
-    --accent-foreground: 20 30% 97%; /* Very light cream on accent #F9F5F3 */
+    --accent: 36 100% 50%;   /* Vibrant Orange (#FF9800) */
+    --accent-foreground: 0 0% 100%; /* White */
 
-    --destructive: 0 70% 60%; /* A clearer red for destructive actions, e.g. #DB6B6B */
-    --destructive-foreground: 0 0% 100%; /* White text */
+    --destructive: 0 84% 60%; /* A standard error red */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 20 25% 88%; /* Soft peachy border #EBE4E1 */
-    --input: 0 0% 100%;  /* Input background, white for clarity */
-    --ring: 15 35% 50%; /* Ring color to match accent */
+    --border: 230 40% 88%;
+    --input: 230 40% 98%;
+    --ring: 231 48% 54%; /* Primary color for rings */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Slightly more rounded corners */
 
-    --sidebar-background: 20 40% 96%; /* Slightly more peachy than main bg #FDF5F2 */
-    --sidebar-foreground: 20 10% 30%;
-    --sidebar-primary: 15 30% 40%;
-    --sidebar-primary-foreground: 20 30% 95%;
-    --sidebar-accent: 15 35% 50%;
-    --sidebar-accent-foreground: 20 30% 97%;
-    --sidebar-border: 20 25% 85%; /* #EBDCD7 */
-    --sidebar-ring: 15 35% 50%;
-
-    --chart-1: 15 35% 50%; /* Accent */
-    --chart-2: 25 50% 65%; /* Softer orange/peach */
-    --chart-3: 35 40% 60%; /* Muted gold/light brown */
-    --chart-4: 0 30% 70%;  /* Soft rose */
-    --chart-5: 20 20% 55%; /* Desaturated warm brown */
+    --chart-1: 231 48% 54%; /* primary */
+    --chart-2: 36 100% 50%; /* accent */
+    --chart-3: 210 100% 65%; /* a lighter, brighter blue */
+    --chart-4: 190 70% 55%; /* a teal/cyan */
+    --chart-5: 280 60% 65%; /* a soft purple */
   }
 
   .dark {
-    --background: 20 10% 12%; /* Very dark warm gray #242221 */
-    --foreground: 20 20% 90%;   /* Light soft cream #EBE8E6 */
+    /* Keeping dark mode simple for now, but inverting the colors */
+    --background: 230 20% 12%; 
+    --foreground: 228 60% 95%;
 
-    --card: 20 8% 18%; /* Darker warm gray cards #302E2C */
-    --card-foreground: 20 20% 90%;
+    --card: 230 20% 18%; 
+    --card-foreground: 228 60% 95%;
 
-    --popover: 20 10% 12%;
-    --popover-foreground: 20 20% 90%;
+    --popover: 230 20% 12%;
+    --popover-foreground: 228 60% 95%;
 
-    --primary: 15 35% 55%; /* Brighter muted terracotta for dark mode #B58A7E */
-    --primary-foreground: 20 15% 15%; /* Dark text on this primary #2B2827 */
+    --primary: 231 48% 64%; /* Lighter blue for dark mode */
+    --primary-foreground: 0 0% 100%; 
 
-    --secondary: 20 8% 22%; /* Darker secondary #3B3836 */
-    --secondary-foreground: 20 20% 85%; /* Lighter cream #DDD9D6 */
+    --secondary: 230 20% 25%; 
+    --secondary-foreground: 228 60% 90%;
 
-    --muted: 20 8% 22%;
-    --muted-foreground: 20 15% 65%; /* Softer grey for muted text #ADAAA7 */
+    --muted: 230 20% 25%;
+    --muted-foreground: 230 20% 65%;
 
-    --accent: 15 40% 65%; /* Lighter, more noticeable terracotta #D49A8A */
-    --accent-foreground: 20 10% 15%; /* Dark text on accent #292625 */
+    --accent: 36 100% 60%;   /* Brighter orange for dark mode */
+    --accent-foreground: 230 20% 10%;
 
-    --destructive: 0 60% 50%; /* A bit darker red for dark mode #BF4040 */
-    --destructive-foreground: 0 0% 95%; /* Light text */
+    --destructive: 0 70% 65%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 20 8% 25%; /* Subtle dark border #423F3D */
-    --input: 20 8% 18%; /* Same as card for input */
-    --ring: 15 40% 65%; /* Ring to match accent */
+    --border: 230 20% 30%;
+    --input: 230 20% 22%;
+    --ring: 231 48% 64%; /* Lighter primary */
 
-    --sidebar-background: 20 10% 10%; /* Even darker for sidebar #1C1A19 */
-    --sidebar-foreground: 20 20% 90%;
-    --sidebar-primary: 15 35% 55%;
-    --sidebar-primary-foreground: 20 15% 15%;
-    --sidebar-accent: 15 40% 65%;
-    --sidebar-accent-foreground: 20 10% 15%;
-    --sidebar-border: 20 8% 20%; /* #363331 */
-    --sidebar-ring: 15 40% 65%;
-
-    --chart-1: 15 40% 65%; /* Accent */
-    --chart-2: 25 55% 70%; /* Lighter Softer orange/peach */
-    --chart-3: 35 45% 68%; /* Lighter Muted gold/light brown */
-    --chart-4: 0 35% 75%;  /* Lighter Soft rose */
-    --chart-5: 20 25% 65%; /* Lighter Desaturated warm brown */
+    --chart-1: 231 48% 64%;
+    --chart-2: 36 100% 60%;
+    --chart-3: 210 100% 70%;
+    --chart-4: 190 70% 60%;
+    --chart-5: 280 60% 70%;
   }
 }
 

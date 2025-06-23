@@ -25,13 +25,13 @@ interface AdminFeatureCardProps {
   description: string;
   link: string;
   icon: React.ReactNode;
-  isExternal?: boolean; // To handle external links if any, though not used here
+  isExternal?: boolean;
 }
 
 function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, imageHint }: FeatureCardProps) {
   return (
     <Link href={link} passHref>
-      <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-secondary text-secondary-foreground shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1.5">
+      <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1.5">
         <div className="relative h-48 w-full">
           <Image
             src={imageSrc}
@@ -41,15 +41,16 @@ function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, image
             data-ai-hint={imageHint}
             className="transition-transform duration-300 group-hover:scale-105"
           />
+           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
         <div className="flex flex-1 flex-col p-6">
           <div className="flex items-start">
-            <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-background">
+            <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-secondary">
               {React.cloneElement(icon as React.ReactElement, { className: "h-7 w-7 text-primary" })}
             </div>
             <div className="flex-1">
               <h3 className="text-2xl font-bold font-headline text-primary">{title}</h3>
-              <p className="mt-2 text-base text-secondary-foreground">{description}</p>
+              <p className="mt-2 text-base text-card-foreground">{description}</p>
             </div>
           </div>
           <div className="mt-auto flex justify-end pt-4">
@@ -65,21 +66,24 @@ function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, image
 
 function AdminFeatureLinkCard({ title, description, link, icon }: AdminFeatureCardProps) {
   return (
-    <Link href={link} passHref className="block h-full">
-      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+    <Link href={link} passHref className="block h-full group">
+      <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col bg-card hover:-translate-y-1.5">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-lg font-medium text-primary">{title}</CardTitle>
-          {icon}
+          <CardTitle className="text-xl font-medium text-primary">{title}</CardTitle>
+          <div className="p-3 bg-secondary rounded-xl">
+            {React.cloneElement(icon as React.ReactElement, { className: "h-6 w-6 text-primary" })}
+          </div>
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="text-sm text-muted-foreground">
             {description}
           </p>
         </CardContent>
-        <CardFooter className="pt-2">
-           <Button variant="link" className="p-0 text-accent hover:underline">
-              Go to {title} <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+        <CardFooter className="pt-2 flex justify-end">
+           <div className="flex items-center text-accent font-semibold">
+              <span>View Details</span> 
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </div>
         </CardFooter>
       </Card>
     </Link>
@@ -93,37 +97,37 @@ function AdminDashboardContent() {
       title: "Screening Data",
       description: "View aggregated screening results, trends, and detailed analytics.",
       link: "/admin/reports", 
-      icon: <BarChart3 className="h-5 w-5 text-muted-foreground" />
+      icon: <BarChart3 />
     },
     {
       title: "Referral Tracking",
       description: "Monitor referral statuses, patient follow-ups, and turnaround rates.",
       link: "/referrals",
-      icon: <LineChart className="h-5 w-5 text-muted-foreground" />
+      icon: <LineChart />
     },
     {
       title: "Data Export",
       description: "Generate and download reports for screenings, referrals, and other data.",
       link: "/admin/data-export",
-      icon: <FileSpreadsheet className="h-5 w-5 text-muted-foreground" />
+      icon: <FileSpreadsheet />
     },
     {
       title: "Forum Management",
       description: "Oversee forum discussions and manage posts. Create new posts via the Forum page.",
       link: "/forum",
-      icon: <MessageSquareText className="h-5 w-5 text-muted-foreground" />
+      icon: <MessageSquareText />
     },
     {
       title: "User Chat Support",
       description: "Access the chat system to respond to user queries and provide support.",
       link: "/chat",
-      icon: <ShieldAlert className="h-5 w-5 text-muted-foreground" />
+      icon: <ShieldAlert />
     },
     {
       title: "User Management",
       description: "Manage user accounts, roles, permissions, and view user activity.",
       link: "/admin/user-management",
-      icon: <UserCog className="h-5 w-5 text-muted-foreground" />
+      icon: <UserCog />
     }
   ];
 
@@ -142,7 +146,7 @@ function AdminDashboardContent() {
 
       <div className="mt-12 text-center border-t pt-8">
         <h2 className="text-2xl font-semibold text-primary mb-4">Prototype Notes</h2>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground max-w-2xl mx-auto">
           The features linked above lead to mock UI pages or existing functionalities.
           Full implementation requires backend development, database integration, and an authentication system.
         </p>
@@ -160,16 +164,16 @@ export default function Home() {
       title: "Community Forum",
       description: "Browse discussions, share insights, and engage with the community.",
       link: "/forum",
-      icon: <BookOpenText className="h-7 w-7 text-primary" />,
+      icon: <BookOpenText />,
       imageSrc: "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21tdW5pdHl8ZW58MHx8fHwxNzQ5MDIxNzgyfDA&ixlib=rb-4.1.0&q=80&w=1080",
       imageAlt: "Abstract representation of a forum discussion",
       imageHint: "discussion community"
     },
      {
       title: "Screening",
-      description: "Access a confidential screening tool to assess risk and receive guidance on next steps.",
+      description: "Access confidential screening tools to assess risk and receive guidance on next steps.",
       link: "/hiv-screening",
-      icon: <ShieldCheck className="h-7 w-7 text-primary" />,
+      icon: <ShieldCheck />,
       imageSrc: "https://images.unsplash.com/photo-1575998064976-9df66085cc83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxISVZ8ZW58MHx8fHwxNzQ4OTY0MTI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       imageAlt: "Symbolic representation of health and protection",
       imageHint: "health screening"
@@ -178,7 +182,7 @@ export default function Home() {
       title: "Track Referrals", 
       description: "View and manage referrals generated from screenings and other community programs.", 
       link: "/referrals", 
-      icon: <ClipboardList className="h-7 w-7 text-primary" />, 
+      icon: <ClipboardList />, 
       imageSrc: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWxlbmRhcnxlbnwwfHx8fDE3NDkxMjcwNDl8MA&ixlib=rb-4.1.0&q=80&w=1080", 
       imageAlt: "Image representing referral tracking and management", 
       imageHint: "referrals tracking" 
@@ -203,4 +207,3 @@ export default function Home() {
     </div>
   );
 }
-    

@@ -1,3 +1,4 @@
+
 "use client";
 
 import type * as z from 'zod';
@@ -86,11 +87,11 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
 
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-xl border-accent">
+    <Card className="w-full max-w-2xl mx-auto shadow-xl border-2 border-accent bg-card">
         <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">Action Required: Referral Consent</CardTitle>
+                <CardTitle className="font-headline text-2xl text-accent">Action Required: Referral Consent</CardTitle>
                 <CardDescription>
                     A referral has been generated based on your screening responses. Please review and provide your consent to proceed.
                 </CardDescription>
@@ -108,7 +109,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                     control={form.control}
                     name="consent"
                     render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
                         <FormControl>
                             <Checkbox
                             checked={field.value}
@@ -119,7 +120,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                             />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                            <FormLabel>
+                            <FormLabel className="font-semibold">
                              I agree to be referred for the services mentioned above.
                             </FormLabel>
                              <FormMessage />
@@ -159,7 +160,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                 )}
             </CardContent>
             <CardFooter>
-                <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting || !hasAgreed}>
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90" size="lg" disabled={isSubmitting || !hasAgreed}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSubmitting ? 'Submitting...' : 'Confirm Referral'}
                 </Button>

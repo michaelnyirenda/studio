@@ -5,7 +5,6 @@ import { ArrowLeft } from 'lucide-react';
 import { mockPosts, type MockPost } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import PageHeader from '@/components/shared/page-header'; // Though not used directly, good for consistency if needed
 
 export default function ForumPostPage({ params }: { params: { id: string } }) {
   const post = mockPosts.find(p => p.id === params.id);
@@ -41,15 +40,15 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
   const embedUrl = post.videoUrl ? getEmbedUrl(post.videoUrl) : null;
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 max-w-4xl">
       <Link href="/forum" passHref>
-        <Button variant="ghost" className="mb-6 text-accent hover:text-accent/80 pl-0">
+        <Button variant="ghost" className="mb-6 text-accent hover:text-accent/80 pl-0 font-semibold">
           <ArrowLeft className="mr-2 h-5 w-5" />
           Back to Forum
         </Button>
       </Link>
       
-      <Card className="shadow-xl overflow-hidden">
+      <Card className="shadow-xl overflow-hidden bg-card">
         {post.imageUrl && (
           <div className="relative w-full h-64 md:h-96">
             <Image
@@ -61,16 +60,16 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
             />
           </div>
         )}
-        <CardHeader className="pt-6">
-          <CardTitle className="text-3xl md:text-4xl font-headline text-primary leading-tight">
+        <CardHeader className="pt-8 px-8">
+          <CardTitle className="text-4xl md:text-5xl font-headline text-primary leading-tight">
             {post.title}
           </CardTitle>
-          <CardDescription className="text-md text-muted-foreground pt-2">
+          <CardDescription className="text-md text-muted-foreground pt-3">
             By {post.author} on {post.date}
           </CardDescription>
         </CardHeader>
-        <CardContent className="py-6">
-          <div className="text-foreground/90 text-lg leading-relaxed whitespace-pre-wrap">
+        <CardContent className="py-8 px-8">
+          <div className="prose prose-lg max-w-none text-card-foreground/90 leading-relaxed whitespace-pre-wrap">
             {post.content}
           </div>
 
