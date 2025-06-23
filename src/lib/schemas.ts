@@ -29,7 +29,7 @@ export const HivScreeningSchema = z.object({
   // A8
   multiplePartners: z.enum(['no', 'two', 'three_or_more', 'dont_remember', 'refused'], { required_error: "Please select an option." }),
   // A9
-  partnerAgeDifferenceP1: z.enum(['0-3', '4-9', '10+', 'dont_know'], { required_error: "Please select an option for Partner 1." }).optional(),
+  partnerAgeDifferenceP1: z.enum(['0-3', '4-9', '10+', 'dont_know']).optional(),
   partnerAgeDifferenceP2: z.enum(['0-3', '4-9', '10+', 'dont_know']).optional(),
   partnerAgeDifferenceP3: z.enum(['0-3', '4-9', '10+', 'dont_know']).optional(),
   // A10
@@ -118,12 +118,15 @@ export type GbvScreeningFormData = z.infer<typeof GbvScreeningSchema>;
 export const PrEpScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
-  partnersLast6Months: z.enum(["0", "1", "2-4", "5+", "prefer_not_to_say"], { required_error: "Please select an option."}),
-  knowPartnerStatus: z.enum(["yes_all", "yes_some", "no", "prefer_not_to_say"], { required_error: "Please select an option."}),
-  consistentCondomUse: z.enum(["always", "sometimes", "rarely", "never", "prefer_not_to_say"], { required_error: "Please select an option."}),
-  stiLast6Months: z.enum(["yes", "no", "prefer_not_to_say"], { required_error: "Please select an option."}),
-  currentPrevention: z.string().max(100, "Response is too long.").optional(),
-  wantsPrEpInfo: z.enum(["yes", "no"], { required_error: "Please select an option." }),
+  multiplePartners: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  unprotectedSex: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  unknownStatusPartners: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  atRiskPartners: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  sexUnderInfluence: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  newStiDiagnosis: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  considersAtRisk: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  usedPepMultipleTimes: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
+  forcedSex: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
 });
 export type PrEpScreeningFormData = z.infer<typeof PrEpScreeningSchema>;
 

@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -41,12 +40,15 @@ export default function PrEpScreeningForm() {
     defaultValues: {
       name: '',
       age: undefined,
-      partnersLast6Months: undefined,
-      knowPartnerStatus: undefined,
-      consistentCondomUse: undefined,
-      stiLast6Months: undefined,
-      currentPrevention: '',
-      wantsPrEpInfo: undefined,
+      multiplePartners: undefined,
+      unprotectedSex: undefined,
+      unknownStatusPartners: undefined,
+      atRiskPartners: undefined,
+      sexUnderInfluence: undefined,
+      newStiDiagnosis: undefined,
+      considersAtRisk: undefined,
+      usedPepMultipleTimes: undefined,
+      forcedSex: undefined,
     },
   });
 
@@ -85,13 +87,36 @@ export default function PrEpScreeningForm() {
     }
   }
 
+  const renderQuestion = (fieldName: keyof PrEpScreeningFormData, label: string) => (
+    <FormField
+      control={form.control}
+      name={fieldName}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-lg">{label}</FormLabel>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormControl>
+              <SelectTrigger><SelectValue placeholder="Select Yes or No" /></SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="yes">Yes</SelectItem>
+              <SelectItem value="no">No</SelectItem>
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+
+
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Confidential PrEP Screening</CardTitle>
         <CardDescription>
-          This screening helps assess if PrEP (Pre-Exposure Prophylaxis) might be right for you. 
-          Your answers are confidential. This is not medical advice.
+          This screening helps assess if PrEP might be right for you. Your answers are confidential. This is not medical advice.
+          Please answer the following questions based on your experiences in the last six months.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -119,113 +144,17 @@ export default function PrEpScreeningForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="partnersLast6Months"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">How many sexual partners have you had in the past 6 months?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="0">0</SelectItem>
-                      <SelectItem value="1">1</SelectItem>
-                      <SelectItem value="2-4">2-4</SelectItem>
-                      <SelectItem value="5+">5+</SelectItem>
-                      <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="knowPartnerStatus"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Do you know the HIV status of all your sexual partners?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="yes_all">Yes, all of them</SelectItem>
-                      <SelectItem value="yes_some">Yes, some of them</SelectItem>
-                      <SelectItem value="no">No, I don't know for some/all</SelectItem>
-                      <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="consistentCondomUse"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">How consistently do you use condoms during sexual activity?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="always">Always</SelectItem>
-                      <SelectItem value="sometimes">Sometimes</SelectItem>
-                      <SelectItem value="rarely">Rarely</SelectItem>
-                      <SelectItem value="never">Never</SelectItem>
-                      <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="stiLast6Months"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Have you been diagnosed with a sexually transmitted infection (STI) in the past 6 months?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
-                      <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="currentPrevention"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Are you currently using any HIV prevention methods? If so, what?</FormLabel>
-                  <FormControl><Textarea placeholder="e.g., Condoms, PrEP, TasP. Leave blank if none." {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="wantsPrEpInfo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Would you be interested in learning more about PrEP as an HIV prevention option?</FormLabel>
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes, I'm interested</SelectItem>
-                      <SelectItem value="no">No, not at this time</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
+            {renderQuestion("multiplePartners", "B1. Have you had sex with more than one sexual partner?")}
+            {renderQuestion("unprotectedSex", "B2. Have you had sex without a condom on more than one occasion?")}
+            {renderQuestion("unknownStatusPartners", "B3. Have you had sex with people whose HIV status you do not know?")}
+            {renderQuestion("atRiskPartners", "B4. Are any of your partners at risk of HIV?")}
+            {renderQuestion("sexUnderInfluence", "B5. Have you had sex under the influence of alcohol or other drugs?")}
+            {renderQuestion("newStiDiagnosis", "B6. Have you received a new diagnosis of a sexually transmitted infection?")}
+            {renderQuestion("considersAtRisk", "B7. Do you consider yourself at risk of getting HIV?")}
+            {renderQuestion("usedPepMultipleTimes", "B8. Have you used PEP two times or more?")}
+            {renderQuestion("forcedSex", "B9. Have you been forced to have sex against your will by your current sexual partner(s)?")}
+
             {referralMessage && (
               <Alert variant={referralMessage.toLowerCase().includes("recommend") ? "destructive" : "default"} className="mt-6">
                  {referralMessage.toLowerCase().includes("recommend") ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
