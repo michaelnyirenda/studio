@@ -1,3 +1,4 @@
+// src/lib/schemas.ts
 
 import { z } from 'zod';
 
@@ -174,7 +175,8 @@ export type StiScreeningFormData = z.infer<typeof StiScreeningSchema>;
 
 
 export const UpdateReferralFormSchema = z.object({
-  status: z.enum(['Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
+  // This is the line to fix. Add 'Pending Consent' here.
+  status: z.enum(['Pending Consent', 'Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
   notes: z.string().max(1000, { message: "Notes must be 1000 characters or less." }).optional(),
   services: z.array(z.string()).optional(),
 });

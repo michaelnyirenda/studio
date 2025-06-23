@@ -1,20 +1,23 @@
-
 "use client";
 
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { mockReferrals as initialReferrals, type MockReferral } from '@/lib/mock-data';
+import type { MockReferral } from '@/lib/mock-data';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import UpdateReferralDialog from '@/components/referrals/update-referral-dialog';
 import ReferralConsentForm from '@/components/referrals/referral-consent-form';
 import { useRole } from '@/contexts/role-context';
 import { useEffect, useState, useMemo } from 'react';
-import { FileText, ShieldAlert } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import { collection, query, where, onSnapshot, doc, updateDoc, orderBy, Timestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
+// This function now correctly handles the "Pending Consent" status
 function getStatusVariant(status: MockReferral['status']): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (status) {
+    case 'Pending Consent':
     case 'Pending Review':
       return 'destructive';
     case 'Contacted':
@@ -30,32 +33,69 @@ function getStatusVariant(status: MockReferral['status']): 'default' | 'secondar
 
 export default function ReferralsPage() {
   const { role } = useRole();
-  const [referrals, setReferrals] = useState<MockReferral[]>(initialReferrals);
+  const [referrals, setReferrals] = useState<MockReferral[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  const MOCK_CURRENT_USER = 'John Doe (HIV)';
+  // In a real app, this would come from your Firebase Auth context
+  const MOCK_CURRENT_USER_ID = 'client-test-user'; 
 
+  useEffect(() => {
+    setLoading(true);
+    const referralsCollection = collection(db, 'referrals');
+    let q;
+
+    if (role === 'admin') {
+      // Admin sees all referrals that have been consented to
+      q = query(referralsCollection, where('consentStatus', '==', 'agreed'), orderBy('referralDate', 'desc'));
+    } else {
+      // Client sees all of their own referrals
+      q = query(referralsCollection, where('userId', '==', MOCK_CURRENT_USER_ID), orderBy('referralDate', 'desc'));
+    }
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const referralsData = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          referralDate: (data.referralDate as Timestamp)?.toDate().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }) || 'N/A',
+        } as MockReferral;
+      });
+      setReferrals(referralsData);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching referrals: ", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [role]);
+  
   const pendingUserReferral = useMemo(() => {
     if (role === 'user') {
-      return referrals.find(r => r.patientName === MOCK_CURRENT_USER && r.consentStatus === 'pending');
+      return referrals.find(r => r.consentStatus === 'pending');
     }
     return null;
   }, [role, referrals]);
 
   const displayReferrals = useMemo(() => {
     if (role === 'user') {
-      return referrals.filter(r => r.patientName === MOCK_CURRENT_USER && r.consentStatus === 'agreed');
+      return referrals.filter(r => r.consentStatus === 'agreed');
     }
-    return referrals.filter(r => r.consentStatus === 'agreed');
+    return referrals;
   }, [role, referrals]);
   
-  const handleConsentSubmit = (referralId: string, facility: string) => {
-    setReferrals(prevReferrals =>
-      prevReferrals.map(r =>
-        r.id === referralId
-          ? { ...r, consentStatus: 'agreed', facility: facility }
-          : r
-      )
-    );
+  const handleConsentSubmit = async (referralId: string, facility: string) => {
+    const referralRef = doc(db, 'referrals', referralId);
+    await updateDoc(referralRef, {
+      consentStatus: 'agreed',
+      facility: facility,
+      status: 'Pending Review'
+    });
   };
 
   const pageTitle = role === 'admin' ? "Manage All Referrals" : "Your Referrals";
@@ -78,7 +118,9 @@ export default function ReferralsPage() {
         </div>
       )}
       
-      {displayReferrals.length === 0 ? (
+      {loading ? (
+        <div className="mt-8 text-center">Loading referrals...</div>
+      ) : displayReferrals.length === 0 ? (
         <div className="mt-8 text-center flex flex-col items-center justify-center rounded-2xl bg-card p-12">
           <FileText className="h-16 w-16 text-muted-foreground mb-4" />
           <p className="text-xl font-semibold text-card-foreground">

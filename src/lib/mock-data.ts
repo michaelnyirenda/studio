@@ -1,4 +1,3 @@
-
 export interface MockPost {
   id: string;
   title: string;
@@ -70,7 +69,7 @@ export interface MockReferral {
   patientName: string;
   referralDate: string;
   referralMessage: string;
-  status: 'Pending Review' | 'Contacted' | 'Follow-up Scheduled' | 'Closed';
+  status: 'Pending Consent' | 'Pending Review' | 'Contacted' | 'Follow-up Scheduled' | 'Closed';
   consentStatus: 'pending' | 'agreed' | 'declined';
   facility?: string;
   services?: string[];

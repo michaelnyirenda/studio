@@ -15,6 +15,8 @@ import { Edit3, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const serviceItems = [
   { id: 'HTS', label: 'HTS' },
@@ -61,16 +63,30 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
 
   async function onSubmit(values: UpdateReferralFormData) {
     setIsSubmitting(true);
-    console.log("Simulating update for referral ID:", referral.id, "with data:", values);
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const referralRef = doc(db, 'referrals', referral.id);
+      await updateDoc(referralRef, {
+          status: values.status,
+          notes: values.notes,
+          services: values.services
+      });
 
-    toast({
-      title: "Update Simulated",
-      description: `Changes for ${referral.patientName} logged to console. Data is NOT persisted in this demo.`,
-    });
-    setIsSubmitting(false);
-    setIsOpen(false); 
+      toast({
+        title: "Update Successful",
+        description: `Referral for ${referral.patientName} has been updated.`,
+      });
+      setIsSubmitting(false);
+      setIsOpen(false);
+    } catch (e) {
+        console.error("Error updating referral: ", e);
+        toast({
+          title: "Update Failed",
+          description: "Could not update the referral. Please try again.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+    }
   }
 
   return (

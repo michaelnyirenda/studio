@@ -1,7 +1,11 @@
+// src/app/forum/actions.ts
 "use server";
 
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { ForumPostFormData } from '@/lib/schemas';
 import { ForumPostSchema } from '@/lib/schemas';
+import type * as z from 'zod';
 
 export async function createForumPostAction(
   data: ForumPostFormData
@@ -12,9 +16,20 @@ export async function createForumPostAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
 
-  // Simulate saving to a database or calling an API
-  console.log("New Forum Post Data:", validationResult.data);
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate async operation
+  try {
+    // In a real app, you would get the author's name from the authenticated user session.
+    // For now, we'll hardcode it as the admin.
+    const authorName = "i-BreakFree Admin"; 
 
-  return { success: true, message: "Forum post created successfully!" };
+    await addDoc(collection(db, 'posts'), {
+      ...validationResult.data,
+      author: authorName,
+      createdAt: serverTimestamp(),
+    });
+
+    return { success: true, message: "Forum post created successfully!" };
+  } catch (error) {
+    console.error("Error creating forum post:", error);
+    return { success: false, message: "An error occurred while creating the post." };
+  }
 }
