@@ -165,9 +165,10 @@ export type PrEpScreeningFormData = z.infer<typeof PrEpScreeningSchema>;
 export const StiScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
-  symptoms: z.enum(['yes', 'no', 'unsure'], { required_error: "Please select an option." }),
-  partnerSymptoms: z.enum(['yes', 'no', 'unsure', 'unknown'], { required_error: "Please select an option." }),
-  wantsTesting: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
+  diagnosedOrTreated: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
+  abnormalDischarge: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
+  vaginalItchiness: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
+  genitalSores: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
 });
 export type StiScreeningFormData = z.infer<typeof StiScreeningSchema>;
 

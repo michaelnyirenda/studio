@@ -23,7 +23,7 @@ export async function submitStiScreeningAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
 
-  const { name, symptoms, partnerSymptoms, wantsTesting } = validationResult.data;
+  const { name, ...answers } = validationResult.data;
 
   console.log("STI Screening Data for", name, ":", validationResult.data);
   await new Promise(resolve => setTimeout(resolve, 1000)); 
@@ -33,8 +33,10 @@ export async function submitStiScreeningAction(
   let needsReferral = false;
   let referralObject: MockReferral | undefined = undefined;
 
-  if (symptoms === 'yes' || partnerSymptoms === 'yes' || wantsTesting === 'yes') {
-    recommendation = "Based on your responses, we recommend a consultation with a healthcare provider to discuss STI testing. Getting tested is a proactive step for your health and the health of your partners.";
+  const answeredYes = Object.values(answers).some(answer => answer === 'yes');
+
+  if (answeredYes) {
+    recommendation = "Based on your responses, we recommend a clinical STI assessment. Getting tested is a proactive step for your health and the health of your partners.";
     needsReferral = true;
   } else {
     recommendation = "Thank you for completing the screening. Remember that regular STI testing can be an important part of your overall health, even without symptoms. Please consult a healthcare provider for personalized advice on testing frequency.";
@@ -56,7 +58,7 @@ export async function submitStiScreeningAction(
       referralDate: currentDate,
       referralMessage: `Based on your STI screening, the following guidance was provided: ${recommendation}`,
       status: 'Pending Review',
-      notes: 'STI screening referral. Patient recommended for consultation and testing.',
+      notes: 'STI screening referral. Patient recommended for clinical assessment.',
     };
     console.log("Generated STI Referral Object:", referralObject);
   }

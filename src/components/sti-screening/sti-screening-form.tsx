@@ -39,9 +39,10 @@ export default function StiScreeningForm() {
     defaultValues: {
       name: '',
       age: undefined,
-      symptoms: undefined,
-      partnerSymptoms: undefined,
-      wantsTesting: undefined,
+      diagnosedOrTreated: undefined,
+      abnormalDischarge: undefined,
+      vaginalItchiness: undefined,
+      genitalSores: undefined,
     },
   });
 
@@ -79,6 +80,28 @@ export default function StiScreeningForm() {
       setIsSubmitting(false);
     }
   }
+  
+  const renderQuestion = (fieldName: keyof StiScreeningFormData, label: string) => (
+    <FormField
+      control={form.control}
+      name={fieldName}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-lg">{label}</FormLabel>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormControl>
+              <SelectTrigger><SelectValue placeholder="Select Yes or No" /></SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="yes">Yes</SelectItem>
+              <SelectItem value="no">No</SelectItem>
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl">
@@ -117,66 +140,12 @@ export default function StiScreeningForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="symptoms"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Are you experiencing any unusual symptoms (e.g., sores, discharge, itching, pain)?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
-                      <SelectItem value="unsure">I'm not sure</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="partnerSymptoms"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Has a sexual partner told you they have an STI or symptoms of one?</FormLabel>
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
-                      <SelectItem value="unsure">I'm not sure</SelectItem>
-                       <SelectItem value="unknown">I don't know my partner's status</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="wantsTesting"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Would you like to get tested for STIs?</FormLabel>
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
+            {renderQuestion("diagnosedOrTreated", "D1. Have you ever been diagnosed or treated for STI?")}
+            {renderQuestion("abnormalDischarge", "D2. Do you have any abnormal vaginal discharge (more than normal, abnormal colour? foul smelling)?")}
+            {renderQuestion("vaginalItchiness", "D3. Do you have any vaginal itchiness or abnormal discomfort?")}
+            {renderQuestion("genitalSores", "D4. Do you have sore, ulcers, or wounds on your genitals?")}
+            
             {referralMessage && (
               <Alert variant={referralMessage.toLowerCase().includes("recommend") ? "destructive" : "default"} className="mt-6">
                 {referralMessage.toLowerCase().includes("recommend") ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
