@@ -58,6 +58,7 @@ export async function submitStiScreeningAction(
       referralDate: currentDate,
       referralMessage: `Based on your STI screening, the following guidance was provided: ${recommendation}`,
       status: 'Pending Review',
+      consentStatus: 'pending',
       notes: 'STI screening referral. Patient recommended for clinical assessment.',
     };
     console.log("Generated STI Referral Object:", referralObject);

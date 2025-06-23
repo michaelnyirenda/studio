@@ -58,6 +58,7 @@ export async function submitPrEpScreeningAction(
       referralDate: currentDate,
       referralMessage: `Based on the PrEP screening, the user is likely eligible for PrEP and requires a consultation. Guidance provided: ${recommendation}`,
       status: 'Pending Review',
+      consentStatus: 'pending',
       notes: 'PrEP screening indicates eligibility. Consultation recommended.',
     };
     console.log("Generated PrEP Referral Object:", referralObject);

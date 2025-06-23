@@ -74,6 +74,7 @@ export async function submitGbvScreeningAction(
     referralDate: currentDate,
     referralMessage: fullReferralMessage,
     status: needsImmediateReferral ? 'Pending Review' : 'Closed',
+    consentStatus: 'pending',
     notes: notes.join(' '),
   };
   

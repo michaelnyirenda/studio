@@ -176,6 +176,7 @@ export type StiScreeningFormData = z.infer<typeof StiScreeningSchema>;
 export const UpdateReferralFormSchema = z.object({
   status: z.enum(['Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
   notes: z.string().max(1000, { message: "Notes must be 1000 characters or less." }).optional(),
+  services: z.array(z.string()).optional(),
 });
 export type UpdateReferralFormData = z.infer<typeof UpdateReferralFormSchema>;
 
@@ -201,3 +202,9 @@ export const AttendanceSchema = z.object({
 });
 
 export type AttendanceFormData = z.infer<typeof AttendanceSchema>;
+
+export const ReferralConsentSchema = z.object({
+  consent: z.literal<boolean>(true, { errorMap: () => ({ message: 'You must agree to be referred.'})}),
+  facility: z.string({ required_error: "Please select a facility." }),
+});
+export type ReferralConsentFormData = z.infer<typeof ReferralConsentSchema>;

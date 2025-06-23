@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import type * as z from 'zod';
@@ -16,6 +17,21 @@ import { UpdateReferralFormSchema, type UpdateReferralFormData } from '@/lib/sch
 import { Edit3, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
+
+const serviceItems = [
+  { id: 'HTS', label: 'HTS' },
+  { id: 'PrEP', label: 'PrEP' },
+  { id: 'ART', label: 'ART' },
+  { id: 'GBV post Care', label: 'GBV post Care' },
+  { id: 'STI Assessment', label: 'STI Assessment' },
+  { id: 'PEP', label: 'PEP' },
+  { id: 'TB Screening', label: 'TB Screening' },
+  { id: 'PMTCT', label: 'PMTCT' },
+  { id: 'ANC', label: 'ANC' },
+  { id: 'Family Planning', label: 'Family Planning' },
+  { id: 'Pap Smear', label: 'Pap Smear' },
+  { id: 'Others', label: 'Others' },
+] as const;
 
 interface UpdateReferralDialogProps {
   referral: MockReferral;
@@ -31,6 +47,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
     defaultValues: {
       status: referral.status,
       notes: referral.notes || '',
+      services: referral.services || [],
     },
   });
 
@@ -39,6 +56,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
       form.reset({
         status: referral.status,
         notes: referral.notes || '',
+        services: referral.services || [],
       });
     }
   }, [isOpen, referral, form]);
@@ -47,7 +65,6 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
     setIsSubmitting(true);
     console.log("Simulating update for referral ID:", referral.id, "with data:", values);
     
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     toast({
@@ -66,30 +83,15 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
           Update
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
           <CardDescription className="text-sm text-muted-foreground pt-1">
-            ID: {referral.id}
+            ID: {referral.id} | Facility: {referral.facility || 'N/A'}
           </CardDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
-            <FormItem>
-              <FormLabel>Patient Name</FormLabel>
-              <Input value={referral.patientName} readOnly className="bg-secondary/30 border-border/50" />
-            </FormItem>
-
-            <FormItem>
-              <FormLabel>Referred On</FormLabel>
-              <Input value={referral.referralDate} readOnly className="bg-secondary/30 border-border/50" />
-            </FormItem>
-            
-            <FormItem>
-              <FormLabel>Referral Reason/Message</FormLabel>
-              <Textarea value={referral.referralMessage} readOnly className="bg-secondary/30 border-border/50 h-28 resize-none" />
-            </FormItem>
-
             <FormField
               control={form.control}
               name="status"
@@ -113,6 +115,46 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                 </FormItem>
               )}
             />
+
+            <FormField
+                control={form.control}
+                name="services"
+                render={() => (
+                    <FormItem>
+                        <FormLabel>Services Referred</FormLabel>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-2 border rounded-md max-h-48 overflow-y-auto">
+                            {serviceItems.map((item) => (
+                            <FormField
+                                key={item.id}
+                                control={form.control}
+                                name="services"
+                                render={({ field }) => (
+                                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                    <FormControl>
+                                    <Checkbox
+                                        checked={field.value?.includes(item.id)}
+                                        onCheckedChange={(checked) => {
+                                        return checked
+                                            ? field.onChange([...(field.value || []), item.id])
+                                            : field.onChange(
+                                                (field.value || []).filter(
+                                                (value) => value !== item.id
+                                                )
+                                            );
+                                        }}
+                                    />
+                                    </FormControl>
+                                    <FormLabel className="text-sm font-normal">{item.label}</FormLabel>
+                                </FormItem>
+                                )}
+                            />
+                            ))}
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
 
             <FormField
               control={form.control}

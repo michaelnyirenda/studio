@@ -4,11 +4,11 @@
 import type * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,11 +28,11 @@ import { submitPrEpScreeningAction } from '@/app/prep-screening/actions';
 import { PrEpScreeningSchema, type PrEpScreeningFormData } from '@/lib/schemas';
 import { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Info, Loader2 } from 'lucide-react';
+import { ArrowRight, CheckCircle, Info, Loader2 } from 'lucide-react';
 
 export default function PrEpScreeningForm() {
   const { toast } = useToast();
-  const [referralMessage, setReferralMessage] = useState<string | null>(null);
+  const [submissionResult, setSubmissionResult] = useState<{ message: string; hasReferral: boolean; } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<PrEpScreeningFormData>({
@@ -54,7 +54,7 @@ export default function PrEpScreeningForm() {
 
   async function onSubmit(values: PrEpScreeningFormData) {
     setIsSubmitting(true);
-    setReferralMessage(null);
+    setSubmissionResult(null);
     try {
       const result = await submitPrEpScreeningAction(values);
       if (result.success) {
@@ -62,8 +62,10 @@ export default function PrEpScreeningForm() {
           title: "Screening Submitted",
           description: result.message,
         });
-        setReferralMessage(result.referralMessage || "No specific referral advice at this time.");
-        form.reset(); 
+        setSubmissionResult({
+            message: result.referralMessage || "Your screening has been submitted.",
+            hasReferral: !!result.referralDetails,
+        });
       } else {
         toast({
           title: "Error",
@@ -108,6 +110,32 @@ export default function PrEpScreeningForm() {
       )}
     />
   );
+  
+  if (submissionResult) {
+    return (
+        <Card className="w-full max-w-2xl mx-auto shadow-xl">
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">Screening Submitted</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Alert variant={submissionResult.hasReferral ? "destructive" : "default"} className="mt-6">
+                    {submissionResult.hasReferral ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
+                    <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
+                    <AlertDescription>{submissionResult.message}</AlertDescription>
+                </Alert>
+                {submissionResult.hasReferral && (
+                    <div className="mt-6 flex justify-center">
+                        <Link href="/referrals" passHref>
+                            <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                                Complete Your Referral <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </Link>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+  }
 
 
   return (
@@ -154,14 +182,6 @@ export default function PrEpScreeningForm() {
             {renderQuestion("considersAtRisk", "B7. Do you consider yourself at risk of getting HIV?")}
             {renderQuestion("usedPepMultipleTimes", "B8. Have you used PEP two times or more?")}
             {renderQuestion("forcedSex", "B9. Have you been forced to have sex against your will by your current sexual partner(s)?")}
-
-            {referralMessage && (
-              <Alert variant={referralMessage.toLowerCase().includes("recommend") ? "destructive" : "default"} className="mt-6">
-                 {referralMessage.toLowerCase().includes("recommend") ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
-                <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
-                <AlertDescription>{referralMessage}</AlertDescription>
-              </Alert>
-            )}
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>

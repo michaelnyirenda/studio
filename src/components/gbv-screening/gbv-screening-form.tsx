@@ -4,6 +4,7 @@
 import type * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -29,7 +30,7 @@ import { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Info, Loader2, ShieldAlert } from 'lucide-react';
+import { ArrowRight, CheckCircle, Info, Loader2, ShieldAlert } from 'lucide-react';
 
 const emotionalViolenceItems = [
   { id: 'mocked', label: 'Mock you, insulted you or put you down?' },
@@ -52,7 +53,7 @@ const sexualViolenceItems = [
 export default function GbvScreeningForm() {
   const { toast } = useToast();
   const [consent, setConsent] = useState<'agreed' | 'declined' | null>(null);
-  const [referralMessage, setReferralMessage] = useState<string | null>(null);
+  const [submissionResult, setSubmissionResult] = useState<{ message: string; hasReferral: boolean; isHighRisk: boolean; } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<GbvScreeningFormData>({
@@ -76,9 +77,8 @@ export default function GbvScreeningForm() {
 
   async function onSubmit(values: GbvScreeningFormData) {
     setIsSubmitting(true);
-    setReferralMessage(null);
+    setSubmissionResult(null);
 
-    // Ensure timeline is set correctly if no sexual violence is reported
     const finalValues = { ...values };
     if (finalValues.sexualViolence.includes('no')) {
       finalValues.sexualViolenceTimeline = 'no_history';
@@ -91,9 +91,12 @@ export default function GbvScreeningForm() {
           title: "Screening Submitted",
           description: result.message,
         });
-        setReferralMessage(result.referralMessage || "No specific referral advice at this time.");
-        form.reset(); 
-        setConsent(null); // Reset consent to show disclaimer again
+        const isHighRisk = result.referralMessage?.toLowerCase().includes("immediate") || result.referralMessage?.toLowerCase().includes("urgent");
+        setSubmissionResult({
+            message: result.referralMessage || "No specific referral advice at this time.",
+            hasReferral: !!result.referralDetails,
+            isHighRisk: !!isHighRisk,
+        });
       } else {
         toast({
           title: "Error",
@@ -115,6 +118,32 @@ export default function GbvScreeningForm() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (submissionResult) {
+    return (
+        <Card className="w-full max-w-2xl mx-auto shadow-xl">
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">Screening Submitted</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Alert variant={submissionResult.isHighRisk ? "destructive" : "default"} className="mt-6">
+                    {submissionResult.isHighRisk ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
+                    <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
+                    <AlertDescription>{submissionResult.message}</AlertDescription>
+                </Alert>
+                {submissionResult.hasReferral && (
+                    <div className="mt-6 flex justify-center">
+                        <Link href="/referrals" passHref>
+                            <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                                Complete Your Referral <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </Link>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
   }
 
   if (consent === null) {
@@ -263,14 +292,6 @@ export default function GbvScreeningForm() {
             />
             {showTimelineQuestion && (
                 <FormField control={form.control} name="sexualViolenceTimeline" render={({ field }) => (<FormItem className="pl-4 border-l-4 border-destructive/50"><FormLabel className="text-lg text-destructive">C6. When did you experience the sexual violence?</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger></FormControl><SelectContent><SelectItem value="le_72_hr">≤ 72 hours</SelectItem><SelectItem value="gt_72_le_120_hr">&gt; 72 hours to ≤ 120 hours</SelectItem><SelectItem value="gt_120_hr">&gt; 120 hours (&gt; 5 days)</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-            )}
-
-            {referralMessage && (
-              <Alert variant={referralMessage.toLowerCase().includes("immediate") || referralMessage.toLowerCase().includes("urgent") ? "destructive" : "default"} className="mt-6">
-                {referralMessage.toLowerCase().includes("immediate") || referralMessage.toLowerCase().includes("urgent") ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
-                <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
-                <AlertDescription>{referralMessage}</AlertDescription>
-              </Alert>
             )}
           </CardContent>
           <CardFooter>

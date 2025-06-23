@@ -4,6 +4,7 @@
 import type * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -27,11 +28,11 @@ import { submitStiScreeningAction } from '@/app/sti-screening/actions';
 import { StiScreeningSchema, type StiScreeningFormData } from '@/lib/schemas';
 import { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Info, Loader2 } from 'lucide-react';
+import { ArrowRight, CheckCircle, Info, Loader2 } from 'lucide-react';
 
 export default function StiScreeningForm() {
   const { toast } = useToast();
-  const [referralMessage, setReferralMessage] = useState<string | null>(null);
+  const [submissionResult, setSubmissionResult] = useState<{ message: string; hasReferral: boolean; } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<StiScreeningFormData>({
@@ -48,7 +49,7 @@ export default function StiScreeningForm() {
 
   async function onSubmit(values: StiScreeningFormData) {
     setIsSubmitting(true);
-    setReferralMessage(null);
+    setSubmissionResult(null);
     try {
       const result = await submitStiScreeningAction(values);
       if (result.success) {
@@ -56,8 +57,10 @@ export default function StiScreeningForm() {
           title: "Screening Submitted",
           description: result.message,
         });
-        setReferralMessage(result.referralMessage || "No specific referral advice at this time.");
-        form.reset(); 
+        setSubmissionResult({
+            message: result.referralMessage || "Your screening has been submitted.",
+            hasReferral: !!result.referralDetails,
+        });
       } else {
         toast({
           title: "Error",
@@ -102,6 +105,32 @@ export default function StiScreeningForm() {
       )}
     />
   );
+  
+  if (submissionResult) {
+    return (
+        <Card className="w-full max-w-2xl mx-auto shadow-xl">
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">Screening Submitted</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Alert variant={submissionResult.hasReferral ? "destructive" : "default"} className="mt-6">
+                    {submissionResult.hasReferral ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
+                    <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
+                    <AlertDescription>{submissionResult.message}</AlertDescription>
+                </Alert>
+                {submissionResult.hasReferral && (
+                    <div className="mt-6 flex justify-center">
+                        <Link href="/referrals" passHref>
+                            <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                                Complete Your Referral <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </Link>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl">
@@ -146,13 +175,6 @@ export default function StiScreeningForm() {
             {renderQuestion("vaginalItchiness", "D3. Do you have any vaginal itchiness or abnormal discomfort?")}
             {renderQuestion("genitalSores", "D4. Do you have sore, ulcers, or wounds on your genitals?")}
             
-            {referralMessage && (
-              <Alert variant={referralMessage.toLowerCase().includes("recommend") ? "destructive" : "default"} className="mt-6">
-                {referralMessage.toLowerCase().includes("recommend") ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
-                <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
-                <AlertDescription>{referralMessage}</AlertDescription>
-              </Alert>
-            )}
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>

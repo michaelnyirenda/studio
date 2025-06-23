@@ -71,16 +71,20 @@ export interface MockReferral {
   referralDate: string;
   referralMessage: string;
   status: 'Pending Review' | 'Contacted' | 'Follow-up Scheduled' | 'Closed';
+  consentStatus: 'pending' | 'agreed' | 'declined';
+  facility?: string;
+  services?: string[];
   notes?: string;
 }
 
 export const mockReferrals: MockReferral[] = [
   {
-    id: 'ref-hiv-john-doe-1627840000000', // Example static ID for predictability in user mode
+    id: 'ref-hiv-john-doe-1627840000000', 
     patientName: 'John Doe (HIV)',
     referralDate: 'August 1, 2024',
     referralMessage: 'Dear John Doe, thank you for completing the screening. Given your sexual activity and no prior testing, a referral for HIV testing and counseling is recommended. Please consult a healthcare professional to discuss this further. Early testing is key for your health.',
     status: 'Pending Review',
+    consentStatus: 'pending',
     notes: 'Patient seemed anxious during HIV screening.',
   },
   {
@@ -89,6 +93,9 @@ export const mockReferrals: MockReferral[] = [
     referralDate: 'August 2, 2024',
     referralMessage: 'Based on your GBV screening, the following guidance was provided: We are concerned that you have experienced harm. It is important to seek support. We can provide you with information on available resources.',
     status: 'Contacted',
+    consentStatus: 'agreed',
+    facility: 'Downtown Women\'s Center',
+    services: ['GBV post Care'],
     notes: 'Patient was receptive during the call. Safety planning discussed, resources provided.',
   },
   {
@@ -97,6 +104,9 @@ export const mockReferrals: MockReferral[] = [
     referralDate: 'August 3, 2024',
     referralMessage: 'Based on your PrEP screening, the following guidance was provided: Based on your responses, you may have factors that increase your risk of HIV exposure. PrEP (Pre-Exposure Prophylaxis) is a highly effective medication to prevent HIV. We recommend discussing PrEP with a healthcare provider to see if it\'s right for you.',
     status: 'Follow-up Scheduled',
+    consentStatus: 'agreed',
+    facility: 'City Health Clinic',
+    services: ['PrEP', 'HTS'],
     notes: 'PrEP consultation scheduled with Dr. Carter.',
   },
    {
@@ -105,6 +115,9 @@ export const mockReferrals: MockReferral[] = [
     referralDate: 'August 4, 2024',
     referralMessage: 'Dear Samuel Green, we acknowledge your testing history. It\'s important to continue with regular medical follow-ups and adhere to any prescribed treatment. If you need support or further consultation, please reach out to a healthcare provider.',
     status: 'Closed',
+    consentStatus: 'agreed',
+    facility: 'General Hospital',
+    services: ['ART', 'Family Planning'],
     notes: 'Patient confirmed linkage to care.',
   },
 ];

@@ -51,6 +51,7 @@ export async function submitHivScreeningAction(
     referralDate: currentDate,
     referralMessage: "Referral generated from detailed HIV screening. Patient requires consultation with a healthcare professional for a full review of their risk profile.",
     status: 'Pending Review',
+    consentStatus: 'pending',
     notes: 'Generated from detailed screening form. See server logs for submitted data.',
   };
   
