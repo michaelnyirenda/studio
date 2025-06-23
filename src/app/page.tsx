@@ -8,6 +8,7 @@ import PageHeader from "@/components/shared/page-header";
 import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, LineChart, Users, MessageSquareText, ShieldAlert, UserCog, BarChart3, Search } from 'lucide-react';
 import Image from 'next/image';
 import { useRole } from '@/contexts/role-context';
+import * as React from 'react';
 
 interface FeatureCardProps {
   title: string;
@@ -29,25 +30,36 @@ interface AdminFeatureCardProps {
 
 function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, imageHint }: FeatureCardProps) {
   return (
-    <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <div className="relative h-48 w-full">
-        <Image src={imageSrc} alt={imageAlt} layout="fill" objectFit="cover" data-ai-hint={imageHint} />
+    <Link href={link} passHref>
+      <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-secondary text-secondary-foreground shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1.5">
+        <div className="relative h-48 w-full">
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            layout="fill"
+            objectFit="cover"
+            data-ai-hint={imageHint}
+            className="transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+        <div className="flex flex-1 flex-col p-6">
+          <div className="flex items-start">
+            <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-background">
+              {React.cloneElement(icon as React.ReactElement, { className: "h-7 w-7 text-primary" })}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold font-headline text-primary">{title}</h3>
+              <p className="mt-2 text-base text-secondary-foreground">{description}</p>
+            </div>
+          </div>
+          <div className="mt-auto flex justify-end pt-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground transition-transform duration-300 group-hover:rotate-[-45deg]">
+                <ArrowRight className="h-5 w-5" />
+              </div>
+          </div>
+        </div>
       </div>
-      <CardHeader>
-        <CardTitle className="flex items-center text-2xl font-headline text-primary">
-          {icon}
-          <span className="ml-3">{title}</span>
-        </CardTitle>
-        <CardDescription className="text-base">{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="mt-auto">
-        <Link href={link} passHref>
-          <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-            Proceed <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </Link>
-      </CardContent>
-    </Card>
+    </Link>
   );
 }
 
