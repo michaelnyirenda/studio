@@ -31,11 +31,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info, Loader2 } from 'lucide-react';
 
 const mockFacilities = [
-    "City Health Clinic",
-    "Downtown Women's Center",
-    "General Hospital",
-    "Community Wellness Hub",
-    "Northside Youth Services"
+    "Clinic 1",
+    "Clinic 2",
+    "Clinic 3",
+    "Clinic 4",
+    "Clinic 5"
 ];
 
 interface ReferralConsentFormProps {
