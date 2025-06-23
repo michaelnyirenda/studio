@@ -83,7 +83,6 @@ export default function ScreeningForm() {
   const watchHasDisability = form.watch("hasDisability");
   const watchPregnancyHistory = form.watch("pregnancyHistory");
   const watchHadSex = form.watch("hadSex");
-  const watchMultiplePartners = form.watch("multiplePartners");
   
   async function onSubmit(values: HivScreeningFormData) {
     setIsSubmitting(true);
@@ -180,8 +179,8 @@ export default function ScreeningForm() {
                   <FormLabel className="text-lg">A9. What is the age difference between you and your sexual partner(s)?</FormLabel>
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {renderQuestion("partnerAgeDifferenceP1", "Partner 1", [{value: '0-3', label: '0-3 years'}, {value: '4-9', label: '4-9 years'}, {value: '10+', label: '10+ years'}, {value: 'dont_know', label: 'Don’t know'}])}
-                    {(watchMultiplePartners === 'two' || watchMultiplePartners === 'three_or_more' || watchMultiplePartners === 'dont_remember') && renderQuestion("partnerAgeDifferenceP2", "Partner 2", [{value: '0-3', label: '0-3 years'}, {value: '4-9', label: '4-9 years'}, {value: '10+', label: '10+ years'}, {value: 'dont_know', label: 'Don’t know'}])}
-                    {(watchMultiplePartners === 'three_or_more' || watchMultiplePartners === 'dont_remember') && renderQuestion("partnerAgeDifferenceP3", "Partner 3", [{value: '0-3', label: '0-3 years'}, {value: '4-9', label: '4-9 years'}, {value: '10+', label: '10+ years'}, {value: 'dont_know', label: 'Don’t know'}])}
+                    {renderQuestion("partnerAgeDifferenceP2", "Partner 2", [{value: '0-3', label: '0-3 years'}, {value: '4-9', label: '4-9 years'}, {value: '10+', label: '10+ years'}, {value: 'dont_know', label: 'Don’t know'}])}
+                    {renderQuestion("partnerAgeDifferenceP3", "Partner 3", [{value: '0-3', label: '0-3 years'}, {value: '4-9', label: '4-9 years'}, {value: '10+', label: '10+ years'}, {value: 'dont_know', label: 'Don’t know'}])}
                    </div>
                 </FormItem>
               )}
