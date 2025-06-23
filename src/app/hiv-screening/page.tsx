@@ -100,15 +100,6 @@ export default function ScreeningPage() {
           imageHint="HIV test"
         />
         <ScreeningTypeCard
-          title="GBV Screening"
-          description="Screening for Gender-Based Violence. Support and resources are available."
-          icon={<ShieldAlert className="h-10 w-10 text-primary mb-3" />}
-          onSelect={() => handleSelectScreening('gbv')}
-          imageSrc="https://images.unsplash.com/photo-1656577796467-e049bfc98376?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d29tZW4lMjBzdXBwb3J0fGVufDB8fHx8MTc1MDMxMjgzOXww&ixlib=rb-4.1.0&q=80&w=1080"
-          imageAlt="Hands offering support"
-          imageHint="support help"
-        />
-        <ScreeningTypeCard
           title="PrEP Screening"
           description="Determine if PrEP (Pre-Exposure Prophylaxis) is a suitable HIV prevention option for you."
           icon={<Pill className="h-10 w-10 text-primary mb-3" />}
@@ -116,6 +107,15 @@ export default function ScreeningPage() {
           imageSrc="https://images.unsplash.com/photo-1625402534923-e8132f4b1de4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxOXx8bWVkaWNhdGlvbnxlbnwwfHx8fDE3NTAzMTI4NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080"
           imageAlt="Pills and medication"
           imageHint="medication pills"
+        />
+        <ScreeningTypeCard
+          title="GBV Screening"
+          description="Screening for Gender-Based Violence. Support and resources are available."
+          icon={<ShieldAlert className="h-10 w-10 text-primary mb-3" />}
+          onSelect={() => handleSelectScreening('gbv')}
+          imageSrc="https://images.unsplash.com/photo-1656577796467-e049bfc98376?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d29tZW4lMjBzdXBwb3J0fGVufDB8fHx8MTc1MDMxMjgzOXww&ixlib=rb-4.1.0&q=80&w=1080"
+          imageAlt="Hands offering support"
+          imageHint="support help"
         />
         <ScreeningTypeCard
           title="STI Screening"
