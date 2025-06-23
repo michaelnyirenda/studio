@@ -9,23 +9,23 @@ body {
 
 @layer base {
   :root {
-    --background: 228 67% 94%; /* Light Blue (#E8EAF6) */
-    --foreground: 230 20% 25%;   /* Dark Blue-Gray */
+    --background: 10 30% 96%; /* Very light, warm gray */
+    --foreground: 10 10% 20%;   /* Very dark, slightly warm gray */
 
     --card: 0 0% 100%; /* White */
-    --card-foreground: 230 20% 25%;
+    --card-foreground: 10 10% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 230 20% 25%;
+    --popover-foreground: 10 10% 20%;
 
-    --primary: 231 48% 54%; /* Deep Blue (#3F51B5) */
+    --primary: 5 62% 38%; /* Deep Red (#9B2F25) */
     --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 230 50% 90%; /* Lighter Blue */
-    --secondary-foreground: 231 48% 54%; /* Deep Blue */
+    --secondary: 10 30% 92%; /* Light, warm gray */
+    --secondary-foreground: 5 62% 38%; /* Deep Red */
 
-    --muted: 230 50% 90%; /* Same as secondary */
-    --muted-foreground: 230 20% 45%; /* Medium Blue-Gray */
+    --muted: 10 30% 92%; /* Same as secondary */
+    --muted-foreground: 10 10% 45%; /* Medium warm gray */
 
     --accent: 36 100% 50%;   /* Vibrant Orange (#FF9800) */
     --accent-foreground: 0 0% 100%; /* White */
@@ -33,53 +33,52 @@ body {
     --destructive: 0 84% 60%; /* A standard error red */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 230 40% 88%;
-    --input: 230 40% 98%;
-    --ring: 231 48% 54%; /* Primary color for rings */
+    --border: 10 20% 88%;
+    --input: 10 30% 98%;
+    --ring: 5 62% 38%; /* Primary color for rings */
 
     --radius: 0.75rem; /* Slightly more rounded corners */
 
-    --chart-1: 231 48% 54%; /* primary */
+    --chart-1: 5 62% 45%; /* primary */
     --chart-2: 36 100% 50%; /* accent */
-    --chart-3: 210 100% 65%; /* a lighter, brighter blue */
-    --chart-4: 190 70% 55%; /* a teal/cyan */
+    --chart-3: 145 50% 45%; /* a complementary green */
+    --chart-4: 30 40% 50%; /* a complementary brown/gold */
     --chart-5: 280 60% 65%; /* a soft purple */
   }
 
   .dark {
-    /* Keeping dark mode simple for now, but inverting the colors */
-    --background: 230 20% 12%; 
-    --foreground: 228 60% 95%;
+    --background: 10 10% 12%; 
+    --foreground: 10 20% 95%;
 
-    --card: 230 20% 18%; 
-    --card-foreground: 228 60% 95%;
+    --card: 10 10% 18%; 
+    --card-foreground: 10 20% 95%;
 
-    --popover: 230 20% 12%;
-    --popover-foreground: 228 60% 95%;
+    --popover: 10 10% 12%;
+    --popover-foreground: 10 20% 95%;
 
-    --primary: 231 48% 64%; /* Lighter blue for dark mode */
+    --primary: 5 70% 60%; /* Lighter red for dark mode */
     --primary-foreground: 0 0% 100%; 
 
-    --secondary: 230 20% 25%; 
-    --secondary-foreground: 228 60% 90%;
+    --secondary: 10 10% 25%; 
+    --secondary-foreground: 10 20% 90%;
 
-    --muted: 230 20% 25%;
-    --muted-foreground: 230 20% 65%;
+    --muted: 10 10% 25%;
+    --muted-foreground: 10 15% 65%;
 
     --accent: 36 100% 60%;   /* Brighter orange for dark mode */
-    --accent-foreground: 230 20% 10%;
+    --accent-foreground: 20 15% 10%;
 
     --destructive: 0 70% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 230 20% 30%;
-    --input: 230 20% 22%;
-    --ring: 231 48% 64%; /* Lighter primary */
+    --border: 10 10% 30%;
+    --input: 10 10% 22%;
+    --ring: 5 70% 60%; /* Lighter primary */
 
-    --chart-1: 231 48% 64%;
+    --chart-1: 5 70% 60%;
     --chart-2: 36 100% 60%;
-    --chart-3: 210 100% 70%;
-    --chart-4: 190 70% 60%;
+    --chart-3: 145 50% 55%;
+    --chart-4: 30 40% 60%;
     --chart-5: 280 60% 70%;
   }
 }
