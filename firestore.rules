@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // This rule allows anyone to read and write to any collection.
+    // WARNING: This is for development only. Do not use in production.
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

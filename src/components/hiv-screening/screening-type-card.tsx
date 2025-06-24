@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { ReactNode } from 'react';
@@ -28,8 +27,8 @@ export default function ScreeningTypeCard({ title, description, icon, onSelect, 
         <Image
           src={imageSrc}
           alt={imageAlt}
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: 'cover' }}
           data-ai-hint={imageHint}
           className="transition-transform duration-300 group-hover:scale-105"
         />

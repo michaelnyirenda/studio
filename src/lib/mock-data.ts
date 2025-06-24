@@ -1,3 +1,5 @@
+import { FieldValue } from 'firebase/firestore';
+
 export interface MockPost {
   id: string;
   title: string;
@@ -11,9 +13,9 @@ export interface MockPost {
 
 // Mock data - in a real app, this would come from an API or database
 export const mockPosts: MockPost[] = [
-  { 
-    id: '1', 
-    title: 'Getting Started with i-BreakFree Platform', 
+  {
+    id: '1',
+    title: 'Getting Started with i-BreakFree Platform',
     content: `Welcome to i-BreakFree! This platform is designed to foster community engagement and learning.
 Explore the features and share your knowledge. You can embed images and videos in your posts to make them more engaging.
 
@@ -27,15 +29,15 @@ Key Features to Explore:
 - GBV Screening: Access GBV support information.
 
 We hope you find this platform valuable!`,
-    author: 'i-BreakFree Admin', 
+    author: 'i-BreakFree Admin',
     date: 'July 29, 2024',
     imageUrl: 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBlbmdhZ2VtZW50fGVufDB8fHx8MTc0OTAxMjM0NXww&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'community engagement',
-    videoUrl: 'https://youtu.be/NnfkVsVnl3s?si=ZjKcWKiSUULn4bjW' 
+    videoUrl: 'https://youtu.be/NnfkVsVnl3s?si=ZjKcWKiSUULn4bjW'
   },
-  { 
-    id: '2', 
-    title: 'Tips for Effective Online Learning', 
+  {
+    id: '2',
+    title: 'Tips for Effective Online Learning',
     content: `Online learning can be challenging, but with the right strategies, it can be very rewarding.
 Here are some tips to help you succeed:
 1.  **Set a Schedule**: Treat your online courses like traditional classes. Allocate specific times for study and stick to them.
@@ -43,12 +45,12 @@ Here are some tips to help you succeed:
 3.  **Participate Actively**: Engage in online discussions, ask questions, and collaborate with peers.
 4.  **Take Regular Breaks**: Avoid burnout by taking short breaks every hour.
 5.  **Utilize Resources**: Take advantage of all available resources, such as lecture notes, supplementary materials, and instructor office hours.`,
-    author: 'Community Educator', 
-    date: 'July 28, 2024' 
+    author: 'Community Educator',
+    date: 'July 28, 2024'
   },
-  { 
-    id: '3', 
-    title: 'Understanding HIV Prevention Methods', 
+  {
+    id: '3',
+    title: 'Understanding HIV Prevention Methods',
     content: `Knowledge is power when it comes to HIV prevention. Learn about safe practices, regular testing, and available resources in our community.
 Key prevention strategies include:
 - Consistent and correct use of condoms.
@@ -57,7 +59,7 @@ Key prevention strategies include:
 - Post-exposure prophylaxis (PEP) after potential exposure.
 - Avoiding sharing needles or other injection equipment.
 - Treatment as Prevention (TasP): People with HIV who take ART daily as prescribed and achieve and maintain an undetectable viral load have effectively no risk of sexually transmitting HIV to their HIV-negative partners.`,
-    author: 'Health Awareness Team', 
+    author: 'Health Awareness Team',
     date: 'July 27, 2024',
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoZWFsdGhjYXJlJTIwYXdhcmVuZXNzfGVufDB8fHx8MTc0OTAxMjM0Nnww&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'healthcare awareness'
@@ -67,7 +69,7 @@ Key prevention strategies include:
 export interface MockReferral {
   id: string;
   patientName: string;
-  referralDate: string;
+  referralDate: string | Date | FieldValue; // This is the fix
   referralMessage: string;
   status: 'Pending Consent' | 'Pending Review' | 'Contacted' | 'Follow-up Scheduled' | 'Closed';
   consentStatus: 'pending' | 'agreed' | 'declined';
@@ -78,7 +80,7 @@ export interface MockReferral {
 
 export const mockReferrals: MockReferral[] = [
   {
-    id: 'ref-hiv-john-doe-1627840000000', 
+    id: 'ref-hiv-john-doe-1627840000000',
     patientName: 'John Doe (HIV)',
     referralDate: 'August 1, 2024',
     referralMessage: 'Dear John Doe, thank you for completing the screening. Given your sexual activity and no prior testing, a referral for HIV testing and counseling is recommended. Please consult a healthcare professional to discuss this further. Early testing is key for your health.',
@@ -108,7 +110,7 @@ export const mockReferrals: MockReferral[] = [
     services: ['PrEP', 'HTS'],
     notes: 'PrEP consultation scheduled with Dr. Carter.',
   },
-   {
+  {
     id: 'ref-hiv-samuel-green-1628099200000',
     patientName: 'Samuel Green (HIV)',
     referralDate: 'August 4, 2024',

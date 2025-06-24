@@ -1,6 +1,7 @@
-
 "use server";
 
+import { addDoc, collection, serverTimestamp, FieldValue } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { StiScreeningFormData } from '@/lib/schemas';
 import { StiScreeningSchema } from '@/lib/schemas';
 import type * as z from 'zod';
@@ -24,50 +25,51 @@ export async function submitStiScreeningAction(
   }
 
   const { name, ...answers } = validationResult.data;
-
-  console.log("STI Screening Data for", name, ":", validationResult.data);
-  await new Promise(resolve => setTimeout(resolve, 1000)); 
-
-  let baseMessage = `Dear ${name}, thank you for completing the STI screening.`;
-  let recommendation = "";
-  let needsReferral = false;
-  let referralObject: MockReferral | undefined = undefined;
-
   const answeredYes = Object.values(answers).some(answer => answer === 'yes');
+  let recommendation = "";
 
   if (answeredYes) {
     recommendation = "Based on your responses, we recommend a clinical STI assessment. Getting tested is a proactive step for your health and the health of your partners.";
-    needsReferral = true;
   } else {
     recommendation = "Thank you for completing the screening. Remember that regular STI testing can be an important part of your overall health, even without symptoms. Please consult a healthcare provider for personalized advice on testing frequency.";
-    needsReferral = false;
   }
-  
-  const fullReferralMessage = `${baseMessage} ${recommendation}`;
 
-  if (needsReferral) {
-    const referralId = `ref-sti-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
-    const currentDate = new Date().toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    referralObject = {
-      id: referralId,
-      patientName: name,
-      referralDate: currentDate,
-      referralMessage: `Based on your STI screening, the following guidance was provided: ${recommendation}`,
-      status: 'Pending Review',
-      consentStatus: 'pending',
-      notes: 'STI screening referral. Patient recommended for clinical assessment.',
+  const fullReferralMessage = `Dear ${name}, thank you for completing the STI screening. ${recommendation}`;
+
+  try {
+    await addDoc(collection(db, 'stiScreenings'), { name, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
+
+    let referralObjectForClient: MockReferral | undefined = undefined;
+
+    if (answeredYes) {
+      const newReferralDataForDb = {
+        patientName: name,
+        referralDate: serverTimestamp(), // Use server timestamp for DB
+        referralMessage: `Based on your STI screening, the following guidance was provided: ${recommendation}`,
+        status: 'Pending Consent' as const,
+        consentStatus: 'pending' as const,
+        type: 'STI',
+        userId: 'client-test-user'
+      };
+
+      const referralDocRef = await addDoc(collection(db, 'referrals'), newReferralDataForDb);
+
+      // Create a "plain" object to return to the client
+      referralObjectForClient = {
+        id: referralDocRef.id,
+        ...newReferralDataForDb,
+        referralDate: new Date() // Use a standard Date object for the client
+      } as MockReferral;
+    }
+
+    return {
+      success: true,
+      message: "STI Screening submitted successfully.",
+      referralMessage: fullReferralMessage,
+      referralDetails: referralObjectForClient
     };
-    console.log("Generated STI Referral Object:", referralObject);
+  } catch (error) {
+    console.error("Error submitting STI screening:", error);
+    return { success: false, message: "An error occurred during submission." };
   }
-
-  return { 
-    success: true, 
-    message: "STI Screening submitted successfully.",
-    referralMessage: fullReferralMessage,
-    referralDetails: referralObject 
-  };
 }

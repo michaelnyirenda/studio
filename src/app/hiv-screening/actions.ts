@@ -1,6 +1,7 @@
-
 "use server";
 
+import { addDoc, collection, serverTimestamp, FieldValue } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { HivScreeningFormData } from '@/lib/schemas';
 import { HivScreeningSchema } from '@/lib/schemas';
 import type * as z from 'zod';
@@ -20,47 +21,45 @@ export async function submitHivScreeningAction(
   const validationResult = HivScreeningSchema.safeParse(data);
 
   if (!validationResult.success) {
-    console.error("Validation failed:", validationResult.error.issues);
-    return { success: false, message: "Validation failed. Please check the form for errors.", errors: validationResult.error.issues };
+    return { success: false, message: "Validation failed.", errors: validationResult.error.issues, };
   }
 
-  const { name } = validationResult.data;
+  const { name, ...screeningData } = validationResult.data;
 
-  // In a real app, this data would be saved to a secure database.
-  // For this prototype, we're just logging it to the server console.
-  console.log("Full HIV Screening Data for", name, ":", JSON.stringify(validationResult.data, null, 2));
-  
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate async operation
+  try {
+    const baseMessage = `Dear ${name}, thank you for completing the detailed screening. Your responses have been recorded.`;
+    const recommendation = "Based on your answers, we recommend you discuss your health profile with a healthcare professional. They can provide personalized advice and support. A record of this screening has been made for follow-up if needed.";
+    const fullReferralMessage = `${baseMessage} ${recommendation}`;
 
-  // Simplified referral logic for the prototype
-  const baseMessage = `Dear ${name}, thank you for completing the detailed screening. Your responses have been recorded.`;
-  const recommendation = "Based on your answers, we recommend you discuss your health profile with a healthcare professional. They can provide personalized advice and support. A record of this screening has been made for follow-up if needed.";
-  
-  const fullReferralMessage = `${baseMessage} ${recommendation}`;
+    await addDoc(collection(db, 'hivScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
-  // For prototype purposes, always generate a referral object to show the flow.
-  const referralId = `ref-hiv-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const referralObject: MockReferral = {
-    id: referralId,
-    patientName: name,
-    referralDate: currentDate,
-    referralMessage: "Referral generated from detailed HIV screening. Patient requires consultation with a healthcare professional for a full review of their risk profile.",
-    status: 'Pending Review',
-    consentStatus: 'pending',
-    notes: 'Generated from detailed screening form. See server logs for submitted data.',
-  };
-  
-  console.log("Generated Referral Object:", referralObject);
+    const newReferralDataForDb = {
+      patientName: name,
+      referralDate: serverTimestamp(),
+      referralMessage: "Referral generated from detailed HIV screening. Patient requires consultation with a healthcare professional for a full review of their risk profile.",
+      status: 'Pending Consent' as const,
+      consentStatus: 'pending' as const,
+      type: 'HIV',
+      userId: 'client-test-user',
+    };
 
-  return { 
-    success: true, 
-    message: "Screening submitted successfully.",
-    referralMessage: fullReferralMessage,
-    referralDetails: referralObject 
-  };
+    const referralDocRef = await addDoc(collection(db, 'referrals'), newReferralDataForDb);
+
+    const referralObjectForClient: MockReferral = {
+      id: referralDocRef.id,
+      ...newReferralDataForDb,
+      referralDate: new Date() // Use a standard Date object for the client
+    } as MockReferral;
+
+    return {
+      success: true,
+      message: "Screening submitted successfully.",
+      referralMessage: fullReferralMessage,
+      referralDetails: referralObjectForClient
+    };
+
+  } catch (error) {
+    console.error("Error submitting HIV screening:", error);
+    return { success: false, message: "An error occurred during submission." };
+  }
 }

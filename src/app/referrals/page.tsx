@@ -13,8 +13,12 @@ import { useEffect, useState, useMemo } from 'react';
 import { FileText } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, updateDoc, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useSearchParams } from 'next/navigation';
 
-// This function now correctly handles the "Pending Consent" status
+type ClientReferral = Omit<MockReferral, 'referralDate'> & {
+  referralDate: string;
+};
+
 function getStatusVariant(status: MockReferral['status']): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (status) {
     case 'Pending Consent':
@@ -25,7 +29,7 @@ function getStatusVariant(status: MockReferral['status']): 'default' | 'secondar
     case 'Follow-up Scheduled':
       return 'secondary';
     case 'Closed':
-      return 'default'; 
+      return 'default';
     default:
       return 'default';
   }
@@ -33,11 +37,13 @@ function getStatusVariant(status: MockReferral['status']): 'default' | 'secondar
 
 export default function ReferralsPage() {
   const { role } = useRole();
-  const [referrals, setReferrals] = useState<MockReferral[]>([]);
+  const searchParams = useSearchParams();
+  const pendingIdFromUrl = searchParams.get('pendingId');
+
+  const [referrals, setReferrals] = useState<ClientReferral[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // In a real app, this would come from your Firebase Auth context
-  const MOCK_CURRENT_USER_ID = 'client-test-user'; 
+
+  const MOCK_CURRENT_USER_ID = 'client-test-user';
 
   useEffect(() => {
     setLoading(true);
@@ -45,15 +51,13 @@ export default function ReferralsPage() {
     let q;
 
     if (role === 'admin') {
-      // Admin sees all referrals that have been consented to
       q = query(referralsCollection, where('consentStatus', '==', 'agreed'), orderBy('referralDate', 'desc'));
     } else {
-      // Client sees all of their own referrals
       q = query(referralsCollection, where('userId', '==', MOCK_CURRENT_USER_ID), orderBy('referralDate', 'desc'));
     }
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const referralsData = querySnapshot.docs.map(doc => {
+      const referralsData: ClientReferral[] = querySnapshot.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -63,24 +67,25 @@ export default function ReferralsPage() {
             month: 'long',
             day: 'numeric',
           }) || 'N/A',
-        } as MockReferral;
+        } as ClientReferral;
       });
       setReferrals(referralsData);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching referrals: ", error);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [role]);
-  
+
   const pendingUserReferral = useMemo(() => {
-    if (role === 'user') {
-      return referrals.find(r => r.consentStatus === 'pending');
+    if (role !== 'user') return null;
+
+    if (pendingIdFromUrl) {
+      const referral = referrals.find(r => r.id === pendingIdFromUrl);
+      if (referral) return referral;
     }
-    return null;
-  }, [role, referrals]);
+
+    return referrals.find(r => r.consentStatus === 'pending');
+  }, [role, referrals, pendingIdFromUrl]);
 
   const displayReferrals = useMemo(() => {
     if (role === 'user') {
@@ -88,14 +93,27 @@ export default function ReferralsPage() {
     }
     return referrals;
   }, [role, referrals]);
-  
+
   const handleConsentSubmit = async (referralId: string, facility: string) => {
+    // This is the fix: Update the local state immediately
+    // to give the user instant feedback.
+    setReferrals(prevReferrals =>
+      prevReferrals.map(r =>
+        r.id === referralId
+          ? { ...r, consentStatus: 'agreed', status: 'Pending Review', facility: facility }
+          : r
+      )
+    );
+
+    // Then, send the update to the database in the background.
     const referralRef = doc(db, 'referrals', referralId);
     await updateDoc(referralRef, {
       consentStatus: 'agreed',
       facility: facility,
       status: 'Pending Review'
     });
+
+    window.history.replaceState(null, '', '/referrals');
   };
 
   const pageTitle = role === 'admin' ? "Manage All Referrals" : "Your Referrals";
@@ -117,25 +135,23 @@ export default function ReferralsPage() {
           <Separator className="my-12" />
         </div>
       )}
-      
+
       {loading ? (
         <div className="mt-8 text-center">Loading referrals...</div>
-      ) : displayReferrals.length === 0 ? (
+      ) : displayReferrals.length === 0 && (role === 'user' && !pendingUserReferral) ? (
         <div className="mt-8 text-center flex flex-col items-center justify-center rounded-2xl bg-card p-12">
           <FileText className="h-16 w-16 text-muted-foreground mb-4" />
           <p className="text-xl font-semibold text-card-foreground">
             {role === 'user' ? 'You have no active referrals.' : 'No consented referrals to display.'}
           </p>
-          {role === 'user' && !pendingUserReferral && (
-             <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-              Referrals will appear here after you complete a screening and give consent.
-            </p>
-          )}
+          <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+            Referrals will appear here after you complete a screening and give consent.
+          </p>
         </div>
       ) : (
         <>
           <h2 className="text-3xl font-semibold text-primary mb-6">{role === 'user' ? "Your Approved Referrals" : "Consented Referrals"}</h2>
-          <ScrollArea className="h-[calc(100vh-350px)]"> 
+          <ScrollArea className="h-[calc(100vh-350px)]">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pr-4">
               {displayReferrals.map((referral) => (
                 <Card key={referral.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col bg-card">
@@ -153,7 +169,7 @@ export default function ReferralsPage() {
                   <CardContent className="flex-grow">
                     <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
                     <p className="text-sm text-accent font-medium mb-3">{referral.facility || 'N/A'}</p>
-                    
+
                     <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referral Reason:</p>
                     <p className="text-sm text-card-foreground/80 line-clamp-4">{referral.referralMessage}</p>
                     {referral.notes && (

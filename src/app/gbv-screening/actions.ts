@@ -1,6 +1,7 @@
-
 "use server";
 
+import { addDoc, collection, serverTimestamp, FieldValue } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { GbvScreeningFormData } from '@/lib/schemas';
 import { GbvScreeningSchema } from '@/lib/schemas';
 import type * as z from 'zod';
@@ -23,18 +24,13 @@ export async function submitGbvScreeningAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
 
-  const { name, suicideAttempt, seriousInjury, sexualViolenceTimeline } = validationResult.data;
-
-  console.log("GBV Screening Data for", name, ":", validationResult.data);
-  await new Promise(resolve => setTimeout(resolve, 1000)); 
-
+  const { name, suicideAttempt, seriousInjury, sexualViolenceTimeline, ...screeningData } = validationResult.data;
   let recommendations: string[] = [];
   let notes: string[] = [];
 
   const isHighRiskSuicide = suicideAttempt === 'yes';
   const isHighRiskInjury = seriousInjury === 'yes';
   const isHighRiskSexualViolence = sexualViolenceTimeline === 'le_72_hr' || sexualViolenceTimeline === 'gt_72_le_120_hr';
-  
   const needsImmediateReferral = isHighRiskSuicide || isHighRiskInjury || isHighRiskSexualViolence;
 
   if (isHighRiskSuicide) {
@@ -51,8 +47,6 @@ export async function submitGbvScreeningAction(
   }
 
   let fullReferralMessage: string;
-  let referralObject: MockReferral | undefined = undefined;
-
   if (needsImmediateReferral) {
     fullReferralMessage = `Dear ${name}, thank you for your honesty. Based on your answers, your safety and health may be at immediate risk. ${recommendations.join(' ')} Please follow the guidance of the support worker who will be in touch shortly.`;
   } else {
@@ -60,30 +54,32 @@ export async function submitGbvScreeningAction(
     notes.push("No immediate high-risk factors identified, but general support may be beneficial.");
   }
 
-  // Always generate a referral object for this prototype to show the flow
-  const referralId = `ref-gbv-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  
-  referralObject = {
-    id: referralId,
-    patientName: name,
-    referralDate: currentDate,
-    referralMessage: fullReferralMessage,
-    status: needsImmediateReferral ? 'Pending Review' : 'Closed',
-    consentStatus: 'pending',
-    notes: notes.join(' '),
-  };
-  
-  console.log("Generated GBV Referral Object:", referralObject);
+  try {
+    await addDoc(collection(db, 'gbvScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
-  return { 
-    success: true, 
-    message: "GBV Screening submitted successfully.",
-    referralMessage: fullReferralMessage,
-    referralDetails: referralObject 
-  };
+    const newReferralDataForDb = {
+      patientName: name,
+      referralDate: serverTimestamp(),
+      referralMessage: fullReferralMessage,
+      status: 'Pending Consent' as const,
+      consentStatus: 'pending' as const,
+      notes: notes.join(' '),
+      type: 'GBV',
+      userId: 'client-test-user'
+    };
+
+    const referralDocRef = await addDoc(collection(db, 'referrals'), newReferralDataForDb);
+    const referralObjectForClient: MockReferral = { id: referralDocRef.id, ...newReferralDataForDb, referralDate: new Date() } as MockReferral;
+
+    return {
+      success: true,
+      message: "GBV Screening submitted successfully.",
+      referralMessage: fullReferralMessage,
+      referralDetails: referralObjectForClient
+    };
+
+  } catch (error) {
+    console.error("Error submitting GBV screening:", error);
+    return { success: false, message: "An error occurred during submission." };
+  }
 }

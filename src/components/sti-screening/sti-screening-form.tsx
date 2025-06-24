@@ -1,10 +1,9 @@
-
 "use client";
 
 import type * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -32,7 +31,8 @@ import { ArrowRight, CheckCircle, Info, Loader2 } from 'lucide-react';
 
 export default function StiScreeningForm() {
   const { toast } = useToast();
-  const [submissionResult, setSubmissionResult] = useState<{ message: string; hasReferral: boolean; } | null>(null);
+  const router = useRouter();
+  const [submissionResult, setSubmissionResult] = useState<{ message: string; referralId?: string; } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<StiScreeningFormData>({
@@ -58,8 +58,8 @@ export default function StiScreeningForm() {
           description: result.message,
         });
         setSubmissionResult({
-            message: result.referralMessage || "Your screening has been submitted.",
-            hasReferral: !!result.referralDetails,
+          message: result.referralMessage || "Your screening has been submitted.",
+          referralId: result.referralDetails?.id,
         });
       } else {
         toast({
@@ -67,7 +67,7 @@ export default function StiScreeningForm() {
           description: result.message || "Failed to submit screening. Please try again.",
           variant: "destructive",
         });
-         if (result.errors) {
+        if (result.errors) {
           result.errors.forEach(error => {
             form.setError(error.path[0] as keyof StiScreeningFormData, { message: error.message });
           });
@@ -83,7 +83,7 @@ export default function StiScreeningForm() {
       setIsSubmitting(false);
     }
   }
-  
+
   const renderQuestion = (fieldName: keyof StiScreeningFormData, label: string) => (
     <FormField
       control={form.control}
@@ -91,7 +91,8 @@ export default function StiScreeningForm() {
       render={({ field }) => (
         <FormItem>
           <FormLabel className="text-lg">{label}</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          {/* This is the fix: field.value is now cast to a string */}
+          <Select onValueChange={field.onChange} defaultValue={field.value as string}>
             <FormControl>
               <SelectTrigger><SelectValue placeholder="Select Yes or No" /></SelectTrigger>
             </FormControl>
@@ -105,30 +106,31 @@ export default function StiScreeningForm() {
       )}
     />
   );
-  
+
   if (submissionResult) {
     return (
-        <Card className="w-full max-w-2xl mx-auto shadow-xl">
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">Screening Submitted</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <Alert variant={submissionResult.hasReferral ? "destructive" : "default"} className="mt-6">
-                    {submissionResult.hasReferral ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
-                    <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
-                    <AlertDescription>{submissionResult.message}</AlertDescription>
-                </Alert>
-                {submissionResult.hasReferral && (
-                    <div className="mt-6 flex justify-center">
-                        <Link href="/referrals" passHref>
-                            <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                                Complete Your Referral <ArrowRight className="ml-2 h-5 w-5" />
-                            </Button>
-                        </Link>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+      <Card className="w-full max-w-2xl mx-auto shadow-xl">
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl">Screening Submitted</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant={submissionResult.referralId ? "destructive" : "default"} className="mt-6">
+            {submissionResult.referralId ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
+            <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
+            <AlertDescription>{submissionResult.message}</AlertDescription>
+          </Alert>
+          {submissionResult.referralId && (
+            <div className="mt-6 flex justify-center">
+              <Button
+                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                onClick={() => router.push(`/referrals?pendingId=${submissionResult.referralId}`)}
+              >
+                Complete Your Referral <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     )
   }
 
@@ -163,18 +165,18 @@ export default function StiScreeningForm() {
                 <FormItem>
                   <FormLabel className="text-lg">Age</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)} />
+                    <Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value, 10) || undefined)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             {renderQuestion("diagnosedOrTreated", "D1. Have you ever been diagnosed or treated for STI?")}
             {renderQuestion("abnormalDischarge", "D2. Do you have any abnormal vaginal discharge (more than normal, abnormal colour? foul smelling)?")}
             {renderQuestion("vaginalItchiness", "D3. Do you have any vaginal itchiness or abnormal discomfort?")}
             {renderQuestion("genitalSores", "D4. Do you have sore, ulcers, or wounds on your genitals?")}
-            
+
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>

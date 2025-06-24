@@ -1,10 +1,9 @@
-
 "use client";
 
 import type * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -32,7 +31,8 @@ import { ArrowRight, CheckCircle, Info, Loader2 } from 'lucide-react';
 
 export default function PrEpScreeningForm() {
   const { toast } = useToast();
-  const [submissionResult, setSubmissionResult] = useState<{ message: string; hasReferral: boolean; } | null>(null);
+  const router = useRouter();
+  const [submissionResult, setSubmissionResult] = useState<{ message: string; referralId?: string; } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<PrEpScreeningFormData>({
@@ -63,8 +63,8 @@ export default function PrEpScreeningForm() {
           description: result.message,
         });
         setSubmissionResult({
-            message: result.referralMessage || "Your screening has been submitted.",
-            hasReferral: !!result.referralDetails,
+          message: result.referralMessage || "Your screening has been submitted.",
+          referralId: result.referralDetails?.id,
         });
       } else {
         toast({
@@ -72,7 +72,7 @@ export default function PrEpScreeningForm() {
           description: result.message || "Failed to submit screening. Please try again.",
           variant: "destructive",
         });
-         if (result.errors) {
+        if (result.errors) {
           result.errors.forEach(error => {
             form.setError(error.path[0] as keyof PrEpScreeningFormData, { message: error.message });
           });
@@ -96,7 +96,8 @@ export default function PrEpScreeningForm() {
       render={({ field }) => (
         <FormItem>
           <FormLabel className="text-lg">{label}</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          {/* This is the fix: field.value is now cast to a string */}
+          <Select onValueChange={field.onChange} defaultValue={field.value as string}>
             <FormControl>
               <SelectTrigger><SelectValue placeholder="Select Yes or No" /></SelectTrigger>
             </FormControl>
@@ -110,30 +111,31 @@ export default function PrEpScreeningForm() {
       )}
     />
   );
-  
+
   if (submissionResult) {
     return (
-        <Card className="w-full max-w-2xl mx-auto shadow-xl">
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">Screening Submitted</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <Alert variant={submissionResult.hasReferral ? "destructive" : "default"} className="mt-6">
-                    {submissionResult.hasReferral ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
-                    <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
-                    <AlertDescription>{submissionResult.message}</AlertDescription>
-                </Alert>
-                {submissionResult.hasReferral && (
-                    <div className="mt-6 flex justify-center">
-                        <Link href="/referrals" passHref>
-                            <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                                Complete Your Referral <ArrowRight className="ml-2 h-5 w-5" />
-                            </Button>
-                        </Link>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+      <Card className="w-full max-w-2xl mx-auto shadow-xl">
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl">Screening Submitted</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant={submissionResult.referralId ? "destructive" : "default"} className="mt-6">
+            {submissionResult.referralId ? <Info className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
+            <AlertTitle className="font-headline">Screening Recommendation</AlertTitle>
+            <AlertDescription>{submissionResult.message}</AlertDescription>
+          </Alert>
+          {submissionResult.referralId && (
+            <div className="mt-6 flex justify-center">
+              <Button
+                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                onClick={() => router.push(`/referrals?pendingId=${submissionResult.referralId}`)}
+              >
+                Complete Your Referral <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     )
   }
 
@@ -167,12 +169,12 @@ export default function PrEpScreeningForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-lg">Age</FormLabel>
-                  <FormControl><Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)} /></FormControl>
+                  <FormControl><Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value, 10) || undefined)} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             {renderQuestion("multiplePartners", "B1. Have you had sex with more than one sexual partner?")}
             {renderQuestion("unprotectedSex", "B2. Have you had sex without a condom on more than one occasion?")}
             {renderQuestion("unknownStatusPartners", "B3. Have you had sex with people whose HIV status you do not know?")}

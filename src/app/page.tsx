@@ -1,11 +1,10 @@
-
 "use client";
 
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/shared/page-header";
-import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, LineChart, Users, MessageSquareText, ShieldAlert, UserCog, BarChart3, Search } from 'lucide-react';
+import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, LineChart, Users, MessageSquareText, ShieldAlert, UserCog, BarChart3 } from 'lucide-react';
 import Image from 'next/image';
 import { useRole } from '@/contexts/role-context';
 import * as React from 'react';
@@ -36,12 +35,12 @@ function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, image
           <Image
             src={imageSrc}
             alt={imageAlt}
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: 'cover' }}
             data-ai-hint={imageHint}
             className="transition-transform duration-300 group-hover:scale-105"
           />
-           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
         <div className="flex flex-1 flex-col p-6">
           <div className="flex items-start">
@@ -54,9 +53,9 @@ function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, image
             </div>
           </div>
           <div className="mt-auto flex justify-end pt-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground transition-transform duration-300 group-hover:rotate-[-45deg]">
-                <ArrowRight className="h-5 w-5" />
-              </div>
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground transition-transform duration-300 group-hover:rotate-[-45deg]">
+              <ArrowRight className="h-5 w-5" />
+            </div>
           </div>
         </div>
       </div>
@@ -80,10 +79,10 @@ function AdminFeatureLinkCard({ title, description, link, icon }: AdminFeatureCa
           </p>
         </CardContent>
         <CardFooter className="pt-2 flex justify-end">
-           <div className="flex items-center text-accent font-semibold">
-              <span>View Details</span> 
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </div>
+          <div className="flex items-center text-accent font-semibold">
+            <span>View Details</span>
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </div>
         </CardFooter>
       </Card>
     </Link>
@@ -96,7 +95,7 @@ function AdminDashboardContent() {
     {
       title: "Screening Data",
       description: "View aggregated screening results, trends, and detailed analytics.",
-      link: "/admin/reports", 
+      link: "/admin/reports",
       icon: <BarChart3 />
     },
     {
@@ -137,7 +136,7 @@ function AdminDashboardContent() {
         title="Administrator Dashboard"
         description="Access reports, data exports, and administrative functions."
       />
-      
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8">
         {adminFeatures.map(feature => (
           <AdminFeatureLinkCard key={feature.title} {...feature} />
@@ -169,7 +168,7 @@ export default function Home() {
       imageAlt: "Abstract representation of a forum discussion",
       imageHint: "discussion community"
     },
-     {
+    {
       title: "Screening",
       description: "Access confidential screening tools to assess risk and receive guidance on next steps.",
       link: "/hiv-screening",
@@ -179,13 +178,13 @@ export default function Home() {
       imageHint: "health screening"
     },
     {
-      title: "Track Referrals", 
-      description: "View and manage referrals generated from screenings and other community programs.", 
-      link: "/referrals", 
-      icon: <ClipboardList />, 
-      imageSrc: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWxlbmRhcnxlbnwwfHx8fDE3NDkxMjcwNDl8MA&ixlib=rb-4.1.0&q=80&w=1080", 
-      imageAlt: "Image representing referral tracking and management", 
-      imageHint: "referrals tracking" 
+      title: "Track Referrals",
+      description: "View and manage referrals generated from screenings and other community programs.",
+      link: "/referrals",
+      icon: <ClipboardList />,
+      imageSrc: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWxlbmRhcnxlbnwwfHx8fDE3NDkxMjcwNDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      imageAlt: "Image representing referral tracking and management",
+      imageHint: "referrals tracking"
     },
   ];
 
