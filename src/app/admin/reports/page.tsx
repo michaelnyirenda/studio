@@ -6,13 +6,12 @@ import { collection, getDocs, query, Timestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
-import { BarChart as LucideBarChart, LineChart as LucideLineChart, Users, Filter, Download, TestTube2, Loader2 } from 'lucide-react';
+import { BarChart as LucideBarChart, Loader2 } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart as ShadBarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
@@ -20,6 +19,14 @@ import { db } from '@/lib/firebase';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ScreeningDetailsDisplay from '@/components/referrals/screening-details-display';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+
+// Import new analytics tab components
+import HivAnalyticsTab from '@/components/admin/reports/hiv-analytics-tab';
+import GbvAnalyticsTab from '@/components/admin/reports/gbv-analytics-tab';
+import PrEpAnalyticsTab from '@/components/admin/reports/prep-analytics-tab';
+import StiAnalyticsTab from '@/components/admin/reports/sti-analytics-tab';
+
 
 const chartConfig: ChartConfig = {
   hiv: { label: "HIV", color: "hsl(var(--chart-1))" },
@@ -28,9 +35,9 @@ const chartConfig: ChartConfig = {
   sti: { label: "STI", color: "hsl(var(--chart-4))" },
 };
 
-type ScreeningType = 'HIV' | 'GBV' | 'PrEP' | 'STI';
+export type ScreeningType = 'HIV' | 'GBV' | 'PrEP' | 'STI';
 
-interface Screening {
+export interface Screening {
   id: string;
   userName: string;
   date: string;
@@ -130,7 +137,7 @@ export default function ScreeningDataPage() {
     });
   }, [allScreenings, filters]);
 
-  const chartData = useMemo(() => {
+  const summaryChartData = useMemo(() => {
     const monthlyCounts = allScreenings.reduce((acc, screening) => {
       const date = new Date(screening.date);
       const month = format(date, 'MMM');
@@ -148,11 +155,27 @@ export default function ScreeningDataPage() {
     return Object.values(monthlyCounts).sort((a, b) => monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month));
   }, [allScreenings]);
 
+  const { hivScreenings, gbvScreenings, prepScreenings, stiScreenings } = useMemo(() => ({
+    hivScreenings: allScreenings.filter(s => s.screeningType === 'HIV'),
+    gbvScreenings: allScreenings.filter(s => s.screeningType === 'GBV'),
+    prepScreenings: allScreenings.filter(s => s.screeningType === 'PrEP'),
+    stiScreenings: allScreenings.filter(s => s.screeningType === 'STI'),
+  }), [allScreenings]);
+
   const handleViewDetails = (screening: Screening) => {
     setSelectedScreening(screening);
     setIsModalOpen(true);
   };
   
+  if (loading) {
+     return (
+        <div className="container mx-auto py-8 px-4 flex flex-col items-center justify-center h-[calc(100vh-200px)]">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="mt-4 text-muted-foreground">Loading screening data...</p>
+        </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-8 px-4">
       <PageHeader
@@ -178,13 +201,9 @@ export default function ScreeningDataPage() {
               <CardDescription>Monthly screening counts across all categories.</CardDescription>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex justify-center items-center min-h-[300px]">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
+              {summaryChartData.length > 0 ? (
                 <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-                  <ShadBarChart accessibilityLayer data={chartData}>
+                  <ShadBarChart accessibilityLayer data={summaryChartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
                     <YAxis />
@@ -195,6 +214,8 @@ export default function ScreeningDataPage() {
                     <Bar dataKey="sti" fill="var(--color-sti)" radius={4} name="STI" />
                   </ShadBarChart>
                 </ChartContainer>
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">No data available for chart.</div>
               )}
             </CardContent>
           </Card>
@@ -283,52 +304,16 @@ export default function ScreeningDataPage() {
         </TabsContent>
 
         <TabsContent value="hiv_analytics">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>HIV Screening Analytics</CardTitle>
-              <CardDescription>Detailed metrics for HIV screenings. (Mock UI)</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <LucideLineChart className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
-              <p className="text-muted-foreground">HIV screening specific charts and data will appear here.</p>
-            </CardContent>
-          </Card>
+          <HivAnalyticsTab screenings={hivScreenings} />
         </TabsContent>
          <TabsContent value="gbv_analytics">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>GBV Screening Analytics</CardTitle>
-              <CardDescription>Detailed metrics for GBV screenings. (Mock UI)</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <LucideBarChart className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
-              <p className="text-muted-foreground">GBV screening specific charts and data will appear here.</p>
-            </CardContent>
-          </Card>
+          <GbvAnalyticsTab screenings={gbvScreenings} />
         </TabsContent>
         <TabsContent value="prep_analytics">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>PrEP Screening Analytics</CardTitle>
-              <CardDescription>Detailed metrics for PrEP screenings. (Mock UI)</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <Users className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
-              <p className="text-muted-foreground">PrEP screening specific charts and data will appear here.</p>
-            </CardContent>
-          </Card>
+          <PrEpAnalyticsTab screenings={prepScreenings} />
         </TabsContent>
          <TabsContent value="sti_analytics">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>STI Screening Analytics</CardTitle>
-              <CardDescription>Detailed metrics for STI screenings. (Mock UI)</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <TestTube2 className="h-48 w-48 mx-auto text-muted-foreground/50 my-4" />
-              <p className="text-muted-foreground">STI screening specific charts and data will appear here.</p>
-            </CardContent>
-          </Card>
+          <StiAnalyticsTab screenings={stiScreenings} />
         </TabsContent>
       </Tabs>
       
