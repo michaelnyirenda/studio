@@ -41,7 +41,7 @@ body {
 
     --chart-1: 5 62% 45%; /* primary */
     --chart-2: 36 100% 50%; /* accent */
-    --chart-3: 215 40% 50%; /* a complementary slate blue */
+    --chart-3: 10 10% 45%; /* a medium warm grey */
     --chart-4: 30 40% 50%; /* a complementary brown/gold */
     --chart-5: 280 60% 65%; /* a soft purple */
   }
@@ -77,7 +77,7 @@ body {
 
     --chart-1: 5 70% 60%;
     --chart-2: 36 100% 60%;
-    --chart-3: 215 40% 60%;
+    --chart-3: 10 15% 65%;
     --chart-4: 30 40% 60%;
     --chart-5: 280 60% 70%;
   }
