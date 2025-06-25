@@ -402,9 +402,9 @@ export default function DataExportPage() {
                                   Generated: {item.timestamp} | Rows: {item.rowCount}
                               </p>
                           </div>
-                          <Button variant="ghost" size="icon" onClick={() => handleRedownload(item)} disabled={loading}>
-                              <Download className="h-4 w-4" />
-                              <span className="sr-only">Re-download</span>
+                          <Button variant="ghost" size="sm" onClick={() => handleRedownload(item)} disabled={loading}>
+                              <Download className="mr-2 h-4 w-4" />
+                              Re-download
                           </Button>
                       </div>
                   ))}
