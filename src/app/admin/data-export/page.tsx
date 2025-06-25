@@ -36,28 +36,76 @@ const flattenObject = (obj: any, parentKey = '', res: {[key: string]: any} = {})
     return res;
 };
 
-// Helper to convert an array of objects to a CSV string.
+// Helper to convert an array of objects to a CSV string with human-readable headers and values.
 const convertToCsv = (data: any[]): string => {
     if (!Array.isArray(data) || data.length === 0) {
         return '';
     }
 
+    const formatKeyToHeader = (key: string): string => {
+        if (key === 'id') return 'ID';
+        if (key === 'userId') return 'User ID';
+        if (key === 'screeningId') return 'Screening ID';
+        if (key === 'createdAt' || key === 'referralDate' || key === 'timestamp') {
+            return key.replace(/([A-Z])/g, ' $1').replace(/^\w/, c => c.toUpperCase());
+        }
+        
+        const result = key.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1');
+        return result.charAt(0).toUpperCase() + result.slice(1).trim();
+    };
+
+    const humanReadableValueMap: { [key: string]: string } = {
+        // General
+        'yes': 'Yes', 'no': 'No', 'dont_know': "Don't Know", 'refused': 'Refused to Answer', 'no_answer': 'No Answer', 'na': 'N/A', 'pending': 'Pending', 'agreed': 'Agreed', 'declined': 'Declined',
+
+        // HIV Screening
+        'less_than_3_months': 'Less than 3 months ago', '3_to_6_months': '3-6 months ago', '6_to_12_months': '6-12 months ago', 'more_than_12_months': 'More than 12 months ago', 'never_tested': 'Never tested',
+        'positive': 'HIV Positive', 'negative': 'HIV Negative',
+        'taking_art': 'Currently taking ART', 'started_stopped': 'Started ART but Stopped', 'not_on_art': 'Not on ART',
+        'within_6_months': 'Yes (within the last 6 months)', 'never': 'Never had Sex', 'cant_remember': "Can't Remember",
+        'forced': 'Forced', 'two': 'Yes, two partners', 'three_or_more': 'Yes, three or more partners', 'dont_remember': "Yes, I don't remember the number",
+        '0-3': '0-3 years', '4-9': '4-9 years', '10+': '10+ years',
+        'any': 'Consumed any alcohol', 'none': 'Did not consume any alcohol',
+        'every_day': 'Every day', 'every_week': 'Every week', '2_3_times_month': '2-3 times a month', 'once_month': 'Once a month', 'special_occasions': 'Only on specific occasions',
+        'coughing': 'Coughing', 'weight_loss': 'Weight loss', 'night_sweats': 'Night sweats', 'fever': 'Fever', 'swelling': 'Swelling',
+        'currently_pregnant': 'Currently pregnant', 'pregnant_in_past': 'Pregnant in the past', 'child_passed_on': 'Child passed on', 'child_under_2': 'Have a child ≤ 2 years', 'child_over_2': 'Have a child older than 2 years', 'abortion_miscarriage': 'Had a history of abortion or miscarriage', 'never_pregnant': 'Never been pregnant',
+        'attending_anc': 'Attending ANC/PMTCT', 'attending_post_natal': 'Attending Post Natal Care', 'eligible_not_attending': 'Eligible but not attending',
+        'single': 'Single (lost one parent)', 'double': 'Double (lost both parents)', 'child_headed': 'Child-headed household',
+        
+        // GBV Screening
+        'mocked': 'Mocked/insulted/put down', 'controlled': 'Controlled (money, food, movement)',
+        'punched': 'Punched/slapped/shoved/etc.', 'threatened': 'Threatened with a weapon',
+        'touched': 'Touched sexually without consent',
+        'le_72_hr': '≤ 72 hours ago', 'gt_72_le_120_hr': '> 72 hours to ≤ 120 hours ago', 'gt_120_hr': '> 120 hours (> 5 days) ago', 'no_history': 'No History',
+
+        // STI Screening
+        'diagnosedOrTreated': 'Diagnosed or Treated', 'abnormalDischarge': 'Abnormal Discharge', 'vaginalItchiness': 'Vaginal Itchiness', 'genitalSores': 'Genital Sores/Ulcers',
+
+        // Referral Status
+        'Pending Consent': 'Pending Consent', 'Pending Review': 'Pending Review', 'Contacted': 'Contacted', 'Follow-up Scheduled': 'Follow-up Scheduled', 'Closed': 'Closed',
+    };
+
+    const formatValue = (value: any): string => {
+        if (value === null || value === undefined || value === '') return '';
+        if (Array.isArray(value)) {
+            if (value.length === 0) return 'No selection';
+            if (value.includes('no') || value.includes('never_pregnant')) return 'No';
+            return value.map(v => humanReadableValueMap[v] || v.toString().replace(/_/g, ' ')).join('; ');
+        }
+        const stringValue = String(value);
+        return humanReadableValueMap[stringValue] || stringValue;
+    };
+
     // Collect all unique headers
     const headers = Array.from(new Set(data.flatMap(row => Object.keys(row))));
     
     const csvRows = [];
-    csvRows.push(headers.join(','));
+    csvRows.push(headers.map(formatKeyToHeader).join(','));
 
     for (const row of data) {
         const values = headers.map(header => {
             let cell = row[header];
-            if (cell === null || cell === undefined) {
-                cell = '';
-            } else if (Array.isArray(cell)) {
-                cell = cell.join(';'); // Join arrays with a semicolon
-            } else if (typeof cell === 'object') {
-                cell = JSON.stringify(cell);
-            }
+            cell = formatValue(cell);
             
             const cellString = String(cell);
             const escaped = cellString.replace(/"/g, '""');
@@ -162,17 +210,7 @@ export default function DataExportPage() {
         } else if (dataType === 'referral_data') {
             const q = query(collection(db, 'referrals'), where('referralDate', '>=', startDate), where('referralDate', '<=', endDate));
             const snapshot = await getDocs(q);
-            dataToExport = snapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    id: doc.id, patientName: data.patientName,
-                    referralDate: (data.referralDate as Timestamp)?.toDate().toISOString() || 'N/A',
-                    type: data.type, status: data.status, consentStatus: data.consentStatus,
-                    facility: data.facility, notes: data.notes,
-                    services: Array.isArray(data.services) ? data.services.join('; ') : '',
-                    screeningId: data.screeningId, userId: data.userId
-                }
-            });
+            dataToExport = snapshot.docs.map(doc => flattenObject({ ...doc.data(), id: doc.id }));
         } else {
              const collectionName = collectionMap[dataType];
              const q = query(collection(db, collectionName), where('createdAt', '>=', startDate), where('createdAt', '<=', endDate));
@@ -240,17 +278,7 @@ export default function DataExportPage() {
         } else if (item.dataType === 'referral_data') {
             const q = query(collection(db, 'referrals'), where('referralDate', '>=', startDate), where('referralDate', '<=', endDate));
             const snapshot = await getDocs(q);
-            dataToExport = snapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    id: doc.id, patientName: data.patientName,
-                    referralDate: (data.referralDate as Timestamp)?.toDate().toISOString() || 'N/A',
-                    type: data.type, status: data.status, consentStatus: data.consentStatus,
-                    facility: data.facility, notes: data.notes,
-                    services: Array.isArray(data.services) ? data.services.join('; ') : '',
-                    screeningId: data.screeningId, userId: data.userId
-                }
-            });
+            dataToExport = snapshot.docs.map(doc => flattenObject({ ...doc.data(), id: doc.id }));
         } else {
              const collectionName = collectionMap[item.dataType];
              if (collectionName) {
