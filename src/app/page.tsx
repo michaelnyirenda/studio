@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, 
 import Image from 'next/image';
 import { useRole } from '@/contexts/role-context';
 import * as React from 'react';
+import ReferralStatsCard from '@/components/admin/dashboard/referral-stats-card';
 
 interface FeatureCardProps {
   title: string;
@@ -91,45 +93,6 @@ function AdminFeatureLinkCard({ title, description, link, icon }: AdminFeatureCa
 
 
 function AdminDashboardContent() {
-  const adminFeatures: AdminFeatureCardProps[] = [
-    {
-      title: "Screening Data",
-      description: "View aggregated screening results, trends, and detailed analytics.",
-      link: "/admin/reports",
-      icon: <BarChart3 />
-    },
-    {
-      title: "Referral Tracking",
-      description: "Monitor referral statuses, patient follow-ups, and turnaround rates.",
-      link: "/referrals",
-      icon: <LineChart />
-    },
-    {
-      title: "Data Export",
-      description: "Generate and download reports for screenings, referrals, and other data.",
-      link: "/admin/data-export",
-      icon: <FileSpreadsheet />
-    },
-    {
-      title: "Forum Management",
-      description: "Oversee forum discussions and manage posts. Create new posts via the Forum page.",
-      link: "/forum",
-      icon: <MessageSquareText />
-    },
-    {
-      title: "User Chat Support",
-      description: "Access the chat system to respond to user queries and provide support.",
-      link: "/chat",
-      icon: <ShieldAlert />
-    },
-    {
-      title: "User Management",
-      description: "Manage user accounts, roles, permissions, and view user activity.",
-      link: "/admin/user-management",
-      icon: <UserCog />
-    }
-  ];
-
   return (
     <div className="container mx-auto py-8 px-4">
       <PageHeader
@@ -138,9 +101,39 @@ function AdminDashboardContent() {
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8">
-        {adminFeatures.map(feature => (
-          <AdminFeatureLinkCard key={feature.title} {...feature} />
-        ))}
+        <AdminFeatureLinkCard
+          title="Screening Data"
+          description="View aggregated screening results, trends, and detailed analytics."
+          link="/admin/reports"
+          icon={<BarChart3 />}
+        />
+        
+        <ReferralStatsCard />
+
+        <AdminFeatureLinkCard
+          title="Data Export"
+          description="Generate and download reports for screenings, referrals, and other data."
+          link="/admin/data-export"
+          icon={<FileSpreadsheet />}
+        />
+        <AdminFeatureLinkCard
+          title="Forum Management"
+          description="Oversee forum discussions and manage posts. Create new posts via the Forum page."
+          link="/forum"
+          icon={<MessageSquareText />}
+        />
+        <AdminFeatureLinkCard
+          title="User Chat Support"
+          description="Access the chat system to respond to user queries and provide support."
+          link="/chat"
+          icon={<ShieldAlert />}
+        />
+        <AdminFeatureLinkCard
+          title="User Management"
+          description="Manage user accounts, roles, permissions, and view user activity."
+          link="/admin/user-management"
+          icon={<UserCog />}
+        />
       </div>
 
       <div className="mt-12 text-center border-t pt-8">
