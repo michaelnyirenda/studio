@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -10,6 +9,7 @@ import Image from 'next/image';
 import { useRole } from '@/contexts/role-context';
 import * as React from 'react';
 import ReferralStatsCard from '@/components/admin/dashboard/referral-stats-card';
+import ScreeningStatsCard from '@/components/admin/dashboard/screening-stats-card';
 
 interface FeatureCardProps {
   title: string;
@@ -101,12 +101,7 @@ function AdminDashboardContent() {
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8">
-        <AdminFeatureLinkCard
-          title="Screening Data"
-          description="View aggregated screening results, trends, and detailed analytics."
-          link="/admin/reports"
-          icon={<BarChart3 />}
-        />
+        <ScreeningStatsCard />
         
         <ReferralStatsCard />
 
