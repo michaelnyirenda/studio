@@ -107,7 +107,6 @@ export default function DataExportPage() {
                 <SelectItem value="csv">CSV (Comma Separated Values)</SelectItem>
                 <SelectItem value="excel">Excel (XLSX)</SelectItem>
                 <SelectItem value="json">JSON (JavaScript Object Notation)</SelectItem>
-                <SelectItem value="pdf">PDF (Printable Document)</SelectItem>
               </SelectContent>
             </Select>
           </div>
