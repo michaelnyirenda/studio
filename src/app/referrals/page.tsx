@@ -1,3 +1,4 @@
+
 "use client";
 
 import PageHeader from '@/components/shared/page-header';
@@ -163,14 +164,16 @@ export default function ReferralsPage() {
 
       {loading ? (
         <div className="mt-8 text-center">Loading referrals...</div>
-      ) : displayReferrals.length === 0 && (role === 'user' && !pendingUserReferral) ? (
+      ) : displayReferrals.length === 0 && (role === 'admin' || (role === 'user' && !pendingUserReferral)) ? (
         <div className="mt-8 text-center flex flex-col items-center justify-center rounded-2xl bg-card p-12">
           <FileText className="h-16 w-16 text-muted-foreground mb-4" />
           <p className="text-xl font-semibold text-card-foreground">
-            {role === 'user' ? 'You have no active referrals.' : 'No consented referrals to display.'}
+            {role === 'admin' ? 'No consented referrals to display.' : 'You have no active referrals.'}
           </p>
           <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-            Referrals will appear here after you complete a screening and give consent.
+            {role === 'admin'
+              ? 'Consented referrals from users will appear here once they are submitted.'
+              : 'Referrals will appear here after you complete a screening and give consent.'}
           </p>
         </div>
       ) : (
