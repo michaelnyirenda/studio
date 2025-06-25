@@ -37,7 +37,7 @@ const flattenObject = (obj: any, parentKey = '', res: {[key: string]: any} = {})
 };
 
 // Helper to convert an array of objects to a CSV string with human-readable headers and values.
-const convertToCsv = (data: any[]): string => {
+const convertToCsv = (data: any[], preferredOrder: string[] = []): string => {
     if (!Array.isArray(data) || data.length === 0) {
         return '';
     }
@@ -96,8 +96,23 @@ const convertToCsv = (data: any[]): string => {
         return humanReadableValueMap[stringValue] || stringValue;
     };
 
-    // Collect all unique headers
-    const headers = Array.from(new Set(data.flatMap(row => Object.keys(row))));
+    // Collect all unique keys from the data
+    const allKeys = Array.from(new Set(data.flatMap(row => Object.keys(row))));
+    
+    let headers: string[];
+
+    if (preferredOrder.length > 0) {
+        // Filter preferredOrder to only include keys present in the data, maintaining order
+        const orderedPresentKeys = preferredOrder.filter(key => allKeys.includes(key));
+        // Find keys present in data but not in the preferred order
+        const remainingKeys = allKeys
+            .filter(key => !preferredOrder.includes(key))
+            .sort(); // Sort remaining keys alphabetically for consistent output
+        headers = [...orderedPresentKeys, ...remainingKeys];
+    } else {
+        // Fallback to just sorting all keys alphabetically if no order is provided
+        headers = allKeys.sort();
+    }
     
     const csvRows = [];
     csvRows.push(headers.map(formatKeyToHeader).join(','));
@@ -158,6 +173,39 @@ export default function DataExportPage() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<ExportHistoryItem[]>([]);
   const { toast } = useToast();
+
+  const columnOrders = {
+    hiv_screening: [
+        'id', 'name', 'age', 'createdAt', 'userId', 'knowsHivStatus', 'lastTestDate', 'lastTestResult', 'treatmentStatus',
+        'hadSex', 'usedCondoms', 'transactionalSex', 'multiplePartners', 'partnerAgeDifferenceP1', 'partnerAgeDifferenceP2', 'partnerAgeDifferenceP3',
+        'consumedAlcohol', 'alcoholFrequency', 'symptoms', 'pregnancyHistory', 'attendingAnc', 'isOrphan', 'orphanStatus',
+        'hasDisability', 'isDisabilityRegistered'
+    ],
+    gbv_screening: [
+        'id', 'name', 'age', 'createdAt', 'userId', 'emotionalViolence', 'suicideAttempt', 'physicalViolence', 'seriousInjury',
+        'sexualViolence', 'sexualViolenceTimeline'
+    ],
+    prep_screening: [
+        'id', 'name', 'age', 'createdAt', 'userId', 'multiplePartners', 'unprotectedSex', 'unknownStatusPartners',
+        'atRiskPartners', 'sexUnderInfluence', 'newStiDiagnosis', 'considersAtRisk', 'usedPepMultipleTimes', 'forcedSex'
+    ],
+    sti_screening: [
+        'id', 'name', 'age', 'createdAt', 'userId', 'diagnosedOrTreated', 'abnormalDischarge', 'vaginalItchiness', 'genitalSores'
+    ],
+    referral_data: [
+        'id', 'patientName', 'referralDate', 'type', 'status', 'consentStatus', 'facility', 'services', 'referralMessage',
+        'notes', 'screeningId', 'userId'
+    ],
+    get screening_data_all() {
+        const hivCols = this.hiv_screening.slice(5);
+        const gbvCols = this.gbv_screening.slice(5);
+        const prepCols = this.prep_screening.slice(5);
+        const stiCols = this.sti_screening.slice(5);
+        // Use a Set to ensure unique column names while preserving a logical order.
+        const allUniqueCols = [...new Set([...hivCols, ...gbvCols, ...prepCols, ...stiCols])];
+        return ['id', 'type', 'name', 'age', 'createdAt', 'userId', ...allUniqueCols];
+    }
+  };
 
   useEffect(() => {
     const q = query(collection(db, 'exportHistory'), orderBy('timestamp', 'desc'));
@@ -229,7 +277,8 @@ export default function DataExportPage() {
         let outputData = '';
 
         if (fileExtension === 'csv') {
-            outputData = convertToCsv(dataToExport);
+            const preferredOrder = columnOrders[dataType as keyof typeof columnOrders] || [];
+            outputData = convertToCsv(dataToExport, preferredOrder);
         } else {
             outputData = JSON.stringify(dataToExport, (key, value) => (value instanceof Timestamp ? value.toDate().toISOString() : value), 2);
         }
@@ -299,7 +348,8 @@ export default function DataExportPage() {
         let outputData = '';
 
         if (fileExtension === 'csv') {
-            outputData = convertToCsv(dataToExport);
+            const preferredOrder = columnOrders[item.dataType as keyof typeof columnOrders] || [];
+            outputData = convertToCsv(dataToExport, preferredOrder);
         } else {
             outputData = JSON.stringify(dataToExport, (key, value) => (value instanceof Timestamp ? value.toDate().toISOString() : value), 2);
         }
