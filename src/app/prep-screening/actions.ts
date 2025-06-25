@@ -1,3 +1,4 @@
+
 "use server";
 
 import { addDoc, collection, serverTimestamp, FieldValue } from 'firebase/firestore';
@@ -37,7 +38,7 @@ export async function submitPrEpScreeningAction(
   const fullReferralMessage = `Dear ${name}, thank you for completing the PrEP screening. ${recommendation}`;
 
   try {
-    await addDoc(collection(db, 'prepScreenings'), { name, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'prepScreenings'), { name, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     let referralObjectForClient: MockReferral | undefined = undefined;
     if (isEligible) {
@@ -47,7 +48,8 @@ export async function submitPrEpScreeningAction(
         referralMessage: `Based on the PrEP screening, the user is likely eligible for PrEP and requires a consultation. Guidance provided: ${recommendation}`,
         status: 'Pending Consent' as const,
         consentStatus: 'pending' as const,
-        type: 'PrEP',
+        type: 'PrEP' as const,
+        screeningId: screeningDocRef.id,
         userId: 'client-test-user'
       };
 

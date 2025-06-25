@@ -1,3 +1,4 @@
+
 "use server";
 
 import { addDoc, collection, serverTimestamp, FieldValue } from 'firebase/firestore';
@@ -31,7 +32,7 @@ export async function submitHivScreeningAction(
     const recommendation = "Based on your answers, we recommend you discuss your health profile with a healthcare professional. They can provide personalized advice and support. A record of this screening has been made for follow-up if needed.";
     const fullReferralMessage = `${baseMessage} ${recommendation}`;
 
-    await addDoc(collection(db, 'hivScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'hivScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     const newReferralDataForDb = {
       patientName: name,
@@ -39,7 +40,8 @@ export async function submitHivScreeningAction(
       referralMessage: "Referral generated from detailed HIV screening. Patient requires consultation with a healthcare professional for a full review of their risk profile.",
       status: 'Pending Consent' as const,
       consentStatus: 'pending' as const,
-      type: 'HIV',
+      type: 'HIV' as const,
+      screeningId: screeningDocRef.id,
       userId: 'client-test-user',
     };
 

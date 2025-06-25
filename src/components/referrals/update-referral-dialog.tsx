@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { MockReferral } from '@/lib/mock-data';
@@ -15,8 +16,11 @@ import { Edit3, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import ScreeningDetailsDisplay from './screening-details-display';
+import { Skeleton } from '../ui/skeleton';
 
 const serviceItems = [
   { id: 'HTS', label: 'HTS' },
@@ -41,6 +45,8 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const [screeningDetails, setScreeningDetails] = useState<any | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   const form = useForm<UpdateReferralFormData>({
     resolver: zodResolver(UpdateReferralFormSchema),
@@ -58,6 +64,38 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
         notes: referral.notes || '',
         services: referral.services || [],
       });
+      
+      if (referral.screeningId && referral.type) {
+        const fetchScreeningDetails = async () => {
+            setIsLoadingDetails(true);
+            setScreeningDetails(null);
+            try {
+                let collectionName = '';
+                switch (referral.type) {
+                    case 'HIV': collectionName = 'hivScreenings'; break;
+                    case 'GBV': collectionName = 'gbvScreenings'; break;
+                    case 'PrEP': collectionName = 'prepScreenings'; break;
+                    case 'STI': collectionName = 'stiScreenings'; break;
+                }
+
+                if (collectionName) {
+                    const screeningRef = doc(db, collectionName, referral.screeningId);
+                    const screeningSnap = await getDoc(screeningRef);
+                    if (screeningSnap.exists()) {
+                        setScreeningDetails(screeningSnap.data());
+                    } else {
+                        setScreeningDetails({ error: "Screening details not found." });
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching screening details:", error);
+                setScreeningDetails({ error: "Failed to load screening details." });
+            } finally {
+                setIsLoadingDetails(false);
+            }
+        };
+        fetchScreeningDetails();
+      }
     }
   }, [isOpen, referral, form]);
 
@@ -109,7 +147,29 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
             <p className="text-sm font-semibold text-foreground/90 mb-1">Referral Reason:</p>
             <p className="text-sm text-muted-foreground">{referral.referralMessage}</p>
         </div>
-        <Separator className="-mt-2 mb-2" />
+        
+        {referral.screeningId && (
+            <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                    <AccordionTrigger>View Screening Answers</AccordionTrigger>
+                    <AccordionContent>
+                        {isLoadingDetails ? (
+                           <div className="space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-[80%]" />
+                                <Skeleton className="h-4 w-full" />
+                           </div>
+                        ) : screeningDetails ? (
+                            <ScreeningDetailsDisplay details={screeningDetails} type={referral.type} />
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No screening details are linked to this referral.</p>
+                        )}
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        )}
+        
+        <Separator className="my-2" />
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

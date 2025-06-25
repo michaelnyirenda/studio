@@ -1,3 +1,4 @@
+
 import { FieldValue } from 'firebase/firestore';
 
 export interface MockPost {
@@ -69,14 +70,17 @@ Key prevention strategies include:
 export interface MockReferral {
   id: string;
   patientName: string;
-  referralDate: string | Date | FieldValue; // This is the fix
+  referralDate: string | Date | FieldValue;
   referralMessage: string;
   status: 'Pending Consent' | 'Pending Review' | 'Contacted' | 'Follow-up Scheduled' | 'Closed';
   consentStatus: 'pending' | 'agreed' | 'declined';
+  type: 'HIV' | 'GBV' | 'PrEP' | 'STI';
+  screeningId?: string;
   facility?: string;
   services?: string[];
   notes?: string;
 }
+
 
 export const mockReferrals: MockReferral[] = [
   {
@@ -86,6 +90,8 @@ export const mockReferrals: MockReferral[] = [
     referralMessage: 'Dear John Doe, thank you for completing the screening. Given your sexual activity and no prior testing, a referral for HIV testing and counseling is recommended. Please consult a healthcare professional to discuss this further. Early testing is key for your health.',
     status: 'Pending Review',
     consentStatus: 'pending',
+    type: 'HIV',
+    screeningId: 'mock-hiv-1',
     notes: 'Patient seemed anxious during HIV screening.',
   },
   {
@@ -95,6 +101,8 @@ export const mockReferrals: MockReferral[] = [
     referralMessage: 'Based on your GBV screening, the following guidance was provided: We are concerned that you have experienced harm. It is important to seek support. We can provide you with information on available resources.',
     status: 'Contacted',
     consentStatus: 'agreed',
+    type: 'GBV',
+    screeningId: 'mock-gbv-1',
     facility: 'Downtown Women\'s Center',
     services: ['GBV post Care'],
     notes: 'Patient was receptive during the call. Safety planning discussed, resources provided.',
@@ -106,6 +114,8 @@ export const mockReferrals: MockReferral[] = [
     referralMessage: 'Based on your PrEP screening, the following guidance was provided: Based on your responses, you may have factors that increase your risk of HIV exposure. PrEP (Pre-Exposure Prophylaxis) is a highly effective medication to prevent HIV. We recommend discussing PrEP with a healthcare provider to see if it\'s right for you.',
     status: 'Follow-up Scheduled',
     consentStatus: 'agreed',
+    type: 'PrEP',
+    screeningId: 'mock-prep-1',
     facility: 'Clinic 3',
     services: ['PrEP', 'HTS'],
     notes: 'PrEP consultation scheduled with Dr. Carter.',
@@ -117,6 +127,8 @@ export const mockReferrals: MockReferral[] = [
     referralMessage: 'Dear Samuel Green, we acknowledge your testing history. It\'s important to continue with regular medical follow-ups and adhere to any prescribed treatment. If you need support or further consultation, please reach out to a healthcare provider.',
     status: 'Closed',
     consentStatus: 'agreed',
+    type: 'HIV',
+    screeningId: 'mock-hiv-2',
     facility: 'General Hospital',
     services: ['ART', 'Family Planning'],
     notes: 'Patient confirmed linkage to care.',

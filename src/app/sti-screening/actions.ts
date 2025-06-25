@@ -1,3 +1,4 @@
+
 "use server";
 
 import { addDoc, collection, serverTimestamp, FieldValue } from 'firebase/firestore';
@@ -37,7 +38,7 @@ export async function submitStiScreeningAction(
   const fullReferralMessage = `Dear ${name}, thank you for completing the STI screening. ${recommendation}`;
 
   try {
-    await addDoc(collection(db, 'stiScreenings'), { name, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'stiScreenings'), { name, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     let referralObjectForClient: MockReferral | undefined = undefined;
 
@@ -48,7 +49,8 @@ export async function submitStiScreeningAction(
         referralMessage: `Based on your STI screening, the following guidance was provided: ${recommendation}`,
         status: 'Pending Consent' as const,
         consentStatus: 'pending' as const,
-        type: 'STI',
+        type: 'STI' as const,
+        screeningId: screeningDocRef.id,
         userId: 'client-test-user'
       };
 

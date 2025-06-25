@@ -1,3 +1,4 @@
+
 "use server";
 
 import { addDoc, collection, serverTimestamp, FieldValue } from 'firebase/firestore';
@@ -55,7 +56,7 @@ export async function submitGbvScreeningAction(
   }
 
   try {
-    await addDoc(collection(db, 'gbvScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'gbvScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     const newReferralDataForDb = {
       patientName: name,
@@ -64,7 +65,8 @@ export async function submitGbvScreeningAction(
       status: 'Pending Consent' as const,
       consentStatus: 'pending' as const,
       notes: notes.join(' '),
-      type: 'GBV',
+      type: 'GBV' as const,
+      screeningId: screeningDocRef.id,
       userId: 'client-test-user'
     };
 
