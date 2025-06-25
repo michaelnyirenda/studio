@@ -17,14 +17,26 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { createForumPostAction } from '@/app/forum/actions';
+import { createForumPostAction, updateForumPostAction } from '@/app/forum/actions';
 import { ForumPostSchema, type ForumPostFormData } from '@/lib/schemas';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-export default function CreatePostForm() {
+interface CreatePostFormProps {
+  initialData?: {
+    id: string;
+    title: string;
+    content: string;
+  };
+}
+
+export default function CreatePostForm({ initialData }: CreatePostFormProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEditMode = !!initialData;
 
   const form = useForm<ForumPostFormData>({
     resolver: zodResolver(ForumPostSchema),
@@ -34,27 +46,60 @@ export default function CreatePostForm() {
     },
   });
 
+  useEffect(() => {
+    if (isEditMode && initialData) {
+      form.reset({
+        title: initialData.title,
+        content: initialData.content,
+      });
+    }
+  }, [isEditMode, initialData, form]);
+
   async function onSubmit(values: ForumPostFormData) {
     setIsSubmitting(true);
     try {
-      const result = await createForumPostAction(values);
-      if (result.success) {
-        toast({
-          title: "Success!",
-          description: result.message,
-        });
-        form.reset();
-      } else {
-        toast({
-          title: "Error",
-          description: result.message || "Failed to create post. Please try again.",
-          variant: "destructive",
-        });
-        // Optionally display field-specific errors if your action returns them
-        if (result.errors) {
-          result.errors.forEach(error => {
-            form.setError(error.path[0] as keyof ForumPostFormData, { message: error.message });
+      if (!isEditMode) {
+        const result = await createForumPostAction(values);
+        if (result.success) {
+          toast({
+            title: "Success!",
+            description: result.message,
           });
+          form.reset();
+          router.push('/forum');
+          router.refresh();
+        } else {
+          toast({
+            title: "Error",
+            description: result.message || "Failed to create post. Please try again.",
+            variant: "destructive",
+          });
+          if (result.errors) {
+            result.errors.forEach(error => {
+              form.setError(error.path[0] as keyof ForumPostFormData, { message: error.message });
+            });
+          }
+        }
+      } else if (initialData?.id) {
+        const result = await updateForumPostAction(initialData.id, values);
+        if (result.success) {
+            toast({
+                title: "Success!",
+                description: result.message,
+            });
+            router.push(`/forum/posts/${initialData.id}`);
+            router.refresh();
+        } else {
+             toast({
+                title: "Error",
+                description: result.message || "Failed to update post. Please try again.",
+                variant: "destructive",
+            });
+             if (result.errors) {
+                result.errors.forEach(error => {
+                    form.setError(error.path[0] as keyof ForumPostFormData, { message: error.message });
+                });
+            }
         }
       }
     } catch (error) {
@@ -71,8 +116,8 @@ export default function CreatePostForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Create New Forum Post</CardTitle>
-        <CardDescription>Share your knowledge and insights with the community. Please note: rich text editing is simplified to a standard text area in this version.</CardDescription>
+        <CardTitle className="font-headline text-2xl">{isEditMode ? 'Edit Forum Post' : 'Create New Forum Post'}</CardTitle>
+        <CardDescription>{isEditMode ? 'Update the details of your post.' : 'Share your knowledge and insights with the community. Please note: rich text editing is simplified to a standard text area in this version.'}</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -117,7 +162,7 @@ export default function CreatePostForm() {
           <CardFooter>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isSubmitting ? 'Submitting...' : 'Create Post'}
+              {isSubmitting ? 'Submitting...' : isEditMode ? 'Update Post' : 'Create Post'}
             </Button>
           </CardFooter>
         </form>

@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,10 @@ import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firesto
 import { db } from '@/lib/firebase';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { deleteForumPostAction } from './actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface Post {
   id: string;
@@ -25,9 +29,10 @@ export default function ForumPage() {
   const isAdmin = role === 'admin';
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchPosts = async () => {
+  const fetchPosts = async () => {
       setLoading(true);
       try {
         const postsCollection = collection(db, 'posts');
@@ -35,7 +40,6 @@ export default function ForumPage() {
         const postsSnapshot = await getDocs(q);
         const postsList = postsSnapshot.docs.map(doc => {
           const data = doc.data();
-          // Convert Firestore Timestamp to a readable date string
           const date = (data.createdAt as Timestamp)?.toDate().toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -53,13 +57,28 @@ export default function ForumPage() {
         setPosts(postsList);
       } catch (error) {
         console.error("Error fetching posts: ", error);
+        // Optionally, set an error state to show a message to the user
       } finally {
         setLoading(false);
       }
     };
 
+  useEffect(() => {
     fetchPosts();
   }, []);
+
+  const handleDelete = async () => {
+    if (!postToDelete) return;
+
+    const result = await deleteForumPostAction(postToDelete.id);
+    if (result.success) {
+      toast({ title: "Success", description: result.message });
+      setPosts(posts.filter(p => p.id !== postToDelete.id));
+    } else {
+      toast({ title: "Error", description: result.message, variant: "destructive" });
+    }
+    setPostToDelete(null);
+  };
 
   return (
     <div className="container mx-auto py-8 px-4 relative">
@@ -87,15 +106,39 @@ export default function ForumPage() {
             </Card>
            ))
         ) : posts.length === 0 ? (
-          <p className="text-center text-muted-foreground text-lg py-10">
-            No posts yet. Be the first to start a discussion!
-          </p>
+          <div className="text-center text-muted-foreground text-lg py-10">
+            <p>No posts yet.</p>
+            {isAdmin && <p>Be the first to start a discussion!</p>}
+          </div>
         ) : (
           posts.map(post => (
-            <Card key={post.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out bg-card hover:-translate-y-1">
+            <Card key={post.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out bg-card hover:-translate-y-1 relative">
+               {isAdmin && (
+                <div className="absolute top-2 right-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-9 w-9">
+                        <MoreHorizontal className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/forum/edit/${post.id}`} className="cursor-pointer flex items-center">
+                          <Edit className="mr-2 h-4 w-4" />
+                          <span>Edit</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setPostToDelete(post)} className="text-destructive focus:text-destructive cursor-pointer flex items-center">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
               <CardHeader>
                 <Link href={`/forum/posts/${post.id}`} passHref>
-                  <CardTitle className="text-2xl font-headline text-primary hover:text-accent cursor-pointer transition-colors">
+                  <CardTitle className="text-2xl font-headline text-primary hover:text-accent cursor-pointer transition-colors pr-12">
                     {post.title}
                   </CardTitle>
                 </Link>
@@ -129,6 +172,24 @@ export default function ForumPage() {
           </Button>
         </Link>
       )}
+
+      <AlertDialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the post titled "{postToDelete?.title}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPostToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Yes, delete post
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
