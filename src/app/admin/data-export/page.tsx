@@ -93,10 +93,11 @@ const downloadData = (data: string, fileName: string) => {
 interface ExportHistoryItem {
   id: string;
   dataType: string;
-  format: string;
+  format: 'csv' | 'excel' | 'json';
   rowCount: number;
   timestamp: string;
   fileName: string;
+  dateRange: { from: Timestamp; to: Timestamp };
 }
 
 export default function DataExportPage() {
@@ -122,6 +123,7 @@ export default function DataExportPage() {
           rowCount: data.rowCount,
           timestamp: data.timestamp ? format((data.timestamp as Timestamp).toDate(), 'PPpp') : 'N/A',
           fileName: data.fileName,
+          dateRange: data.dateRange,
         };
       });
       setHistory(historyData);
@@ -207,6 +209,79 @@ export default function DataExportPage() {
     } catch (error) {
         console.error("Failed to generate report:", error);
         toast({ title: "Error", description: `Failed to generate report: ${error instanceof Error ? error.message : 'Unknown error'}`, variant: "destructive" });
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleRedownload = async (item: ExportHistoryItem) => {
+    setLoading(true);
+
+    try {
+        const startDate = item.dateRange.from.toDate();
+        const endDate = item.dateRange.to.toDate();
+
+        let dataToExport: any[] = [];
+        const collectionMap: { [key: string]: string } = {
+            'hiv_screening': 'hivScreenings',
+            'gbv_screening': 'gbvScreenings',
+            'prep_screening': 'prepScreenings',
+            'sti_screening': 'stiScreenings',
+        };
+
+        if (item.dataType === 'screening_data_all') {
+             for (const key in collectionMap) {
+                const collectionName = collectionMap[key];
+                const q = query(collection(db, collectionName), where('createdAt', '>=', startDate), where('createdAt', '<=', endDate));
+                const snapshot = await getDocs(q);
+                const fetchedData = snapshot.docs.map(doc => flattenObject({ type: key.replace('_screening', ''), ...doc.data(), id: doc.id }));
+                dataToExport.push(...fetchedData);
+            }
+        } else if (item.dataType === 'referral_data') {
+            const q = query(collection(db, 'referrals'), where('referralDate', '>=', startDate), where('referralDate', '<=', endDate));
+            const snapshot = await getDocs(q);
+            dataToExport = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id, patientName: data.patientName,
+                    referralDate: (data.referralDate as Timestamp)?.toDate().toISOString() || 'N/A',
+                    type: data.type, status: data.status, consentStatus: data.consentStatus,
+                    facility: data.facility, notes: data.notes,
+                    services: Array.isArray(data.services) ? data.services.join('; ') : '',
+                    screeningId: data.screeningId, userId: data.userId
+                }
+            });
+        } else {
+             const collectionName = collectionMap[item.dataType];
+             if (collectionName) {
+                const q = query(collection(db, collectionName), where('createdAt', '>=', startDate), where('createdAt', '<=', endDate));
+                const snapshot = await getDocs(q);
+                dataToExport = snapshot.docs.map(doc => flattenObject({ ...doc.data(), id: doc.id }));
+             }
+        }
+
+        if (dataToExport.length === 0) {
+            toast({ title: "No Data", description: "No data found for this report's criteria. It might have been deleted.", variant: "destructive" });
+            setLoading(false);
+            return;
+        }
+        
+        const fileExtension = (item.format === 'excel') ? 'csv' : item.format;
+        const fileName = item.fileName;
+        let outputData = '';
+
+        if (fileExtension === 'csv') {
+            outputData = convertToCsv(dataToExport);
+        } else {
+            outputData = JSON.stringify(dataToExport, (key, value) => (value instanceof Timestamp ? value.toDate().toISOString() : value), 2);
+        }
+
+        downloadData(outputData, fileName);
+        toast({ title: "Success", description: `Re-download started for ${fileName}.` });
+
+    } catch (error) {
+        console.error("Failed to re-download report:", error);
+        toast({ title: "Error", description: `Failed to re-download report: ${error instanceof Error ? error.message : 'Unknown error'}`, variant: "destructive" });
     } finally {
         setLoading(false);
     }
@@ -327,6 +402,10 @@ export default function DataExportPage() {
                                   Generated: {item.timestamp} | Rows: {item.rowCount}
                               </p>
                           </div>
+                          <Button variant="ghost" size="icon" onClick={() => handleRedownload(item)} disabled={loading}>
+                              <Download className="h-4 w-4" />
+                              <span className="sr-only">Re-download</span>
+                          </Button>
                       </div>
                   ))}
                   </div>
