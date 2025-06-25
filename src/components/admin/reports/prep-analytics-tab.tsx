@@ -15,7 +15,7 @@ const chartConfig: ChartConfig = {
   notEligible: { label: "Not Eligible", color: "hsl(var(--chart-2))" },
 };
 
-const PIE_COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))"];
+const PIE_COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
 interface PrEpAnalyticsTabProps {
   screenings: Screening[];
@@ -72,7 +72,11 @@ export default function PrEpAnalyticsTab({ screenings }: PrEpAnalyticsTabProps) 
     };
     const riskFactorsChartData = Object.entries(riskFactorCounts)
         .map(([key, count]) => ({ factor: riskFactorLabels[key], count }))
-        .sort((a,b) => b.count - a.count);
+        .sort((a,b) => b.count - a.count)
+        .map((item, index) => ({
+            ...item,
+            fill: PIE_COLORS[index % PIE_COLORS.length],
+        }));
 
 
     return { kpis: kpisData, eligibilityData: eligibilityChartData, riskFactorsData: riskFactorsChartData };
@@ -123,7 +127,11 @@ export default function PrEpAnalyticsTab({ screenings }: PrEpAnalyticsTabProps) 
                 <XAxis type="number" dataKey="count" />
                 <YAxis type="category" dataKey="factor" tickLine={false} axisLine={false} width={120} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill="var(--color-eligible)" radius={4} />
+                <Bar dataKey="count" radius={4}>
+                  {riskFactorsData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={(entry as any).fill} />
+                  ))}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </CardContent>

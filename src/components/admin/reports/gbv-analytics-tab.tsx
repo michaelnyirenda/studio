@@ -92,7 +92,11 @@ export default function GbvAnalyticsTab({ screenings }: GbvAnalyticsTabProps) {
                 <XAxis type="number" dataKey="count" />
                 <YAxis type="category" dataKey="type" tickLine={false} axisLine={false} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" radius={4} />
+                <Bar dataKey="count" radius={4}>
+                  {violenceTypeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -110,7 +114,11 @@ export default function GbvAnalyticsTab({ screenings }: GbvAnalyticsTabProps) {
                 <XAxis type="number" dataKey="count" />
                 <YAxis type="category" dataKey="factor" tickLine={false} axisLine={false} width={150} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" radius={4} />
+                <Bar dataKey="count" radius={4}>
+                   {highRiskFactorsData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </CardContent>

@@ -15,7 +15,7 @@ const chartConfig: ChartConfig = {
   noImmediateRisk: { label: "No Immediate Risk", color: "hsl(var(--chart-2))" },
 };
 
-const PIE_COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))"];
+const PIE_COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
 interface StiAnalyticsTabProps {
   screenings: Screening[];
@@ -62,7 +62,11 @@ export default function StiAnalyticsTab({ screenings }: StiAnalyticsTabProps) {
     };
     const symptomsChartData = Object.entries(symptomCounts)
       .map(([key, count]) => ({ symptom: symptomLabels[key], count }))
-      .sort((a,b) => b.count - a.count);
+      .sort((a,b) => b.count - a.count)
+      .map((item, index) => ({
+        ...item,
+        fill: PIE_COLORS[index % PIE_COLORS.length],
+      }));
 
     return { kpis: kpisData, assessmentData: assessmentChartData, symptomsData: symptomsChartData };
   }, [screenings]);
@@ -112,7 +116,11 @@ export default function StiAnalyticsTab({ screenings }: StiAnalyticsTabProps) {
                 <XAxis type="number" dataKey="count" />
                 <YAxis type="category" dataKey="symptom" tickLine={false} axisLine={false} width={140} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill="var(--color-assessmentRecommended)" radius={4} />
+                <Bar dataKey="count" radius={4}>
+                  {symptomsData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={(entry as any).fill} />
+                  ))}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </CardContent>
