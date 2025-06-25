@@ -10,10 +10,24 @@ import UpdateReferralDialog from '@/components/referrals/update-referral-dialog'
 import ReferralConsentForm from '@/components/referrals/referral-consent-form';
 import { useRole } from '@/contexts/role-context';
 import { useEffect, useState, useMemo } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, Trash2 } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, updateDoc, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useSearchParams } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { deleteReferralAction } from './actions';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+
 
 type ClientReferral = Omit<MockReferral, 'referralDate'> & {
   referralDate: string;
@@ -42,6 +56,8 @@ export default function ReferralsPage() {
 
   const [referrals, setReferrals] = useState<ClientReferral[]>([]);
   const [loading, setLoading] = useState(true);
+  const [referralToDelete, setReferralToDelete] = useState<ClientReferral | null>(null);
+  const { toast } = useToast();
 
   const MOCK_CURRENT_USER_ID = 'client-test-user';
 
@@ -95,8 +111,6 @@ export default function ReferralsPage() {
   }, [role, referrals]);
 
   const handleConsentSubmit = async (referralId: string, facility: string) => {
-    // This is the fix: Update the local state immediately
-    // to give the user instant feedback.
     setReferrals(prevReferrals =>
       prevReferrals.map(r =>
         r.id === referralId
@@ -105,7 +119,6 @@ export default function ReferralsPage() {
       )
     );
 
-    // Then, send the update to the database in the background.
     const referralRef = doc(db, 'referrals', referralId);
     await updateDoc(referralRef, {
       consentStatus: 'agreed',
@@ -114,6 +127,18 @@ export default function ReferralsPage() {
     });
 
     window.history.replaceState(null, '', '/referrals');
+  };
+
+  const handleDelete = async () => {
+    if (!referralToDelete) return;
+
+    const result = await deleteReferralAction(referralToDelete.id);
+    if (result.success) {
+      toast({ title: "Success", description: result.message });
+    } else {
+      toast({ title: "Error", description: result.message, variant: "destructive" });
+    }
+    setReferralToDelete(null);
   };
 
   const pageTitle = role === 'admin' ? "Manage All Referrals" : "Your Referrals";
@@ -182,7 +207,15 @@ export default function ReferralsPage() {
                   </CardContent>
                   <CardFooter className="flex justify-between items-center pt-4 mt-auto">
                     <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
-                    {role === 'admin' && <UpdateReferralDialog referral={referral} />}
+                    {role === 'admin' && (
+                        <div className="flex items-center gap-2">
+                            <UpdateReferralDialog referral={referral} />
+                            <Button variant="outline" size="icon" className="text-destructive border-destructive hover:bg-destructive/10 h-9 w-9" onClick={() => setReferralToDelete(referral)}>
+                                <span className="sr-only">Delete</span>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    )}
                   </CardFooter>
                 </Card>
               ))}
@@ -190,6 +223,23 @@ export default function ReferralsPage() {
           </ScrollArea>
         </>
       )}
+
+      <AlertDialog open={!!referralToDelete} onOpenChange={(open) => !open && setReferralToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the referral for "{referralToDelete?.patientName}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setReferralToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Yes, delete referral
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

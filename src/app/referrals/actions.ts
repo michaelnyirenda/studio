@@ -1,6 +1,7 @@
+// src/app/referrals/actions.ts
 "use server";
 
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { ReferralConsentFormData } from '@/lib/schemas';
 import { ReferralConsentSchema } from '@/lib/schemas';
@@ -30,5 +31,18 @@ export async function submitReferralConsentAction(
   } catch (error) {
     console.error("Error submitting referral consent:", error);
     return { success: false, message: "An error occurred while submitting consent." };
+  }
+}
+
+export async function deleteReferralAction(
+  referralId: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const referralRef = doc(db, 'referrals', referralId);
+    await deleteDoc(referralRef);
+    return { success: true, message: "Referral deleted successfully!" };
+  } catch (error) {
+    console.error("Error deleting referral:", error);
+    return { success: false, message: "An error occurred while deleting the referral." };
   }
 }
