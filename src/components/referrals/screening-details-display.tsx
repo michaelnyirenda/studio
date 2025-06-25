@@ -2,74 +2,101 @@
 "use client";
 
 import type React from 'react';
-import { CardDescription } from '../ui/card';
 
-const DetailItem = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <div className="flex justify-between items-start py-2 border-b last:border-none">
-        <dt className="text-sm text-muted-foreground pr-2">{label}</dt>
-        <dd className="text-sm font-medium text-right break-words">{value === undefined || value === null || value === '' ? 'N/A' : value}</dd>
+const DetailsSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div className="mb-4 last:mb-0">
+        <h3 className="text-md font-semibold text-primary mb-2 pb-2 border-b">{title}</h3>
+        <dl className="space-y-1.5">{children}</dl>
     </div>
 );
 
-const formatArray = (arr?: string[]) => {
-    if (!arr || arr.length === 0) return 'N/A';
-    return arr.join(', ');
+const DetailItem = ({ label, value }: { label: string; value: React.ReactNode }) => {
+    const displayValue = value === undefined || value === null || value === '' ? 
+        <span className="text-muted-foreground/70 italic">N/A</span> : 
+        String(value);
+
+    return (
+        <div className="grid grid-cols-2 gap-4 py-1.5">
+            <dt className="text-sm text-muted-foreground">{label}</dt>
+            <dd className="text-sm font-medium text-right break-words">{displayValue}</dd>
+        </div>
+    );
 };
 
+const formatArray = (arr?: string[]) => {
+    if (!arr || arr.length === 0) return 'No';
+    if (arr.includes('no') || arr.includes('never_pregnant')) return 'No';
+    return arr.map(item => item.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')).join(', ');
+};
+
+const formatValue = (value?: string) => {
+    if (!value) return undefined;
+    return value.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+
 const HivDetails = ({ details }: { details: any }) => (
-    <dl className="space-y-1">
-        <DetailItem label="Knows HIV Status?" value={details.knowsHivStatus} />
-        <DetailItem label="Last Test Date" value={details.lastTestDate} />
-        <DetailItem label="Last Test Result" value={details.lastTestResult} />
-        <DetailItem label="Treatment Status" value={details.treatmentStatus} />
-        <DetailItem label="Ever Had Sex?" value={details.hadSex} />
-        <DetailItem label="Used Condoms?" value={details.usedCondoms} />
-        <DetailItem label="Transactional Sex?" value={details.transactionalSex} />
-        <DetailItem label="Multiple Partners?" value={details.multiplePartners} />
-        <DetailItem label="Consumed Alcohol?" value={details.consumedAlcohol} />
-        <DetailItem label="Alcohol Frequency" value={details.alcoholFrequency} />
-        <DetailItem label="Symptoms" value={formatArray(details.symptoms)} />
-        <DetailItem label="Pregnancy History" value={formatArray(details.pregnancyHistory)} />
-        <DetailItem label="Attending ANC/PNC?" value={details.attendingAnc} />
-        <DetailItem label="Is Orphan?" value={details.isOrphan} />
-        <DetailItem label="Orphan Status" value={details.orphanStatus} />
-        <DetailItem label="Has Disability?" value={details.hasDisability} />
-        <DetailItem label="Disability Registered?" value={details.isDisabilityRegistered} />
-    </dl>
+    <>
+        <DetailsSection title="HIV Testing History">
+            <DetailItem label="Knows HIV Status?" value={formatValue(details.knowsHivStatus)} />
+            <DetailItem label="Last Test Date" value={formatValue(details.lastTestDate)} />
+            {details.lastTestResult && <DetailItem label="Last Test Result" value={formatValue(details.lastTestResult)} />}
+            {details.treatmentStatus && <DetailItem label="Treatment Status" value={formatValue(details.treatmentStatus)} />}
+        </DetailsSection>
+
+        <DetailsSection title="Sexual History">
+            <DetailItem label="Ever Had Sex?" value={formatValue(details.hadSex)} />
+            {details.usedCondoms && <DetailItem label="Used Condoms?" value={formatValue(details.usedCondoms)} />}
+            {details.transactionalSex && <DetailItem label="Transactional Sex?" value={formatValue(details.transactionalSex)} />}
+            {details.multiplePartners && <DetailItem label="Multiple Partners?" value={formatValue(details.multiplePartners)} />}
+        </DetailsSection>
+
+        <DetailsSection title="Other Health & Social Factors">
+            <DetailItem label="Consumed Alcohol?" value={formatValue(details.consumedAlcohol)} />
+            {details.alcoholFrequency && <DetailItem label="Alcohol Frequency" value={formatValue(details.alcoholFrequency)} />}
+            <DetailItem label="Symptoms" value={formatArray(details.symptoms)} />
+            <DetailItem label="Pregnancy History" value={formatArray(details.pregnancyHistory)} />
+            {details.attendingAnc && <DetailItem label="Attending ANC/PNC?" value={formatValue(details.attendingAnc)} />}
+            <DetailItem label="Is Orphan?" value={formatValue(details.isOrphan)} />
+            {details.orphanStatus && <DetailItem label="Orphan Status" value={formatValue(details.orphanStatus)} />}
+            <DetailItem label="Has Disability?" value={formatValue(details.hasDisability)} />
+            {details.isDisabilityRegistered && <DetailItem label="Disability Registered?" value={formatValue(details.isDisabilityRegistered)} />}
+        </DetailsSection>
+    </>
 );
 
 const GbvDetails = ({ details }: { details: any }) => (
-    <dl className="space-y-1">
+    <DetailsSection title="GBV Screening Responses">
         <DetailItem label="Emotional Violence" value={formatArray(details.emotionalViolence)} />
-        <DetailItem label="Suicide/Self-Harm Attempt?" value={details.suicideAttempt} />
+        {details.suicideAttempt && <DetailItem label="Suicide/Self-Harm Attempt?" value={formatValue(details.suicideAttempt)} />}
         <DetailItem label="Physical Violence" value={formatArray(details.physicalViolence)} />
-        <DetailItem label="Serious Injury?" value={details.seriousInjury} />
+        {details.seriousInjury && <DetailItem label="Serious Injury?" value={formatValue(details.seriousInjury)} />}
         <DetailItem label="Sexual Violence" value={formatArray(details.sexualViolence)} />
-        <DetailItem label="Sexual Violence Timeline" value={details.sexualViolenceTimeline} />
-    </dl>
+        {details.sexualViolenceTimeline && <DetailItem label="Sexual Violence Timeline" value={formatValue(details.sexualViolenceTimeline)} />}
+    </DetailsSection>
 );
 
 const PrEpDetails = ({ details }: { details: any }) => (
-     <dl className="space-y-1">
-        <DetailItem label="Multiple Partners?" value={details.multiplePartners} />
-        <DetailItem label="Unprotected Sex?" value={details.unprotectedSex} />
-        <DetailItem label="Unknown Status Partners?" value={details.unknownStatusPartners} />
-        <DetailItem label="At-Risk Partners?" value={details.atRiskPartners} />
-        <DetailItem label="Sex Under Influence?" value={details.sexUnderInfluence} />
-        <DetailItem label="New STI Diagnosis?" value={details.newStiDiagnosis} />
-        <DetailItem label="Considers Self at Risk?" value={details.considersAtRisk} />
-        <DetailItem label="Used PEP Multiple Times?" value={details.usedPepMultipleTimes} />
-        <DetailItem label="Forced Sex?" value={details.forcedSex} />
-    </dl>
+     <DetailsSection title="PrEP Screening Responses">
+        <DetailItem label="Multiple Partners?" value={formatValue(details.multiplePartners)} />
+        <DetailItem label="Unprotected Sex?" value={formatValue(details.unprotectedSex)} />
+        <DetailItem label="Unknown Status Partners?" value={formatValue(details.unknownStatusPartners)} />
+        <DetailItem label="At-Risk Partners?" value={formatValue(details.atRiskPartners)} />
+        <DetailItem label="Sex Under Influence?" value={formatValue(details.sexUnderInfluence)} />
+        <DetailItem label="New STI Diagnosis?" value={formatValue(details.newStiDiagnosis)} />
+        <DetailItem label="Considers Self at Risk?" value={formatValue(details.considersAtRisk)} />
+        <DetailItem label="Used PEP Multiple Times?" value={formatValue(details.usedPepMultipleTimes)} />
+        <DetailItem label="Forced Sex?" value={formatValue(details.forcedSex)} />
+    </DetailsSection>
 );
 
 const StiDetails = ({ details }: { details: any }) => (
-    <dl className="space-y-1">
-        <DetailItem label="Ever Diagnosed/Treated for STI?" value={details.diagnosedOrTreated} />
-        <DetailItem label="Abnormal Discharge?" value={details.abnormalDischarge} />
-        <DetailItem label="Vaginal Itchiness/Discomfort?" value={details.vaginalItchiness} />
-        <DetailItem label="Genital Sores/Ulcers?" value={details.genitalSores} />
-    </dl>
+    <DetailsSection title="STI Screening Responses">
+        <DetailItem label="Ever Diagnosed/Treated for STI?" value={formatValue(details.diagnosedOrTreated)} />
+        <DetailItem label="Abnormal Discharge?" value={formatValue(details.abnormalDischarge)} />
+        <DetailItem label="Vaginal Itchiness/Discomfort?" value={formatValue(details.vaginalItchiness)} />
+        <DetailItem label="Genital Sores/Ulcers?" value={formatValue(details.genitalSores)} />
+    </DetailsSection>
 );
 
 
@@ -86,10 +113,5 @@ export default function ScreeningDetailsDisplay({ details, type }: { details: an
         default: content = <p>Unknown screening type.</p>; break;
     }
 
-    return (
-        <div>
-            <CardDescription className="mb-2">Answers from the {type} screening:</CardDescription>
-            {content}
-        </div>
-    );
+    return <div>{content}</div>;
 }

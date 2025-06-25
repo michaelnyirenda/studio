@@ -318,14 +318,14 @@ export default function ScreeningDataPage() {
       </Tabs>
       
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-2xl">
            {selectedScreening && (
              <>
                 <DialogHeader>
                     <DialogTitle>Screening Details: {selectedScreening.userName}</DialogTitle>
                     <CardDescription>Type: {selectedScreening.screeningType} | Date: {selectedScreening.date}</CardDescription>
                 </DialogHeader>
-                <div className="py-4 max-h-[60vh] overflow-y-auto">
+                <div className="py-4 max-h-[70vh] overflow-y-auto pr-4">
                     <ScreeningDetailsDisplay details={selectedScreening.data} type={selectedScreening.screeningType} />
                 </div>
              </>

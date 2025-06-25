@@ -135,7 +135,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
           Update
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
           <CardDescription className="text-sm text-muted-foreground pt-1">
@@ -160,7 +160,9 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                                 <Skeleton className="h-4 w-full" />
                            </div>
                         ) : screeningDetails ? (
-                            <ScreeningDetailsDisplay details={screeningDetails} type={referral.type} />
+                           <div className="max-h-[30vh] overflow-y-auto pr-3">
+                             <ScreeningDetailsDisplay details={screeningDetails} type={referral.type} />
+                           </div>
                         ) : (
                             <p className="text-sm text-muted-foreground">No screening details are linked to this referral.</p>
                         )}
