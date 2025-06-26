@@ -2,6 +2,7 @@
 "use client"
 
 import * as React from "react"
+import { ChevronUp, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -10,6 +11,64 @@ import { Button } from "@/components/ui/button"
 interface TimePickerInputProps {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
+}
+
+// Helper for the individual time part (hour/minute) with steppers
+function TimePart({
+  value,
+  onChange,
+  onBlur,
+  onIncrement,
+  onDecrement,
+  placeholder,
+  id,
+}: {
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur: React.FocusEventHandler<HTMLInputElement>;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  placeholder: string;
+  id: string;
+}) {
+  return (
+    <div className="relative flex-1">
+      <Input
+        id={id}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        onFocus={(e) => e.target.select()}
+        className="w-full text-center font-mono text-base h-10 pr-8"
+        maxLength={2}
+        placeholder={placeholder}
+      />
+      <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center h-full">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-5 w-5 p-0"
+          onClick={onIncrement}
+          tabIndex={-1}
+        >
+          <span className="sr-only">Increment</span>
+          <ChevronUp className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-5 w-5 p-0"
+          onClick={onDecrement}
+          tabIndex={-1}
+        >
+          <span className="sr-only">Decrement</span>
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
@@ -43,43 +102,39 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
         newDate.setHours(hours, parseInt(m, 10), 0, 0);
         setDate(newDate);
       }
-    } else {
-      setDate(undefined);
+    } else if (!h && !m) {
+        setDate(undefined);
     }
   };
 
   const handleHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (/^([0-9]|0[1-9]|1[0-2])?$/.test(val)) {
-      setHour(val);
-      updateDate(val, minute, period);
-    }
+    const val = e.target.value.replace(/[^0-9]/g, '');
+    setHour(val);
   };
 
   const handleMinuteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (/^([0-9]|[0-5][0-9])?$/.test(val)) {
-        setMinute(val);
-        updateDate(hour, val, period);
-    }
+    const val = e.target.value.replace(/[^0-9]/g, '');
+    setMinute(val);
   };
   
   const handleHourBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      if(val){
-        const newHour = String(val).padStart(2, '0');
-        setHour(newHour);
-        updateDate(newHour, minute, period);
+      let val = parseInt(e.target.value, 10);
+      if (isNaN(val) || val < 1 || val > 12) {
+        val = date ? date.getHours() % 12 || 12 : 12;
       }
+      const newHour = String(val).padStart(2, '0');
+      setHour(newHour);
+      updateDate(newHour, minute, period);
   }
 
   const handleMinuteBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      if(val){
-        const newMinute = String(val).padStart(2, '0');
-        setMinute(newMinute);
-        updateDate(hour, newMinute, period);
+      let val = parseInt(e.target.value, 10);
+      if (isNaN(val) || val < 0 || val > 59) {
+        val = date ? date.getMinutes() : 0;
       }
+      const newMinute = String(val).padStart(2, '0');
+      setMinute(newMinute);
+      updateDate(hour, newMinute, period);
   }
 
   const handlePeriodClick = (newPeriod: 'AM' | 'PM') => {
@@ -87,29 +142,49 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
     updateDate(hour, minute, newPeriod);
   };
 
+  const handleStep = (part: 'hour' | 'minute', direction: 'inc' | 'dec') => {
+    let newHour = parseInt(hour, 10);
+    let newMinute = parseInt(minute, 10);
+    
+    if (part === 'hour') {
+      if (isNaN(newHour)) newHour = 12;
+      newHour = direction === 'inc' ? (newHour % 12) + 1 : (newHour === 1 ? 12 : newHour - 1);
+      const newHourStr = String(newHour).padStart(2, '0');
+      setHour(newHourStr);
+      updateDate(newHourStr, minute, period);
+    } else { // minute
+      if (isNaN(newMinute)) newMinute = 0;
+      newMinute = direction === 'inc' ? (newMinute + 1) % 60 : (newMinute - 1 + 60) % 60;
+      const newMinuteStr = String(newMinute).padStart(2, '0');
+      setMinute(newMinuteStr);
+      updateDate(hour, newMinuteStr, period);
+    }
+  };
+
+
   return (
     <div className="space-y-2">
       <Label>Time</Label>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Input
-              id="time-picker-hour"
-              value={hour}
-              onChange={handleHourChange}
-              onBlur={handleHourBlur}
-              className="w-16 text-center text-lg p-2 h-10 font-mono"
-              maxLength={2}
-              placeholder="hh"
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 flex-1">
+          <TimePart
+            id="time-picker-hour"
+            value={hour}
+            onChange={handleHourChange}
+            onBlur={handleHourBlur}
+            onIncrement={() => handleStep('hour', 'inc')}
+            onDecrement={() => handleStep('hour', 'dec')}
+            placeholder="hh"
           />
           <span className="text-lg font-bold">:</span>
-          <Input
-              id="time-picker-minute"
-              value={minute}
-              onChange={handleMinuteChange}
-              onBlur={handleMinuteBlur}
-              className="w-16 text-center text-lg p-2 h-10 font-mono"
-              maxLength={2}
-              placeholder="mm"
+          <TimePart
+            id="time-picker-minute"
+            value={minute}
+            onChange={handleMinuteChange}
+            onBlur={handleMinuteBlur}
+            onIncrement={() => handleStep('minute', 'inc')}
+            onDecrement={() => handleStep('minute', 'dec')}
+            placeholder="mm"
           />
         </div>
         <div className="flex items-center rounded-md border p-0.5 shrink-0">
