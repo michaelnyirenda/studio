@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/shared/page-header";
-import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, LineChart, Users, MessageSquareText, ShieldAlert, UserCog, BarChart3 } from 'lucide-react';
+import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, LineChart, Users, MessageSquareText, UserCog, BarChart3 } from 'lucide-react';
 import Image from 'next/image';
 import { useRole } from '@/contexts/role-context';
 import * as React from 'react';
@@ -116,12 +116,6 @@ function AdminDashboardContent() {
           description="Oversee forum discussions and manage posts. Create new posts via the Forum page."
           link="/forum"
           icon={<MessageSquareText />}
-        />
-        <AdminFeatureLinkCard
-          title="User Chat Support"
-          description="Access the chat system to respond to user queries and provide support."
-          link="/chat"
-          icon={<ShieldAlert />}
         />
         <AdminFeatureLinkCard
           title="User Management"
