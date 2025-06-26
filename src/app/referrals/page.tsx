@@ -30,7 +30,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import type { ReferralConsentFormData } from '@/lib/schemas';
 import { format } from 'date-fns';
-import ScheduleAppointmentDialog from '@/components/referrals/schedule-appointment-dialog';
 
 
 type ClientReferral = Omit<MockReferral, 'referralDate' | 'appointmentDateTime'> & {
@@ -225,7 +224,6 @@ export default function ReferralsPage() {
                     <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
                     {role === 'admin' && (
                         <div className="flex items-center gap-2">
-                            <ScheduleAppointmentDialog referral={referral} />
                             <UpdateReferralDialog referral={referral} />
                             <Button variant="outline" size="icon" className="text-destructive border-destructive hover:bg-destructive/10 h-9 w-9" onClick={() => setReferralToDelete(referral)}>
                                 <span className="sr-only">Delete</span>

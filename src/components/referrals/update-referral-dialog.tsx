@@ -11,15 +11,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { UpdateReferralFormSchema, type UpdateReferralFormData } from '@/lib/schemas';
-import { Edit3, Loader2, Mail, MessageSquare } from 'lucide-react';
+import { CalendarIcon, Edit3, Loader2, Mail, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ScreeningDetailsDisplay from './screening-details-display';
 import { Skeleton } from '../ui/skeleton';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const serviceItems = [
   { id: 'HTS', label: 'HTS' },
@@ -53,6 +57,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
       status: referral.status,
       notes: referral.notes || '',
       services: referral.services || [],
+      appointmentDateTime: referral.appointmentDateTime ? (referral.appointmentDateTime as Timestamp).toDate() : undefined,
     },
   });
 
@@ -62,6 +67,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
         status: referral.status,
         notes: referral.notes || '',
         services: referral.services || [],
+        appointmentDateTime: referral.appointmentDateTime ? (referral.appointmentDateTime as Timestamp).toDate() : undefined,
       });
       
       if (referral.screeningId && referral.type) {
@@ -107,6 +113,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
           status: values.status,
           notes: values.notes,
           services: values.services,
+          appointmentDateTime: values.appointmentDateTime ? Timestamp.fromDate(values.appointmentDateTime) : null,
       });
 
       toast({
@@ -254,6 +261,57 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                         <FormMessage />
                     </FormItem>
                 )}
+            />
+
+            <FormField
+              control={form.control}
+              name="appointmentDateTime"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Appointment Date & Time</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? format(field.value, "PPP 'at' p") : <span>Pick a date and time</span>}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                      />
+                      <div className="p-3 border-t border-border">
+                        <input
+                          type="time"
+                          className="w-full border-input bg-input p-2 rounded-md"
+                          value={field.value ? format(field.value, "HH:mm") : ""}
+                          onChange={(e) => {
+                            const time = e.target.value;
+                            if (!time) return;
+                            const [hours, minutes] = time.split(':').map(Number);
+                            const newDate = field.value ? new Date(field.value) : new Date();
+                            newDate.setHours(hours, minutes, 0, 0);
+                            field.onChange(newDate);
+                          }}
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
 
             <FormField
