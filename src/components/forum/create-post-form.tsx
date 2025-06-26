@@ -22,18 +22,16 @@ import { ForumPostSchema, type ForumPostFormData } from '@/lib/schemas';
 import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import MarkdownToolbar from './markdown-toolbar';
+import { Separator } from '../ui/separator';
 
 interface CreatePostFormProps {
   initialData?: {
     id: string;
     title: string;
     content: string;
-    imageUrl?: string;
-    imageHint?: string;
-    videoUrl?: string;
-    audioUrl?: string;
+    bannerImageUrl?: string;
+    bannerImageHint?: string;
   };
 }
 
@@ -50,10 +48,8 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
     defaultValues: {
       title: '',
       content: '',
-      imageUrl: '',
-      imageHint: '',
-      videoUrl: '',
-      audioUrl: '',
+      bannerImageUrl: '',
+      bannerImageHint: '',
     },
   });
 
@@ -62,10 +58,8 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
       form.reset({
         title: initialData.title,
         content: initialData.content,
-        imageUrl: initialData.imageUrl || '',
-        imageHint: initialData.imageHint || '',
-        videoUrl: initialData.videoUrl || '',
-        audioUrl: initialData.audioUrl || '',
+        bannerImageUrl: initialData.bannerImageUrl || '',
+        bannerImageHint: initialData.bannerImageHint || '',
       });
     }
   }, [isEditMode, initialData, form]);
@@ -137,6 +131,38 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
+             <div className="space-y-4 rounded-lg border p-4">
+                <h3 className="text-lg font-medium">Banner Image (Optional)</h3>
+                 <FormField
+                    control={form.control}
+                    name="bannerImageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Image URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://example.com/image.png" {...field} />
+                        </FormControl>
+                        <FormDescription>Link to an image to display at the top of your post.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={form.control}
+                    name="bannerImageHint"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Image AI Hint</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., 'community health'" {...field} />
+                        </FormControl>
+                        <FormDescription>One or two keywords describing the image for AI processing.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+             </div>
+
             <FormField
               control={form.control}
               name="title"
@@ -153,6 +179,9 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
                 </FormItem>
               )}
             />
+
+            <Separator />
+
             <FormField
               control={form.control}
               name="content"
@@ -162,8 +191,8 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
                   <MarkdownToolbar editorRef={contentRef} form={form} />
                   <FormControl>
                     <Textarea
-                      placeholder="Write your detailed post content here..."
-                      className="min-h-[200px] resize-y"
+                      placeholder="Write your detailed post content here... Use the toolbar above to style your text and add media."
+                      className="min-h-[250px] resize-y"
                       {...field}
                       ref={(e) => {
                         field.ref(e);
@@ -177,71 +206,6 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
                 </FormItem>
               )}
             />
-
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1">
-                <AccordionTrigger>Admin: Add Media (Optional)</AccordionTrigger>
-                <AccordionContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="imageUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Image URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://example.com/image.png" {...field} />
-                        </FormControl>
-                        <FormDescription>Link to an image to display at the top of your post.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                   <FormField
-                    control={form.control}
-                    name="imageHint"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Image AI Hint</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., 'community health'" {...field} />
-                        </FormControl>
-                        <FormDescription>One or two keywords describing the image for AI processing.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="videoUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>YouTube Video URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://www.youtube.com/watch?v=..." {...field} />
-                        </FormControl>
-                         <FormDescription>Link to a YouTube video to embed in your post.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                   <FormField
-                    control={form.control}
-                    name="audioUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Audio URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://example.com/audio.mp3" {...field} />
-                        </FormControl>
-                         <FormDescription>Link to an audio file (e.g., mp3) to embed in your post.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-
 
           </CardContent>
           <CardFooter>

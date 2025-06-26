@@ -1,7 +1,7 @@
 // src/app/forum/posts/[id]/page.tsx
 "use client";
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
@@ -11,18 +11,122 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Update the Post type to handle potential image and video URLs
 interface Post {
   id: string;
   title: string;
   content: string;
   author: string;
   date: string;
-  imageUrl?: string;
-  imageHint?: string;
-  videoUrl?: string;
-  audioUrl?: string;
+  bannerImageUrl?: string;
+  bannerImageHint?: string;
 }
+
+const getEmbedUrl = (url: string) => {
+    if (!url) return null;
+    let videoId = '';
+     if (url.includes('youtube.com/watch?v=')) {
+      videoId = url.split('v=')[1].split('&')[0];
+    } else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1].split('?')[0];
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+};
+
+const parseInline = (text: string) => {
+    // Split by bold and italic markers, keeping the delimiters
+    const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+    return parts.map((part, index) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={index}>{part.slice(2, -2)}</strong>;
+        }
+        if (part.startsWith('*') && part.endsWith('*')) {
+            return <em key={index}>{part.slice(1, -1)}</em>;
+        }
+        return part;
+    });
+};
+
+
+const ContentRenderer = ({ content }: { content: string }) => {
+    const elements: React.ReactNode[] = [];
+    let listItems: React.ReactNode[] = [];
+    let currentListType: 'ul' | 'ol' | null = null;
+
+    const flushList = (key: string | number) => {
+        if (listItems.length > 0) {
+            if (currentListType === 'ul') {
+                elements.push(<ul key={`ul-${key}`} className="list-disc list-inside my-4 space-y-2 pl-4">{listItems}</ul>);
+            } else if (currentListType === 'ol') {
+                elements.push(<ol key={`ol-${key}`} className="list-decimal list-inside my-4 space-y-2 pl-4">{listItems}</ol>);
+            }
+        }
+        listItems = [];
+        currentListType = null;
+    };
+
+    const lines = content.split('\n');
+
+    lines.forEach((line, index) => {
+        // Regex for various markdown elements
+        const h1Match = line.match(/^# (.*)/);
+        const h2Match = line.match(/^## (.*)/);
+        const imgMatch = line.match(/^!\[(.*?)\]\((.*?)\)/);
+        const videoMatch = line.match(/^\[video\]\((.*?)\)/);
+        const audioMatch = line.match(/^\[audio\]\((.*?)\)/);
+        const ulMatch = line.match(/^- (.*)/);
+        const olMatch = line.match(/^(\d+)\. (.*)/);
+
+        const isNewElement = h1Match || h2Match || imgMatch || videoMatch || audioMatch || (line.trim() === '' && listItems.length > 0);
+        
+        if(isNewElement) flushList(index);
+
+        if (h1Match) {
+            elements.push(<h1 key={index} className="text-4xl font-bold mt-6 mb-2 text-primary">{parseInline(h1Match[1])}</h1>);
+        } else if (h2Match) {
+            elements.push(<h2 key={index} className="text-3xl font-bold mt-6 mb-2">{parseInline(h2Match[1])}</h2>);
+        } else if (imgMatch) {
+            elements.push(
+                <div key={index} className="relative w-full h-96 my-6 rounded-lg overflow-hidden shadow-md">
+                    <Image src={imgMatch[2]} alt={imgMatch[1]} fill style={{ objectFit: 'cover' }} />
+                </div>
+            );
+        } else if (videoMatch) {
+            const embedUrl = getEmbedUrl(videoMatch[1]);
+            if (embedUrl) {
+                elements.push(
+                     <div key={index} className="my-8 aspect-video">
+                        <iframe width="100%" height="100%" src={embedUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen className="rounded-lg shadow-md"></iframe>
+                    </div>
+                );
+            }
+        } else if (audioMatch) {
+             elements.push(
+                 <div key={index} className="my-8">
+                    <audio controls className="w-full"><source src={audioMatch[1]} />Your browser does not support the audio element.</audio>
+                </div>
+             );
+        } else if (ulMatch) {
+            if (currentListType !== 'ul') {
+                flushList(index);
+                currentListType = 'ul';
+            }
+            listItems.push(<li key={index}>{parseInline(ulMatch[1])}</li>);
+        } else if (olMatch) {
+             if (currentListType !== 'ol') {
+                flushList(index);
+                currentListType = 'ol';
+            }
+            listItems.push(<li key={index}>{parseInline(olMatch[2])}</li>);
+        } else if (line.trim() !== '') {
+            elements.push(<p key={index} className="my-4 leading-relaxed">{parseInline(line)}</p>);
+        }
+    });
+
+    flushList('last'); // Flush any remaining list items at the end of content
+
+    return <>{elements}</>;
+};
+
 
 export default function ForumPostPage({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<Post | null>(null);
@@ -61,17 +165,6 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
     }
   }, [params.id]);
 
-  const getEmbedUrl = (url?: string) => {
-    if (!url) return null;
-    let videoId = '';
-     if (url.includes('youtube.com/watch?v=')) {
-      videoId = url.split('v=')[1].split('&')[0];
-    } else if (url.includes('youtu.be/')) {
-      videoId = url.split('youtu.be/')[1].split('?')[0];
-    }
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-  };
-
   if (loading) {
     return (
       <div className="container mx-auto py-8 px-4 max-w-4xl">
@@ -109,8 +202,6 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const embedUrl = getEmbedUrl(post.videoUrl);
-
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <Link href="/forum" passHref>
@@ -121,14 +212,14 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
       </Link>
       
       <Card className="shadow-xl overflow-hidden bg-card">
-        {post.imageUrl && (
+        {post.bannerImageUrl && (
           <div className="relative w-full h-64 md:h-96">
             <Image
-              src={post.imageUrl}
+              src={post.bannerImageUrl}
               alt={post.title}
               fill
               style={{ objectFit: 'cover' }}
-              data-ai-hint={post.imageHint || 'forum post image'}
+              data-ai-hint={post.bannerImageHint || 'forum post image'}
               priority
             />
           </div>
@@ -142,33 +233,7 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="py-8 px-8">
-          <div className="prose prose-lg max-w-none text-card-foreground/90 leading-relaxed whitespace-pre-wrap">
-            {post.content}
-          </div>
-
-          {embedUrl && (
-            <div className="my-8 aspect-video">
-              <iframe
-                width="100%"
-                height="100%"
-                src={embedUrl}
-                title={post.title || 'Forum post video'}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="rounded-lg shadow-md"
-              ></iframe>
-            </div>
-          )}
-
-          {post.audioUrl && (
-             <div className="my-8">
-                <audio controls className="w-full">
-                    <source src={post.audioUrl} />
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-          )}
+           <ContentRenderer content={post.content} />
         </CardContent>
       </Card>
     </div>
