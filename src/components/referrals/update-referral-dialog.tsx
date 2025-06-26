@@ -10,7 +10,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose
+  DialogClose,
+  DialogContent
 } from '@/components/ui/dialog';
 import { CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -147,23 +148,14 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
   const location = [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="h-9 w-9">
             <span className="sr-only">Update</span>
             <Edit3 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      {isOpen && (
-        <DialogPortal forceMount>
-          <div className="fixed inset-0 z-50 bg-black/80" />
-          <DialogPrimitive.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            className={cn(
-                "fixed left-[50%] top-[50%] z-50 grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg",
-                "flex flex-col max-h-[90vh]"
-            )}
-          >
+        <DialogContent onInteractOutside={(e) => e.preventDefault()} className={cn("sm:max-w-2xl", "flex flex-col max-h-[90vh]")}>
             <DialogHeader>
                 <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
                 <CardDescription className="text-sm text-muted-foreground pt-2">
@@ -187,7 +179,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                 </CardDescription>
             </DialogHeader>
 
-            <div className="flex-grow overflow-y-auto pr-6 -mr-6 space-y-4 pb-4">
+            <div className="flex-grow overflow-y-auto -mx-6 px-6 space-y-4 pb-4">
                 <div className="py-2">
                     <p className="text-sm font-semibold text-foreground/90 mb-1">Referral Reason:</p>
                     <p className="text-sm text-muted-foreground">{referral.referralMessage}</p>
@@ -348,14 +340,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                 Save Changes
                 </Button>
             </DialogFooter>
-
-            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-            </DialogClose>
-          </DialogPrimitive.Content>
-        </DialogPortal>
-      )}
+          </DialogContent>
     </Dialog>
   );
 }
