@@ -57,6 +57,7 @@ const convertToCsv = (data: any[], preferredOrder: string[] = []): string => {
     const humanReadableValueMap: { [key: string]: string } = {
         // General
         'yes': 'Yes', 'no': 'No', 'dont_know': "Don't Know", 'refused': 'Refused to Answer', 'no_answer': 'No Answer', 'na': 'N/A', 'pending': 'Pending', 'agreed': 'Agreed', 'declined': 'Declined',
+        'whatsapp': 'WhatsApp/SMS', 'email': 'Email',
 
         // HIV Screening
         'less_than_3_months': 'Less than 3 months ago', '3_to_6_months': '3-6 months ago', '6_to_12_months': '6-12 months ago', 'more_than_12_months': 'More than 12 months ago', 'never_tested': 'Never tested',
@@ -193,7 +194,7 @@ export default function DataExportPage() {
         'id', 'name', 'age', 'phoneNumber', 'email', 'createdAt', 'userId', 'diagnosedOrTreated', 'abnormalDischarge', 'vaginalItchiness', 'genitalSores'
     ],
     referral_data: [
-        'id', 'patientName', 'phoneNumber', 'email', 'referralDate', 'type', 'status', 'consentStatus', 'facility', 'services', 'referralMessage',
+        'id', 'patientName', 'phoneNumber', 'email', 'referralDate', 'type', 'status', 'consentStatus', 'contactMethod', 'facility', 'services', 'referralMessage',
         'notes', 'screeningId', 'userId'
     ],
     get screening_data_all() {

@@ -83,6 +83,7 @@ export interface MockReferral {
   notes?: string;
   phoneNumber?: string;
   email?: string;
+  contactMethod?: 'email' | 'whatsapp';
 }
 
 
@@ -115,6 +116,7 @@ export const mockReferrals: MockReferral[] = [
     constituency: 'Constituency 1.1',
     facility: "Clinic A",
     services: ['GBV post Care'],
+    contactMethod: 'email',
     notes: 'Patient was receptive during the call. Safety planning discussed, resources provided.',
   },
   {
@@ -132,6 +134,7 @@ export const mockReferrals: MockReferral[] = [
     constituency: 'Constituency 2.1',
     facility: 'Clinic F',
     services: ['PrEP', 'HTS'],
+    contactMethod: 'whatsapp',
     notes: 'PrEP consultation scheduled with Dr. Carter.',
   },
   {
@@ -149,6 +152,7 @@ export const mockReferrals: MockReferral[] = [
     constituency: 'Constituency 3.2',
     facility: 'Clinic L',
     services: ['ART', 'Family Planning'],
+    contactMethod: 'whatsapp',
     notes: 'Patient confirmed linkage to care.',
   },
 ];

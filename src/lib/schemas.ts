@@ -195,5 +195,6 @@ export const ReferralConsentSchema = z.object({
   region: z.string({ required_error: "Please select a region." }),
   constituency: z.string({ required_error: "Please select a constituency." }),
   facility: z.string({ required_error: "Please select a facility." }),
+  contactMethod: z.enum(['email', 'whatsapp'], { required_error: "Please select your preferred contact method." }),
 });
 export type ReferralConsentFormData = z.infer<typeof ReferralConsentSchema>;

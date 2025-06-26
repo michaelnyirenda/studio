@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -29,7 +30,8 @@ import { ReferralConsentSchema, type ReferralConsentFormData } from '@/lib/schem
 import type { MockReferral } from '@/lib/mock-data';
 import { useState, useEffect } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, Loader2 } from 'lucide-react';
+import { Info, Loader2, Mail, MessageSquare } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const locationData = {
   "Region 1": {
@@ -66,6 +68,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
             region: undefined,
             constituency: undefined,
             facility: undefined,
+            contactMethod: undefined,
         },
     });
 
@@ -155,7 +158,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                  />
 
                 {hasAgreed && (
-                    <div className="space-y-4 pt-4 border-t">
+                    <div className="space-y-6 pt-4 border-t">
                         <FormField
                             control={form.control}
                             name="region"
@@ -209,6 +212,45 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                                      <FormDescription>
                                         Please select a facility where you would like to receive services.
                                     </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="contactMethod"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel className="text-lg">Preferred Contact Method</FormLabel>
+                                    <FormDescription>
+                                        How would you like our support staff to contact you?
+                                    </FormDescription>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className="flex flex-col space-y-2 pt-2"
+                                        >
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <RadioGroupItem value="whatsapp" />
+                                                </FormControl>
+                                                <FormLabel className="font-normal flex items-center gap-2">
+                                                    <MessageSquare className="h-5 w-5 text-green-600" />
+                                                    WhatsApp / SMS (using {referral.phoneNumber})
+                                                </FormLabel>
+                                            </FormItem>
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <RadioGroupItem value="email" disabled={!referral.email} />
+                                                </FormControl>
+                                                <FormLabel className={cn("font-normal flex items-center gap-2", !referral.email && "text-muted-foreground/80")}>
+                                                    <Mail className="h-5 w-5 text-blue-600" />
+                                                    Email {referral.email ? `(${referral.email})` : '(No email provided)'}
+                                                </FormLabel>
+                                            </FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}

@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { UpdateReferralFormSchema, type UpdateReferralFormData } from '@/lib/schemas';
-import { Edit3, Loader2 } from 'lucide-react';
+import { Edit3, Loader2, Mail, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
@@ -141,7 +141,16 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
         <DialogHeader>
           <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
           <CardDescription className="text-sm text-muted-foreground pt-1">
-            ID: {referral.id} | Location: {location || 'N/A'}
+            <div className="flex justify-between items-center flex-wrap gap-x-4 gap-y-1">
+                <span>ID: {referral.id}</span>
+                <span className="flex-1 min-w-0 truncate">Location: {location || 'N/A'}</span>
+                 {referral.contactMethod && (
+                    <span className="flex items-center gap-1 font-medium text-foreground">
+                        {referral.contactMethod === 'email' ? <Mail className="h-4 w-4 text-blue-600" /> : <MessageSquare className="h-4 w-4 text-green-600" />}
+                        {referral.contactMethod === 'email' ? `Email (${referral.email})` : `WhatsApp (${referral.phoneNumber})`}
+                    </span>
+                )}
+            </div>
           </CardDescription>
         </DialogHeader>
 

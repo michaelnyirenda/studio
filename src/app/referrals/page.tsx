@@ -11,7 +11,7 @@ import UpdateReferralDialog from '@/components/referrals/update-referral-dialog'
 import ReferralConsentForm from '@/components/referrals/referral-consent-form';
 import { useRole } from '@/contexts/role-context';
 import { useEffect, useState, useMemo } from 'react';
-import { FileText, Trash2 } from 'lucide-react';
+import { FileText, Trash2, Mail, MessageSquare } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, updateDoc, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useSearchParams } from 'next/navigation';
@@ -187,8 +187,14 @@ export default function ReferralsPage() {
                         {referral.status}
                       </Badge>
                     </div>
-                    <CardDescription className="text-sm text-muted-foreground pt-1">
-                      Referred on: {referral.referralDate}
+                     <CardDescription className="text-sm text-muted-foreground pt-1 flex justify-between items-center">
+                        <span>Referred on: {referral.referralDate}</span>
+                        {referral.contactMethod && (
+                            <span className="flex items-center gap-1 text-xs font-medium">
+                                {referral.contactMethod === 'email' ? <Mail className="h-3 w-3 text-blue-600" /> : <MessageSquare className="h-3 w-3 text-green-600" />}
+                                Contact via {referral.contactMethod === 'email' ? 'Email' : 'WhatsApp'}
+                            </span>
+                        )}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex-grow">

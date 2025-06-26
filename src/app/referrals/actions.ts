@@ -1,7 +1,7 @@
 // src/app/referrals/actions.ts
 "use server";
 
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { ReferralConsentFormData } from '@/lib/schemas';
 import { ReferralConsentSchema } from '@/lib/schemas';
@@ -16,9 +16,28 @@ export async function submitReferralConsentAction(
   if (!validationResult.success) {
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
+  
+  const referralRef = doc(db, 'referrals', referralId);
+  const referralSnap = await getDoc(referralRef);
+
+  if (!referralSnap.exists()) {
+    return { success: false, message: "Referral not found." };
+  }
+
+  if (validationResult.data.contactMethod === 'email' && !referralSnap.data().email) {
+    return { 
+        success: false, 
+        message: "Cannot select email as contact method because no email was provided during screening.",
+        errors: [{
+            path: ['contactMethod'],
+            message: 'Email not available for this user. Please select another method.',
+            code: 'custom'
+        }]
+    };
+  }
+
 
   try {
-    const referralRef = doc(db, 'referrals', referralId);
     
     // Update the document in Firestore
     await updateDoc(referralRef, {
@@ -26,6 +45,7 @@ export async function submitReferralConsentAction(
       region: validationResult.data.region,
       constituency: validationResult.data.constituency,
       facility: validationResult.data.facility,
+      contactMethod: validationResult.data.contactMethod,
       status: 'Pending Review', // Change status so it appears on the admin's dashboard
     });
 
