@@ -158,6 +158,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
         <DialogPortal forceMount>
           <div className="fixed inset-0 z-50 bg-black/80" />
           <DialogPrimitive.Content
+            onInteractOutside={(e) => e.preventDefault()}
             className={cn(
                 "fixed left-[50%] top-[50%] z-50 grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg",
                 "flex flex-col max-h-[90vh]"
@@ -186,7 +187,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                 </CardDescription>
             </DialogHeader>
 
-            <div className="flex-grow overflow-y-auto pr-6 -mr-6 space-y-4">
+            <div className="flex-grow overflow-y-auto pr-6 -mr-6 space-y-4 pb-4">
                 <div className="py-2">
                     <p className="text-sm font-semibold text-foreground/90 mb-1">Referral Reason:</p>
                     <p className="text-sm text-muted-foreground">{referral.referralMessage}</p>
