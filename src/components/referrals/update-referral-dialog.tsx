@@ -146,10 +146,8 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
       </DialogTrigger>
       <DialogContent 
         className="sm:max-w-2xl flex flex-col max-h-[90vh]"
-        onPointerDownOutside={(e) => {
-            if (e.target.closest('[data-radix-popper-content-wrapper]')) {
-                e.preventDefault();
-            }
+        onInteractOutside={(e) => {
+          e.preventDefault();
         }}
       >
         <DialogHeader>
