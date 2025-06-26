@@ -155,7 +155,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
             <Edit3 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-        <DialogContent className={cn("sm:max-w-2xl", "flex flex-col max-h-[90vh]", "shadow-2xl")}>
+        <DialogContent className={cn("sm:max-w-2xl", "flex flex-col max-h-[90vh]", "shadow-2xl shadow-black/50")}>
             <DialogHeader>
                 <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
                 <CardDescription className="text-sm text-muted-foreground pt-2">
