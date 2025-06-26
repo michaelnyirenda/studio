@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -96,7 +95,7 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
             value={hour}
             onChange={handleHourChange}
             onBlur={handleHourBlur}
-            className="w-14 text-center text-lg p-2 h-10 font-mono"
+            className="w-full flex-1 text-center text-lg p-2 h-10 font-mono"
             maxLength={2}
             placeholder="hh"
         />
@@ -106,11 +105,11 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
             value={minute}
             onChange={handleMinuteChange}
             onBlur={handleMinuteBlur}
-            className="w-14 text-center text-lg p-2 h-10 font-mono"
+            className="w-full flex-1 text-center text-lg p-2 h-10 font-mono"
             maxLength={2}
             placeholder="mm"
         />
-        <div className="flex items-center rounded-md border p-0.5">
+        <div className="flex items-center rounded-md border p-0.5 shrink-0">
           <Button
             type="button"
             variant={period === 'AM' ? 'secondary' : 'ghost'}
