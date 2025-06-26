@@ -148,14 +148,14 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
   const location = [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="h-9 w-9">
             <span className="sr-only">Update</span>
             <Edit3 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-        <DialogContent onInteractOutside={(e) => e.preventDefault()} className={cn("sm:max-w-2xl", "flex flex-col max-h-[90vh]")}>
+        <DialogContent className={cn("sm:max-w-2xl", "flex flex-col max-h-[90vh]")}>
             <DialogHeader>
                 <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
                 <CardDescription className="text-sm text-muted-foreground pt-2">
@@ -179,7 +179,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                 </CardDescription>
             </DialogHeader>
 
-            <div className="flex-grow overflow-y-auto -mx-6 px-6 space-y-4 pb-4">
+            <div className="flex-grow overflow-y-auto -mx-6 px-6 space-y-4 pb-6">
                 <div className="py-2">
                     <p className="text-sm font-semibold text-foreground/90 mb-1">Referral Reason:</p>
                     <p className="text-sm text-muted-foreground">{referral.referralMessage}</p>
