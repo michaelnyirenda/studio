@@ -4,7 +4,7 @@
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { MockReferral } from '@/lib/mock-data';
+import type { Referral } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import UpdateReferralDialog from '@/components/referrals/update-referral-dialog';
@@ -32,12 +32,12 @@ import type { ReferralConsentFormData } from '@/lib/schemas';
 import { format } from 'date-fns';
 
 
-type ClientReferral = Omit<MockReferral, 'referralDate' | 'appointmentDateTime'> & {
+type ClientReferral = Omit<Referral, 'referralDate' | 'appointmentDateTime'> & {
   referralDate: string;
   appointmentDateTime?: Timestamp;
 };
 
-function getStatusVariant(status: MockReferral['status']): 'default' | 'secondary' | 'destructive' | 'outline' {
+function getStatusVariant(status: Referral['status']): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (status) {
     case 'Pending Consent':
     case 'Pending Review':

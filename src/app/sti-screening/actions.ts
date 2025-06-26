@@ -6,13 +6,13 @@ import { db } from '@/lib/firebase';
 import type { StiScreeningFormData } from '@/lib/schemas';
 import { StiScreeningSchema } from '@/lib/schemas';
 import type * as z from 'zod';
-import type { MockReferral } from '@/lib/mock-data';
+import type { Referral } from '@/lib/types';
 
 interface ScreeningResult {
   success: boolean;
   message: string;
   referralMessage?: string;
-  referralDetails?: MockReferral;
+  referralDetails?: Referral;
   errors?: z.ZodIssue[];
 }
 
@@ -40,7 +40,7 @@ export async function submitStiScreeningAction(
   try {
     const screeningDocRef = await addDoc(collection(db, 'stiScreenings'), { name, phoneNumber, email, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
-    let referralObjectForClient: MockReferral | undefined = undefined;
+    let referralObjectForClient: Referral | undefined = undefined;
 
     if (answeredYes) {
       const newReferralDataForDb = {
@@ -63,7 +63,7 @@ export async function submitStiScreeningAction(
         id: referralDocRef.id,
         ...newReferralDataForDb,
         referralDate: new Date() // Use a standard Date object for the client
-      } as MockReferral;
+      } as Referral;
     }
 
     return {

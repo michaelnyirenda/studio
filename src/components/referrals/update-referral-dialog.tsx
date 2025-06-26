@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { MockReferral } from '@/lib/mock-data';
+import type { Referral } from '@/lib/types';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
   Dialog,
@@ -53,7 +53,7 @@ const serviceItems = [
 ] as const;
 
 interface UpdateReferralDialogProps {
-  referral: MockReferral;
+  referral: Referral;
 }
 
 export default function UpdateReferralDialog({ referral }: UpdateReferralDialogProps) {
@@ -155,7 +155,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
             <Edit3 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-        <DialogContent className={cn("sm:max-w-2xl", "flex flex-col max-h-[90vh]", "shadow-2xl shadow-black/50")}>
+        <DialogContent onInteractOutside={(e) => e.preventDefault()} className={cn("sm:max-w-2xl", "flex flex-col max-h-[90vh]", "shadow-2xl shadow-black/50")}>
             <DialogHeader>
                 <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
                 <CardDescription className="text-sm text-muted-foreground pt-2">

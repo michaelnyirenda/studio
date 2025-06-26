@@ -6,13 +6,13 @@ import { db } from '@/lib/firebase';
 import type { PrEpScreeningFormData } from '@/lib/schemas';
 import { PrEpScreeningSchema } from '@/lib/schemas';
 import type * as z from 'zod';
-import type { MockReferral } from '@/lib/mock-data';
+import type { Referral } from '@/lib/types';
 
 interface ScreeningResult {
   success: boolean;
   message: string;
   referralMessage?: string;
-  referralDetails?: MockReferral;
+  referralDetails?: Referral;
   errors?: z.ZodIssue[];
 }
 
@@ -40,7 +40,7 @@ export async function submitPrEpScreeningAction(
   try {
     const screeningDocRef = await addDoc(collection(db, 'prepScreenings'), { name, phoneNumber, email, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
-    let referralObjectForClient: MockReferral | undefined = undefined;
+    let referralObjectForClient: Referral | undefined = undefined;
     if (isEligible) {
       const newReferralDataForDb = {
         patientName: name,
@@ -56,7 +56,7 @@ export async function submitPrEpScreeningAction(
       };
 
       const referralDocRef = await addDoc(collection(db, 'referrals'), newReferralDataForDb);
-      referralObjectForClient = { id: referralDocRef.id, ...newReferralDataForDb, referralDate: new Date() } as MockReferral;
+      referralObjectForClient = { id: referralDocRef.id, ...newReferralDataForDb, referralDate: new Date() } as Referral;
     }
 
     return {

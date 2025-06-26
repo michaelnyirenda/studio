@@ -6,13 +6,13 @@ import { db } from '@/lib/firebase';
 import type { HivScreeningFormData } from '@/lib/schemas';
 import { HivScreeningSchema } from '@/lib/schemas';
 import type * as z from 'zod';
-import type { MockReferral } from '@/lib/mock-data';
+import type { Referral } from '@/lib/types';
 
 interface ScreeningResult {
   success: boolean;
   message: string;
   referralMessage?: string;
-  referralDetails?: MockReferral;
+  referralDetails?: Referral;
   errors?: z.ZodIssue[];
 }
 
@@ -49,11 +49,11 @@ export async function submitHivScreeningAction(
 
     const referralDocRef = await addDoc(collection(db, 'referrals'), newReferralDataForDb);
 
-    const referralObjectForClient: MockReferral = {
+    const referralObjectForClient: Referral = {
       id: referralDocRef.id,
       ...newReferralDataForDb,
       referralDate: new Date() // Use a standard Date object for the client
-    } as MockReferral;
+    } as Referral;
 
     return {
       success: true,

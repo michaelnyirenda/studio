@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,28 +11,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Search, Filter, UserPlus, MoreHorizontal, Edit3, Trash2, ShieldCheck, UserCog } from 'lucide-react';
-import { mockReferrals } from '@/lib/mock-data'; // Using referrals as a base for mock users
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Create mock user data
-const mockUsers = mockReferrals.map((referral, index) => ({
-  id: `user-${referral.id}`,
-  name: referral.patientName.replace(/\s+\((HIV|GBV|PrEP)\)/, ''),
-  email: `${referral.patientName.toLowerCase().replace(/\s+\((HIV|GBV|PrEP)\)/, '').replace(/\s+/g, '.')}@example.com`,
-  role: index % 3 === 0 ? 'Admin' : (index % 3 === 1 ? 'Moderator' : 'User'),
-  lastActive: `2024-07-${28 - index}`, // Mock last active date
-  status: index % 4 === 0 ? 'Active' : 'Pending Activation',
-}));
-mockUsers.push({
-    id: 'user-admin-001',
-    name: 'Super Admin',
-    email: 'super.admin@example.com',
-    role: 'Super Admin',
-    lastActive: '2024-07-29',
-    status: 'Active'
-});
-
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  lastActive: string;
+  status: string;
+}
 
 export default function UserManagementPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // In a real app, you would fetch users from your database here, e.g., from a 'users' collection in Firestore.
+    // For this prototype, we'll simulate an empty user list as the database integration for users is not complete.
+    setUsers([]);
+    setLoading(false);
+  }, []);
+
+
   return (
     <div className="container mx-auto py-8 px-4">
       <PageHeader
@@ -96,7 +98,19 @@ export default function UserManagementPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockUsers.map((user) => (
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
+                      <TableCell><Skeleton className="h-6 w-[90px] rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-6 w-[120px] rounded-lg" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="h-8 w-[32px] rounded-md" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : users.length > 0 ? (
+                  users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
@@ -133,12 +147,19 @@ export default function UserManagementPage() {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))}
+                ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No users found.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
           <div className="flex items-center justify-between mt-6">
-            <p className="text-sm text-muted-foreground">Showing {mockUsers.length} of {mockUsers.length} users.</p>
+            <p className="text-sm text-muted-foreground">Showing {users.length} of {users.length} users.</p>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" disabled>Previous</Button>
               <Button variant="outline" size="sm" disabled>Next</Button>

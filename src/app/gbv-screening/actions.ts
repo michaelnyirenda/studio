@@ -6,13 +6,13 @@ import { db } from '@/lib/firebase';
 import type { GbvScreeningFormData } from '@/lib/schemas';
 import { GbvScreeningSchema } from '@/lib/schemas';
 import type * as z from 'zod';
-import type { MockReferral } from '@/lib/mock-data';
+import type { Referral } from '@/lib/types';
 
 interface ScreeningResult {
   success: boolean;
   message: string;
   referralMessage?: string;
-  referralDetails?: MockReferral;
+  referralDetails?: Referral;
   errors?: z.ZodIssue[];
 }
 
@@ -73,7 +73,7 @@ export async function submitGbvScreeningAction(
     };
 
     const referralDocRef = await addDoc(collection(db, 'referrals'), newReferralDataForDb);
-    const referralObjectForClient: MockReferral = { id: referralDocRef.id, ...newReferralDataForDb, referralDate: new Date() } as MockReferral;
+    const referralObjectForClient: Referral = { id: referralDocRef.id, ...newReferralDataForDb, referralDate: new Date() } as Referral;
 
     return {
       success: true,

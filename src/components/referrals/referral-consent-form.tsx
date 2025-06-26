@@ -27,7 +27,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { submitReferralConsentAction } from '@/app/referrals/actions';
 import { ReferralConsentSchema, type ReferralConsentFormData } from '@/lib/schemas';
-import type { MockReferral } from '@/lib/mock-data';
+import type { Referral } from '@/lib/types';
 import { useState, useEffect } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info, Loader2, Mail, MessageSquare } from 'lucide-react';
@@ -53,7 +53,7 @@ type Region = keyof LocationData;
 type Constituency = keyof LocationData[Region];
 
 interface ReferralConsentFormProps {
-    referral: MockReferral;
+    referral: Referral;
     onConsentSubmit: (referralId: string, data: ReferralConsentFormData) => void;
 }
 
