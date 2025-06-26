@@ -137,7 +137,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
   const location = [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="h-9 w-9">
             <span className="sr-only">Update</span>
