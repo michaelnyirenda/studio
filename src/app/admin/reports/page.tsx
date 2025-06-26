@@ -40,6 +40,8 @@ export type ScreeningType = 'HIV' | 'GBV' | 'PrEP' | 'STI';
 export interface Screening {
   id: string;
   userName: string;
+  phoneNumber?: string;
+  email?: string;
   date: string;
   screeningType: ScreeningType;
   keyResult: string;
@@ -55,10 +57,10 @@ const getKeyResult = (screeningData: any, type: ScreeningType): string => {
       const isHighRisk = screeningData.suicideAttempt === 'yes' || screeningData.seriousInjury === 'yes' || screeningData.sexualViolenceTimeline === 'le_72_hr' || screeningData.sexualViolenceTimeline === 'gt_72_le_120_hr';
       return isHighRisk ? "High Risk / Urgent" : "Support Recommended";
     case 'PrEP':
-      const isEligible = Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && value === 'yes');
+      const isEligible = Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && key !== 'phoneNumber' && key !== 'email' && value === 'yes');
       return isEligible ? "Eligible for PrEP" : "Not Eligible";
     case 'STI':
-       const needsAssessment = Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && value === 'yes');
+       const needsAssessment = Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && key !== 'phoneNumber' && key !== 'email' && value === 'yes');
       return needsAssessment ? "Assessment Recommended" : "No Immediate Risk";
     default:
       return "N/A";
@@ -71,9 +73,9 @@ const hasReferral = (screeningData: any, type: ScreeningType): boolean => {
     case 'GBV':
       return true;
     case 'PrEP':
-       return Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && value === 'yes');
+       return Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && key !== 'phoneNumber' && key !== 'email' && value === 'yes');
     case 'STI':
-      return Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && value === 'yes');
+      return Object.entries(screeningData).some(([key, value]) => key !== 'name' && key !== 'age' && key !== 'phoneNumber' && key !== 'email' && value === 'yes');
     default:
       return false;
   }
@@ -107,6 +109,8 @@ export default function ScreeningDataPage() {
             return {
               id: doc.id,
               userName: data.name,
+              phoneNumber: data.phoneNumber,
+              email: data.email,
               date: data.createdAt ? format((data.createdAt as Timestamp).toDate(), 'yyyy-MM-dd') : 'N/A',
               screeningType: def.type,
               keyResult: getKeyResult(data, def.type),
@@ -128,7 +132,7 @@ export default function ScreeningDataPage() {
 
   const filteredScreenings = useMemo(() => {
     return allScreenings.filter(s => {
-      const searchMatch = s.userName.toLowerCase().includes(filters.search.toLowerCase()) || s.id.toLowerCase().includes(filters.search.toLowerCase());
+      const searchMatch = s.userName.toLowerCase().includes(filters.search.toLowerCase()) || s.id.toLowerCase().includes(filters.search.toLowerCase()) || (s.phoneNumber && s.phoneNumber.includes(filters.search)) || (s.email && s.email.toLowerCase().includes(filters.search.toLowerCase()));
       const typeMatch = filters.type === 'all_types' || s.screeningType.toLowerCase() === filters.type;
       const resultMatch = filters.result === 'any_result' || 
                           (filters.result === 'high_risk' && (s.keyResult.toLowerCase().includes('high risk') || s.keyResult.toLowerCase().includes('urgent') || s.keyResult.toLowerCase().includes('eligible') || s.keyResult.toLowerCase().includes('recommended'))) ||
@@ -227,7 +231,7 @@ export default function ScreeningDataPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                <Input placeholder="Search by name or ID..." className="flex-grow" value={filters.search} onChange={(e) => setFilters(f => ({...f, search: e.target.value}))}/>
+                <Input placeholder="Search by name, ID, phone, or email..." className="flex-grow" value={filters.search} onChange={(e) => setFilters(f => ({...f, search: e.target.value}))}/>
                 <Select value={filters.type} onValueChange={(value) => setFilters(f => ({...f, type: value}))}>
                   <SelectTrigger className="w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -323,7 +327,14 @@ export default function ScreeningDataPage() {
              <>
                 <DialogHeader>
                     <DialogTitle>Screening Details: {selectedScreening.userName}</DialogTitle>
-                    <CardDescription>Type: {selectedScreening.screeningType} | Date: {selectedScreening.date}</CardDescription>
+                    <CardDescription className="text-sm">
+                      <div>Type: {selectedScreening.screeningType} | Date: {selectedScreening.date}</div>
+                      <div className="text-muted-foreground text-xs mt-1">
+                        {selectedScreening.phoneNumber && <span>Phone: {selectedScreening.phoneNumber}</span>}
+                        {selectedScreening.phoneNumber && selectedScreening.email && <span className="mx-2">|</span>}
+                        {selectedScreening.email && <span>Email: {selectedScreening.email}</span>}
+                      </div>
+                    </CardDescription>
                 </DialogHeader>
                 <div className="py-4 max-h-[70vh] overflow-y-auto pr-4">
                     <ScreeningDetailsDisplay details={selectedScreening.data} type={selectedScreening.screeningType} />

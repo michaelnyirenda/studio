@@ -25,7 +25,7 @@ export async function submitGbvScreeningAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
 
-  const { name, suicideAttempt, seriousInjury, sexualViolenceTimeline, ...screeningData } = validationResult.data;
+  const { name, phoneNumber, email, suicideAttempt, seriousInjury, sexualViolenceTimeline, ...screeningData } = validationResult.data;
   let recommendations: string[] = [];
   let notes: string[] = [];
 
@@ -56,10 +56,12 @@ export async function submitGbvScreeningAction(
   }
 
   try {
-    const screeningDocRef = await addDoc(collection(db, 'gbvScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'gbvScreenings'), { name, phoneNumber, email, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     const newReferralDataForDb = {
       patientName: name,
+      phoneNumber,
+      email,
       referralDate: serverTimestamp(),
       referralMessage: fullReferralMessage,
       status: 'Pending Consent' as const,

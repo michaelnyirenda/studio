@@ -12,6 +12,8 @@ export type ForumPostFormData = z.infer<typeof ForumPostSchema>;
 export const HivScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
+  email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   
   // A1
   knowsHivStatus: z.enum(['yes', 'no', 'no_answer'], { required_error: "Please select an option." }),
@@ -115,6 +117,8 @@ const sexualViolenceOptions = z.enum(['touched', 'forced', 'no']);
 export const GbvScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
+  email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   
   // C1
   emotionalViolence: z.array(emotionalViolenceOptions).min(1, { message: "Please select at least one option for Emotional Violence." }),
@@ -151,6 +155,8 @@ export type GbvScreeningFormData = z.infer<typeof GbvScreeningSchema>;
 export const PrEpScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
+  email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   multiplePartners: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
   unprotectedSex: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
   unknownStatusPartners: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
@@ -166,6 +172,8 @@ export type PrEpScreeningFormData = z.infer<typeof PrEpScreeningSchema>;
 export const StiScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
+  email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   diagnosedOrTreated: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
   abnormalDischarge: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
   vaginalItchiness: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
@@ -188,3 +196,8 @@ export const ReferralConsentSchema = z.object({
   facility: z.string({ required_error: "Please select a facility." }),
 });
 export type ReferralConsentFormData = z.infer<typeof ReferralConsentSchema>;
+
+export const ChatMessageSchema = z.object({
+  message: z.string().min(1, { message: "Message cannot be empty." }).max(1000, { message: "Message must be 1000 characters or less." }),
+});
+export type ChatMessageFormData = z.infer<typeof ChatMessageSchema>;

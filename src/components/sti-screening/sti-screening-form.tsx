@@ -40,6 +40,8 @@ export default function StiScreeningForm() {
     defaultValues: {
       name: '',
       age: undefined,
+      phoneNumber: '',
+      email: '',
       diagnosedOrTreated: undefined,
       abnormalDischarge: undefined,
       vaginalItchiness: undefined,
@@ -171,6 +173,9 @@ export default function StiScreeningForm() {
                 </FormItem>
               )}
             />
+             <FormField control={form.control} name="phoneNumber" render={({ field }) => (<FormItem><FormLabel className="text-lg">Phone Number</FormLabel><FormControl><Input type="tel" placeholder="Enter your phone number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+            <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel className="text-lg">Email Address (Optional)</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl><FormMessage /></FormItem>)} />
+
 
             {renderQuestion("diagnosedOrTreated", "D1. Have you ever been diagnosed or treated for STI?")}
             {renderQuestion("abnormalDischarge", "D2. Do you have any abnormal vaginal discharge (more than normal, abnormal colour? foul smelling)?")}

@@ -25,7 +25,7 @@ export async function submitStiScreeningAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
 
-  const { name, ...answers } = validationResult.data;
+  const { name, phoneNumber, email, ...answers } = validationResult.data;
   const answeredYes = Object.values(answers).some(answer => answer === 'yes');
   let recommendation = "";
 
@@ -38,13 +38,15 @@ export async function submitStiScreeningAction(
   const fullReferralMessage = `Dear ${name}, thank you for completing the STI screening. ${recommendation}`;
 
   try {
-    const screeningDocRef = await addDoc(collection(db, 'stiScreenings'), { name, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'stiScreenings'), { name, phoneNumber, email, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     let referralObjectForClient: MockReferral | undefined = undefined;
 
     if (answeredYes) {
       const newReferralDataForDb = {
         patientName: name,
+        phoneNumber,
+        email,
         referralDate: serverTimestamp(), // Use server timestamp for DB
         referralMessage: `Based on your STI screening, the following guidance was provided: ${recommendation}`,
         status: 'Pending Consent' as const,

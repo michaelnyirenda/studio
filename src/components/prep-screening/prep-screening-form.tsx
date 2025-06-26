@@ -40,6 +40,8 @@ export default function PrEpScreeningForm() {
     defaultValues: {
       name: '',
       age: undefined,
+      phoneNumber: '',
+      email: '',
       multiplePartners: undefined,
       unprotectedSex: undefined,
       unknownStatusPartners: undefined,
@@ -174,6 +176,8 @@ export default function PrEpScreeningForm() {
                 </FormItem>
               )}
             />
+            <FormField control={form.control} name="phoneNumber" render={({ field }) => (<FormItem><FormLabel className="text-lg">Phone Number</FormLabel><FormControl><Input type="tel" placeholder="Enter your phone number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+            <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel className="text-lg">Email Address (Optional)</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl><FormMessage /></FormItem>)} />
 
             {renderQuestion("multiplePartners", "B1. Have you had sex with more than one sexual partner?")}
             {renderQuestion("unprotectedSex", "B2. Have you had sex without a condom on more than one occasion?")}

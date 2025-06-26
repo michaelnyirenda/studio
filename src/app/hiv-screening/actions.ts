@@ -25,17 +25,19 @@ export async function submitHivScreeningAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues, };
   }
 
-  const { name, ...screeningData } = validationResult.data;
+  const { name, phoneNumber, email, ...screeningData } = validationResult.data;
 
   try {
     const baseMessage = `Dear ${name}, thank you for completing the detailed screening. Your responses have been recorded.`;
     const recommendation = "Based on your answers, we recommend you discuss your health profile with a healthcare professional. They can provide personalized advice and support. A record of this screening has been made for follow-up if needed.";
     const fullReferralMessage = `${baseMessage} ${recommendation}`;
 
-    const screeningDocRef = await addDoc(collection(db, 'hivScreenings'), { name, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'hivScreenings'), { name, phoneNumber, email, ...screeningData, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     const newReferralDataForDb = {
       patientName: name,
+      phoneNumber,
+      email,
       referralDate: serverTimestamp(),
       referralMessage: "Referral generated from detailed HIV screening. Patient requires consultation with a healthcare professional for a full review of their risk profile.",
       status: 'Pending Consent' as const,

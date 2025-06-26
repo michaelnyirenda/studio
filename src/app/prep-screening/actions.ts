@@ -25,7 +25,7 @@ export async function submitPrEpScreeningAction(
     return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
   }
 
-  const { name, ...answers } = validationResult.data;
+  const { name, phoneNumber, email, ...answers } = validationResult.data;
   const isEligible = Object.values(answers).some(answer => answer === 'yes');
   let recommendation = "";
 
@@ -38,12 +38,14 @@ export async function submitPrEpScreeningAction(
   const fullReferralMessage = `Dear ${name}, thank you for completing the PrEP screening. ${recommendation}`;
 
   try {
-    const screeningDocRef = await addDoc(collection(db, 'prepScreenings'), { name, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
+    const screeningDocRef = await addDoc(collection(db, 'prepScreenings'), { name, phoneNumber, email, ...answers, createdAt: serverTimestamp(), userId: 'client-test-user' });
 
     let referralObjectForClient: MockReferral | undefined = undefined;
     if (isEligible) {
       const newReferralDataForDb = {
         patientName: name,
+        phoneNumber,
+        email,
         referralDate: serverTimestamp(),
         referralMessage: `Based on the PrEP screening, the user is likely eligible for PrEP and requires a consultation. Guidance provided: ${recommendation}`,
         status: 'Pending Consent' as const,

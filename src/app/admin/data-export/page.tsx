@@ -176,34 +176,34 @@ export default function DataExportPage() {
 
   const columnOrders = {
     hiv_screening: [
-        'id', 'name', 'age', 'createdAt', 'userId', 'knowsHivStatus', 'lastTestDate', 'lastTestResult', 'treatmentStatus',
+        'id', 'name', 'age', 'phoneNumber', 'email', 'createdAt', 'userId', 'knowsHivStatus', 'lastTestDate', 'lastTestResult', 'treatmentStatus',
         'hadSex', 'usedCondoms', 'transactionalSex', 'multiplePartners', 'partnerAgeDifferenceP1', 'partnerAgeDifferenceP2', 'partnerAgeDifferenceP3',
         'consumedAlcohol', 'alcoholFrequency', 'symptoms', 'pregnancyHistory', 'attendingAnc', 'isOrphan', 'orphanStatus',
         'hasDisability', 'isDisabilityRegistered'
     ],
     gbv_screening: [
-        'id', 'name', 'age', 'createdAt', 'userId', 'emotionalViolence', 'suicideAttempt', 'physicalViolence', 'seriousInjury',
+        'id', 'name', 'age', 'phoneNumber', 'email', 'createdAt', 'userId', 'emotionalViolence', 'suicideAttempt', 'physicalViolence', 'seriousInjury',
         'sexualViolence', 'sexualViolenceTimeline'
     ],
     prep_screening: [
-        'id', 'name', 'age', 'createdAt', 'userId', 'multiplePartners', 'unprotectedSex', 'unknownStatusPartners',
+        'id', 'name', 'age', 'phoneNumber', 'email', 'createdAt', 'userId', 'multiplePartners', 'unprotectedSex', 'unknownStatusPartners',
         'atRiskPartners', 'sexUnderInfluence', 'newStiDiagnosis', 'considersAtRisk', 'usedPepMultipleTimes', 'forcedSex'
     ],
     sti_screening: [
-        'id', 'name', 'age', 'createdAt', 'userId', 'diagnosedOrTreated', 'abnormalDischarge', 'vaginalItchiness', 'genitalSores'
+        'id', 'name', 'age', 'phoneNumber', 'email', 'createdAt', 'userId', 'diagnosedOrTreated', 'abnormalDischarge', 'vaginalItchiness', 'genitalSores'
     ],
     referral_data: [
-        'id', 'patientName', 'referralDate', 'type', 'status', 'consentStatus', 'facility', 'services', 'referralMessage',
+        'id', 'patientName', 'phoneNumber', 'email', 'referralDate', 'type', 'status', 'consentStatus', 'facility', 'services', 'referralMessage',
         'notes', 'screeningId', 'userId'
     ],
     get screening_data_all() {
-        const hivCols = this.hiv_screening.slice(5);
-        const gbvCols = this.gbv_screening.slice(5);
-        const prepCols = this.prep_screening.slice(5);
-        const stiCols = this.sti_screening.slice(5);
+        const hivCols = this.hiv_screening.slice(7);
+        const gbvCols = this.gbv_screening.slice(7);
+        const prepCols = this.prep_screening.slice(7);
+        const stiCols = this.sti_screening.slice(7);
         // Use a Set to ensure unique column names while preserving a logical order.
         const allUniqueCols = [...new Set([...hivCols, ...gbvCols, ...prepCols, ...stiCols])];
-        return ['id', 'type', 'name', 'age', 'createdAt', 'userId', ...allUniqueCols];
+        return ['id', 'type', 'name', 'age', 'phoneNumber', 'email', 'createdAt', 'userId', ...allUniqueCols];
     }
   };
 
@@ -480,7 +480,7 @@ export default function DataExportPage() {
                                   Generated: {item.timestamp} | Rows: {item.rowCount}
                               </p>
                           </div>
-                          <Button variant="outline" size="sm" onClick={() => handleRedownload(item)} disabled={loading} className="text-accent border-accent">
+                          <Button variant="outline" size="sm" onClick={() => handleRedownload(item)} disabled={loading} className="text-accent border-accent hover:bg-accent hover:text-accent-foreground">
                               <Download className="mr-2 h-4 w-4" />
                               Re-download
                           </Button>
