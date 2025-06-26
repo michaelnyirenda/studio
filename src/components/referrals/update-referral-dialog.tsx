@@ -144,7 +144,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
             <Edit3 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent 
+      <DialogContent
         className="sm:max-w-2xl flex flex-col max-h-[90vh]"
         onInteractOutside={(e) => {
           e.preventDefault();
