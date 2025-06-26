@@ -1,5 +1,5 @@
 
-import { FieldValue } from 'firebase/firestore';
+import type { FieldValue, Timestamp } from 'firebase/firestore';
 
 export interface MockPost {
   id: string;
@@ -84,6 +84,7 @@ export interface MockReferral {
   phoneNumber?: string;
   email?: string;
   contactMethod?: 'email' | 'whatsapp';
+  appointmentDateTime?: Timestamp;
 }
 
 

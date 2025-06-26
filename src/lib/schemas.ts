@@ -1,3 +1,4 @@
+
 // src/lib/schemas.ts
 
 import { z } from 'zod';
@@ -186,6 +187,7 @@ export const UpdateReferralFormSchema = z.object({
   status: z.enum(['Pending Consent', 'Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
   notes: z.string().max(1000, { message: "Notes must be 1000 characters or less." }).optional(),
   services: z.array(z.string()).optional(),
+  appointmentDateTime: z.date().optional().nullable(),
 });
 export type UpdateReferralFormData = z.infer<typeof UpdateReferralFormSchema>;
 
@@ -198,3 +200,8 @@ export const ReferralConsentSchema = z.object({
   contactMethod: z.enum(['email', 'whatsapp'], { required_error: "Please select your preferred contact method." }),
 });
 export type ReferralConsentFormData = z.infer<typeof ReferralConsentSchema>;
+
+export const ChatMessageSchema = z.object({
+  message: z.string().min(1, { message: "Message cannot be empty." }).max(1000),
+});
+export type ChatMessageFormData = z.infer<typeof ChatMessageSchema>;
