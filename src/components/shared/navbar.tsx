@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -21,8 +22,8 @@ export default function Navbar() {
   const adminNavItems = [
     { href: "/", label: "Home", icon: <Home /> },
     { href: "/forum", label: "Forum", icon: <BookOpenText /> },
-    { href: "/admin/user-management", label: "Users", icon: <UserCog /> },
     { href: "/referrals", label: "Referrals", icon: <ClipboardList /> },
+    { href: "/admin/user-management", label: "Users", icon: <UserCog /> },
   ];
 
   const navItems = role === 'admin' ? adminNavItems : userNavItems;
