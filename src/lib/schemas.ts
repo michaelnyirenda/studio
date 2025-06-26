@@ -5,6 +5,10 @@ import { z } from 'zod';
 export const ForumPostSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters long." }).max(150, { message: "Title must be 150 characters or less." }),
   content: z.string().min(20, { message: "Content must be at least 20 characters long." }).max(5000, { message: "Content must be 5000 characters or less." }),
+  imageUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
+  imageHint: z.string().max(50, { message: "Hint must be 50 characters or less."}).optional(),
+  videoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
+  audioUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
 });
 
 export type ForumPostFormData = z.infer<typeof ForumPostSchema>;

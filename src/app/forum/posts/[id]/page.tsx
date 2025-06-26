@@ -21,6 +21,7 @@ interface Post {
   imageUrl?: string;
   imageHint?: string;
   videoUrl?: string;
+  audioUrl?: string;
 }
 
 export default function ForumPostPage({ params }: { params: { id: string } }) {
@@ -157,6 +158,15 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
                 allowFullScreen
                 className="rounded-lg shadow-md"
               ></iframe>
+            </div>
+          )}
+
+          {post.audioUrl && (
+             <div className="my-8">
+                <audio controls className="w-full">
+                    <source src={post.audioUrl} />
+                    Your browser does not support the audio element.
+                </audio>
             </div>
           )}
         </CardContent>

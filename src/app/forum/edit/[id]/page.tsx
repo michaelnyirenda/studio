@@ -14,6 +14,10 @@ interface PostData {
   id: string;
   title: string;
   content: string;
+  imageUrl?: string;
+  imageHint?: string;
+  videoUrl?: string;
+  audioUrl?: string;
 }
 
 export default function EditForumPostPage({ params }: { params: { id: string } }) {
@@ -49,6 +53,10 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
             id: postSnap.id,
             title: data.title,
             content: data.content,
+            imageUrl: data.imageUrl,
+            imageHint: data.imageHint,
+            videoUrl: data.videoUrl,
+            audioUrl: data.audioUrl,
           });
         } else {
           setError('Post not found.');
