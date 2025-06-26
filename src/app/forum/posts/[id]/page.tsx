@@ -1,3 +1,4 @@
+
 // src/app/forum/posts/[id]/page.tsx
 "use client";
 
@@ -136,10 +137,10 @@ const ContentRenderer = ({ content }: { content: string }) => {
 
 
 export default function ForumPostPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { id } = params;
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -242,7 +243,7 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
             By {post.author} on {post.date}
           </CardDescription>
         </CardHeader>
-        <CardContent className="py-8 px-8">
+        <CardContent className="px-8 pt-2 pb-8">
            <ContentRenderer content={post.content} />
         </CardContent>
       </Card>
