@@ -11,7 +11,7 @@ export type ForumPostFormData = z.infer<typeof ForumPostSchema>;
 
 export const HivScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   
@@ -116,7 +116,7 @@ const sexualViolenceOptions = z.enum(['touched', 'forced', 'no']);
 
 export const GbvScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   
@@ -154,7 +154,7 @@ export type GbvScreeningFormData = z.infer<typeof GbvScreeningSchema>;
 
 export const PrEpScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   multiplePartners: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
@@ -171,7 +171,7 @@ export type PrEpScreeningFormData = z.infer<typeof PrEpScreeningSchema>;
 
 export const StiScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  age: z.coerce.number().min(1, { message: "Age must be a positive number." }).max(120, { message: "Please enter a valid age."}),
+  age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   diagnosedOrTreated: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
