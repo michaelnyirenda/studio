@@ -137,14 +137,21 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
   const location = [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="h-9 w-9">
             <span className="sr-only">Update</span>
             <Edit3 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl flex flex-col max-h-[90vh]">
+      <DialogContent 
+        className="sm:max-w-2xl flex flex-col max-h-[90vh]"
+        onPointerDownOutside={(e) => {
+            if (e.target.closest('[data-radix-popper-content-wrapper]')) {
+                e.preventDefault();
+            }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
            <CardDescription className="text-sm text-muted-foreground pt-2">
@@ -272,18 +279,18 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                     <FormLabel>Appointment Date & Time</FormLabel>
                     <Popover>
                         <PopoverTrigger asChild>
-                        <FormControl>
-                            <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                            )}
-                            >
-                            {field.value ? format(field.value, "PPP 'at' p") : <span>Pick a date and time</span>}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                        </FormControl>
+                            <FormControl>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                )}
+                                >
+                                {field.value ? format(field.value, "PPP 'at' HH:mm") : <span>Pick a date and time</span>}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                            </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
