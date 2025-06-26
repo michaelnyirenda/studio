@@ -19,10 +19,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { createForumPostAction, updateForumPostAction } from '@/app/forum/actions';
 import { ForumPostSchema, type ForumPostFormData } from '@/lib/schemas';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import MarkdownToolbar from './markdown-toolbar';
 
 interface CreatePostFormProps {
   initialData?: {
@@ -40,6 +41,7 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   const isEditMode = !!initialData;
 
@@ -157,16 +159,20 @@ export default function CreatePostForm({ initialData }: CreatePostFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-lg">Post Content</FormLabel>
+                  <MarkdownToolbar editorRef={contentRef} form={form} />
                   <FormControl>
                     <Textarea
                       placeholder="Write your detailed post content here..."
                       className="min-h-[200px] resize-y"
                       {...field}
+                      ref={(e) => {
+                        field.ref(e);
+                        if(e) {
+                           contentRef.current = e;
+                        }
+                      }}
                     />
                   </FormControl>
-                  <FormDescription>
-                    You can use Markdown for formatting (e.g., `# Heading`, `**bold**`, `*italic*`).
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
