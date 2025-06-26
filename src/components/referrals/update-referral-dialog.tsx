@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { MockReferral } from '@/lib/mock-data';
@@ -147,16 +146,23 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
-          <CardDescription className="text-sm text-muted-foreground pt-1">
-            <div className="flex justify-between items-center flex-wrap gap-x-4 gap-y-1">
-                <span>ID: {referral.id}</span>
-                <span className="flex-1 min-w-0 truncate">Location: {location || 'N/A'}</span>
-                 {referral.contactMethod && (
-                    <span className="flex items-center gap-1 font-medium text-foreground">
-                        {referral.contactMethod === 'email' ? <Mail className="h-4 w-4 text-blue-600" /> : <MessageSquare className="h-4 w-4 text-green-600" />}
-                        {referral.contactMethod === 'email' ? `Email (${referral.email})` : `WhatsApp (${referral.phoneNumber})`}
-                    </span>
-                )}
+           <CardDescription className="text-sm text-muted-foreground pt-2">
+            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 items-center">
+              <span className="font-semibold text-right">ID:</span>
+              <span className="font-mono text-xs">{referral.id}</span>
+
+              <span className="font-semibold text-right">Location:</span>
+              <span className="truncate">{location || 'N/A'}</span>
+
+              {referral.contactMethod && (
+                <>
+                  <span className="font-semibold text-right">Contact:</span>
+                  <span className="flex items-center gap-1.5 font-medium text-foreground">
+                      {referral.contactMethod === 'email' ? <Mail className="h-4 w-4 text-blue-500" /> : <MessageSquare className="h-4 w-4 text-green-500" />}
+                      <span>{referral.contactMethod === 'email' ? referral.email : referral.phoneNumber}</span>
+                  </span>
+                </>
+              )}
             </div>
           </CardDescription>
         </DialogHeader>
