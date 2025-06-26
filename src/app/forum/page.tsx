@@ -2,6 +2,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Plus, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -22,6 +23,8 @@ interface Post {
   content: string;
   author: string;
   date: string;
+  bannerImageUrl?: string;
+  bannerImageHint?: string;
 }
 
 export default function ForumPage() {
@@ -52,6 +55,8 @@ export default function ForumPage() {
             content: data.content,
             author: data.author,
             date: date,
+            bannerImageUrl: data.bannerImageUrl,
+            bannerImageHint: data.bannerImageHint,
           } as Post;
         });
         setPosts(postsList);
@@ -87,37 +92,37 @@ export default function ForumPage() {
         description="Browse discussions, share insights, and connect with others."
       />
       
-      <div className="grid gap-8 mt-8 mb-24">
+      <div className="grid gap-8 mt-8 mb-24 md:grid-cols-2 lg:grid-cols-3">
         {loading ? (
            Array.from({ length: 3 }).map((_, index) => (
-            <Card key={index} className="shadow-lg">
-              <CardHeader>
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-4 w-1/4 mt-2" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full mt-2" />
-                <Skeleton className="h-4 w-2/3 mt-2" />
-              </CardContent>
-              <CardFooter>
-                <Skeleton className="h-6 w-24" />
-              </CardFooter>
+            <Card key={index} className="shadow-lg overflow-hidden flex flex-col">
+              <Skeleton className="h-48 w-full" />
+              <div className="p-6 flex flex-col flex-grow">
+                <Skeleton className="h-7 w-3/4" />
+                <Skeleton className="h-4 w-1/2 mt-2" />
+                <div className="flex-grow mt-4 space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                </div>
+                <div className="mt-auto pt-4">
+                    <Skeleton className="h-6 w-24" />
+                </div>
+              </div>
             </Card>
            ))
         ) : posts.length === 0 ? (
-          <div className="text-center text-muted-foreground text-lg py-10">
+          <div className="text-center text-muted-foreground text-lg py-10 col-span-full">
             <p>No posts yet.</p>
             {isAdmin && <p>Be the first to start a discussion!</p>}
           </div>
         ) : (
           posts.map(post => (
-            <Card key={post.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out bg-card hover:-translate-y-1 relative">
+            <Card key={post.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out bg-card hover:-translate-y-1 relative flex flex-col overflow-hidden">
                {isAdmin && (
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-2 right-2 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-9 w-9">
+                      <Button variant="ghost" size="icon" className="h-9 w-9 bg-black/30 hover:bg-black/50 text-white hover:text-white rounded-full">
                         <MoreHorizontal className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -136,26 +141,43 @@ export default function ForumPage() {
                   </DropdownMenu>
                 </div>
               )}
-              <CardHeader>
-                <Link href={`/forum/posts/${post.id}`} passHref>
-                  <CardTitle className="text-2xl font-headline text-primary hover:text-accent cursor-pointer transition-colors pr-12">
-                    {post.title}
-                  </CardTitle>
+
+              {post.bannerImageUrl && (
+                <Link href={`/forum/posts/${post.id}`} passHref className="block">
+                    <div className="relative w-full h-48">
+                        <Image
+                            src={post.bannerImageUrl}
+                            alt={post.title}
+                            fill
+                            className="object-cover"
+                            data-ai-hint={post.bannerImageHint || 'forum post banner'}
+                        />
+                    </div>
                 </Link>
-                <CardDescription className="text-sm text-muted-foreground pt-1">
-                  By {post.author} on {post.date}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="line-clamp-3 text-card-foreground/90">{post.content}</p>
-              </CardContent>
-              <CardFooter>
-                 <Link href={`/forum/posts/${post.id}`} passHref>
-                  <Button variant="link" className="p-0 h-auto text-accent font-semibold hover:underline">
-                    Read More &rarr;
-                  </Button>
-                </Link>
-              </CardFooter>
+              )}
+
+              <div className="flex flex-col flex-grow">
+                <CardHeader>
+                    <Link href={`/forum/posts/${post.id}`} passHref>
+                    <CardTitle className="text-2xl font-headline text-primary hover:text-accent cursor-pointer transition-colors">
+                        {post.title}
+                    </CardTitle>
+                    </Link>
+                    <CardDescription className="text-sm text-muted-foreground pt-1">
+                    By {post.author} on {post.date}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                    <p className="line-clamp-3 text-card-foreground/90">{post.content}</p>
+                </CardContent>
+                <CardFooter>
+                    <Link href={`/forum/posts/${post.id}`} passHref>
+                    <Button variant="link" className="p-0 h-auto text-accent font-semibold hover:underline">
+                        Read More &rarr;
+                    </Button>
+                    </Link>
+                </CardFooter>
+              </div>
             </Card>
           ))
         )}
