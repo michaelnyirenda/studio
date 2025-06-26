@@ -90,26 +90,28 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
   return (
     <div className="space-y-2">
       <Label>Time</Label>
-      <div className="flex items-center gap-2">
-        <Input
-            id="time-picker-hour"
-            value={hour}
-            onChange={handleHourChange}
-            onBlur={handleHourBlur}
-            className="flex-1 text-center text-lg p-2 h-10 font-mono"
-            maxLength={2}
-            placeholder="hh"
-        />
-        <span className="text-lg font-bold">:</span>
-        <Input
-            id="time-picker-minute"
-            value={minute}
-            onChange={handleMinuteChange}
-            onBlur={handleMinuteBlur}
-            className="flex-1 text-center text-lg p-2 h-10 font-mono"
-            maxLength={2}
-            placeholder="mm"
-        />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Input
+              id="time-picker-hour"
+              value={hour}
+              onChange={handleHourChange}
+              onBlur={handleHourBlur}
+              className="w-16 text-center text-lg p-2 h-10 font-mono"
+              maxLength={2}
+              placeholder="hh"
+          />
+          <span className="text-lg font-bold">:</span>
+          <Input
+              id="time-picker-minute"
+              value={minute}
+              onChange={handleMinuteChange}
+              onBlur={handleMinuteBlur}
+              className="w-16 text-center text-lg p-2 h-10 font-mono"
+              maxLength={2}
+              placeholder="mm"
+          />
+        </div>
         <div className="flex items-center rounded-md border p-0.5 shrink-0">
           <Button
             type="button"
