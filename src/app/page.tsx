@@ -101,29 +101,30 @@ function AdminDashboardContent() {
         description="Access reports, data exports, and administrative functions."
       />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8">
+      <div className="mt-8 space-y-6">
         <ScreeningStatsCard />
-        
         <ReferralStatsCard />
 
-        <AdminFeatureLinkCard
-          title="Data Export"
-          description="Generate and download reports for screenings, referrals, and other data."
-          link="/admin/data-export"
-          icon={<FileSpreadsheet />}
-        />
-        <AdminFeatureLinkCard
-          title="Forum Management"
-          description="Oversee forum discussions and manage posts. Create new posts via the Forum page."
-          link="/forum"
-          icon={<MessageSquareText />}
-        />
-        <AdminFeatureLinkCard
-          title="User Management"
-          description="Manage user accounts, roles, permissions, and view user activity."
-          link="/admin/user-management"
-          icon={<UserCog />}
-        />
+        <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
+          <AdminFeatureLinkCard
+            title="Data Export"
+            description="Generate and download reports for screenings, referrals, and other data."
+            link="/admin/data-export"
+            icon={<FileSpreadsheet />}
+          />
+          <AdminFeatureLinkCard
+            title="Forum Management"
+            description="Oversee forum discussions and manage posts. Create new posts via the Forum page."
+            link="/forum"
+            icon={<MessageSquareText />}
+          />
+          <AdminFeatureLinkCard
+            title="User Management"
+            description="Manage user accounts, roles, permissions, and view user activity."
+            link="/admin/user-management"
+            icon={<UserCog />}
+          />
+        </div>
       </div>
     </div>
   );
