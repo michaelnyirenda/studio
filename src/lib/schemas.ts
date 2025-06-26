@@ -1,4 +1,3 @@
-
 // src/lib/schemas.ts
 
 import { z } from 'zod';
@@ -187,9 +186,16 @@ export const UpdateReferralFormSchema = z.object({
   status: z.enum(['Pending Consent', 'Pending Review', 'Contacted', 'Follow-up Scheduled', 'Closed'], { required_error: "Please select a status."}),
   notes: z.string().max(1000, { message: "Notes must be 1000 characters or less." }).optional(),
   services: z.array(z.string()).optional(),
-  appointmentDateTime: z.date().optional().nullable(),
 });
 export type UpdateReferralFormData = z.infer<typeof UpdateReferralFormSchema>;
+
+
+export const ScheduleAppointmentFormSchema = z.object({
+  appointmentDateTime: z.date({
+    required_error: "An appointment date and time is required.",
+  }),
+});
+export type ScheduleAppointmentFormData = z.infer<typeof ScheduleAppointmentFormSchema>;
 
 
 export const ReferralConsentSchema = z.object({

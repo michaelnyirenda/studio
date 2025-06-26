@@ -1,10 +1,10 @@
 // src/app/referrals/actions.ts
 "use server";
 
-import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc, getDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import type { ReferralConsentFormData } from '@/lib/schemas';
-import { ReferralConsentSchema } from '@/lib/schemas';
+import type { ReferralConsentFormData, ScheduleAppointmentFormData } from '@/lib/schemas';
+import { ReferralConsentSchema, ScheduleAppointmentFormSchema } from '@/lib/schemas';
 import type * as z from 'zod';
 
 export async function submitReferralConsentAction(
@@ -66,5 +66,28 @@ export async function deleteReferralAction(
   } catch (error) {
     console.error("Error deleting referral:", error);
     return { success: false, message: "An error occurred while deleting the referral." };
+  }
+}
+
+export async function scheduleAppointmentAction(
+  referralId: string,
+  data: ScheduleAppointmentFormData
+): Promise<{ success: boolean; message: string; errors?: z.ZodIssue[] }> {
+  const validationResult = ScheduleAppointmentFormSchema.safeParse(data);
+
+  if (!validationResult.success) {
+    return { success: false, message: "Validation failed.", errors: validationResult.error.issues };
+  }
+
+  try {
+    const referralRef = doc(db, 'referrals', referralId);
+    await updateDoc(referralRef, {
+      appointmentDateTime: Timestamp.fromDate(validationResult.data.appointmentDateTime),
+      status: 'Follow-up Scheduled',
+    });
+    return { success: true, message: "Appointment scheduled successfully!" };
+  } catch (error) {
+    console.error("Error scheduling appointment:", error);
+    return { success: false, message: "An error occurred while scheduling the appointment." };
   }
 }
