@@ -102,8 +102,10 @@ function AdminDashboardContent() {
       />
 
       <div className="mt-8 space-y-6">
-        <ScreeningStatsCard />
-        <ReferralStatsCard />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <ScreeningStatsCard />
+          <ReferralStatsCard />
+        </div>
 
         <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
           <AdminFeatureLinkCard
