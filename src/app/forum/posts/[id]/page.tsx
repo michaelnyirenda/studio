@@ -86,8 +86,15 @@ const ContentRenderer = ({ content }: { content: string }) => {
             elements.push(<h2 key={index} className="text-3xl font-bold mt-6 mb-2">{parseInline(h2Match[1])}</h2>);
         } else if (imgMatch) {
             elements.push(
-                <div key={index} className="relative w-full h-96 my-6 rounded-lg overflow-hidden shadow-md">
-                    <Image src={imgMatch[2]} alt={imgMatch[1]} fill style={{ objectFit: 'cover' }} />
+                <div key={index} className="relative w-full my-6 rounded-lg overflow-hidden shadow-md">
+                    <Image
+                        src={imgMatch[2]}
+                        alt={imgMatch[1]}
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        style={{ width: '100%', height: 'auto' }}
+                    />
                 </div>
             );
         } else if (videoMatch) {
@@ -214,12 +221,14 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
       
       <Card className="shadow-xl overflow-hidden bg-card">
         {post.bannerImageUrl && (
-          <div className="relative w-full h-64 md:h-96">
+          <div className="relative w-full">
             <Image
               src={post.bannerImageUrl}
               alt={post.title}
-              fill
-              style={{ objectFit: 'cover' }}
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{ width: '100%', height: 'auto' }}
               data-ai-hint={post.bannerImageHint || 'forum post image'}
               priority
             />
