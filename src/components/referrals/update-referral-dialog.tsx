@@ -34,6 +34,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { TimePickerInput } from '@/components/ui/time-picker-input';
 
 const serviceItems = [
   { id: 'HTS', label: 'HTS' },
@@ -241,7 +242,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                         </FormItem>
                     )}
                     />
-
+                    
                     <FormField
                         control={form.control}
                         name="services"
@@ -297,7 +298,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                                         !field.value && "text-muted-foreground"
                                     )}
                                     >
-                                    {field.value ? format(field.value, "PPP 'at' HH:mm") : <span>Pick a date and time</span>}
+                                    {field.value ? format(field.value, "PPP 'at' hh:mm a") : <span>Pick a date and time</span>}
                                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
                                 </FormControl>
@@ -311,19 +312,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
                                 initialFocus
                             />
                             <div className="p-3 border-t border-border">
-                                <input
-                                type="time"
-                                className="w-full border-input bg-input p-2 rounded-md"
-                                value={field.value ? format(field.value, "HH:mm") : ""}
-                                onChange={(e) => {
-                                    const time = e.target.value;
-                                    if (!time) return;
-                                    const [hours, minutes] = time.split(':').map(Number);
-                                    const newDate = field.value ? new Date(field.value) : new Date();
-                                    newDate.setHours(hours, minutes, 0, 0);
-                                    field.onChange(newDate);
-                                }}
-                                />
+                                <TimePickerInput setDate={field.onChange} date={field.value} />
                             </div>
                             </PopoverContent>
                         </Popover>
