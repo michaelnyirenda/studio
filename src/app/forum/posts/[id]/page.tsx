@@ -132,12 +132,13 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { id } = params;
 
   useEffect(() => {
     const fetchPost = async () => {
       setLoading(true);
       try {
-        const postRef = doc(db, 'posts', params.id);
+        const postRef = doc(db, 'posts', id);
         const postSnap = await getDoc(postRef);
 
         if (postSnap.exists()) {
@@ -160,10 +161,10 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
       }
     };
 
-    if (params.id) {
+    if (id) {
       fetchPost();
     }
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return (
