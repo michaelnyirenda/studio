@@ -32,14 +32,14 @@ function TimePart({
   id: string;
 }) {
   return (
-    <div className="relative flex-1">
+    <div className="relative">
       <Input
         id={id}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
         onFocus={(e) => e.target.select()}
-        className="w-full text-center font-mono text-base h-10 pr-8"
+        className="w-16 text-center font-mono text-base h-10 pr-8"
         maxLength={2}
         placeholder={placeholder}
       />
@@ -166,7 +166,7 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
     <div className="space-y-2">
       <Label>Time</Label>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 flex-1">
+        <div className="flex items-center gap-2">
           <TimePart
             id="time-picker-hour"
             value={hour}
