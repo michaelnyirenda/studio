@@ -127,10 +127,12 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
     }
   }
 
+  const location = [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="text-accent border-accent hover:bg-accent/10">
+        <Button variant="outline" size="sm" className="text-accent border-accent hover:bg-accent hover:text-accent-foreground">
           <Edit3 className="mr-2 h-4 w-4" />
           Update
         </Button>
@@ -139,7 +141,7 @@ export default function UpdateReferralDialog({ referral }: UpdateReferralDialogP
         <DialogHeader>
           <DialogTitle>Update Referral: {referral.patientName}</DialogTitle>
           <CardDescription className="text-sm text-muted-foreground pt-1">
-            ID: {referral.id} | Facility: {referral.facility || 'N/A'}
+            ID: {referral.id} | Location: {location || 'N/A'}
           </CardDescription>
         </DialogHeader>
 

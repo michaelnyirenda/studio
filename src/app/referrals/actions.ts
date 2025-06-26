@@ -23,6 +23,8 @@ export async function submitReferralConsentAction(
     // Update the document in Firestore
     await updateDoc(referralRef, {
       consentStatus: 'agreed',
+      region: validationResult.data.region,
+      constituency: validationResult.data.constituency,
       facility: validationResult.data.facility,
       status: 'Pending Review', // Change status so it appears on the admin's dashboard
     });

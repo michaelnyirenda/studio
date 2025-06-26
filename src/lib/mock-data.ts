@@ -76,6 +76,8 @@ export interface MockReferral {
   consentStatus: 'pending' | 'agreed' | 'declined';
   type: 'HIV' | 'GBV' | 'PrEP' | 'STI';
   screeningId?: string;
+  region?: string;
+  constituency?: string;
   facility?: string;
   services?: string[];
   notes?: string;
@@ -109,7 +111,9 @@ export const mockReferrals: MockReferral[] = [
     consentStatus: 'agreed',
     type: 'GBV',
     screeningId: 'mock-gbv-1',
-    facility: 'Downtown Women\'s Center',
+    region: 'Region 1',
+    constituency: 'Constituency 1.1',
+    facility: "Clinic A",
     services: ['GBV post Care'],
     notes: 'Patient was receptive during the call. Safety planning discussed, resources provided.',
   },
@@ -124,7 +128,9 @@ export const mockReferrals: MockReferral[] = [
     consentStatus: 'agreed',
     type: 'PrEP',
     screeningId: 'mock-prep-1',
-    facility: 'Clinic 3',
+    region: 'Region 2',
+    constituency: 'Constituency 2.1',
+    facility: 'Clinic F',
     services: ['PrEP', 'HTS'],
     notes: 'PrEP consultation scheduled with Dr. Carter.',
   },
@@ -139,7 +145,9 @@ export const mockReferrals: MockReferral[] = [
     consentStatus: 'agreed',
     type: 'HIV',
     screeningId: 'mock-hiv-2',
-    facility: 'General Hospital',
+    region: 'Region 3',
+    constituency: 'Constituency 3.2',
+    facility: 'Clinic L',
     services: ['ART', 'Family Planning'],
     notes: 'Patient confirmed linkage to care.',
   },

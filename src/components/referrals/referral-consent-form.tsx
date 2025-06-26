@@ -3,7 +3,7 @@
 
 import type * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -27,35 +27,63 @@ import { useToast } from '@/hooks/use-toast';
 import { submitReferralConsentAction } from '@/app/referrals/actions';
 import { ReferralConsentSchema, type ReferralConsentFormData } from '@/lib/schemas';
 import type { MockReferral } from '@/lib/mock-data';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info, Loader2 } from 'lucide-react';
 
-const mockFacilities = [
-    "Clinic 1",
-    "Clinic 2",
-    "Clinic 3",
-    "Clinic 4",
-    "Clinic 5"
-];
+const locationData = {
+  "Region 1": {
+    "Constituency 1.1": ["Clinic A", "Clinic B", "Clinic C"],
+    "Constituency 1.2": ["Clinic D", "Clinic E"],
+  },
+  "Region 2": {
+    "Constituency 2.1": ["Clinic F", "Clinic G"],
+    "Constituency 2.2": ["Clinic H", "Clinic I", "Clinic J"],
+  },
+  "Region 3": {
+    "Constituency 3.1": ["Clinic K"],
+    "Constituency 3.2": ["Clinic L", "Clinic M"],
+  }
+};
+
+type LocationData = typeof locationData;
+type Region = keyof LocationData;
+type Constituency = keyof LocationData[Region];
 
 interface ReferralConsentFormProps {
     referral: MockReferral;
-    onConsentSubmit: (referralId: string, facility: string) => void;
+    onConsentSubmit: (referralId: string, data: ReferralConsentFormData) => void;
 }
 
 export default function ReferralConsentForm({ referral, onConsentSubmit }: ReferralConsentFormProps) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [hasAgreed, setHasAgreed] = useState(false);
-
+    
     const form = useForm<ReferralConsentFormData>({
         resolver: zodResolver(ReferralConsentSchema),
         defaultValues: {
             consent: false,
+            region: undefined,
+            constituency: undefined,
             facility: undefined,
         },
     });
+
+    const hasAgreed = useWatch({ control: form.control, name: 'consent' });
+    const selectedRegion = useWatch({ control: form.control, name: 'region' }) as Region | undefined;
+    const selectedConstituency = useWatch({ control: form.control, name: 'constituency' }) as Constituency | undefined;
+    
+    useEffect(() => {
+        form.setValue('constituency', undefined, { shouldValidate: true });
+        form.setValue('facility', undefined, { shouldValidate: true });
+    }, [selectedRegion, form]);
+
+    useEffect(() => {
+        form.setValue('facility', undefined, { shouldValidate: true });
+    }, [selectedConstituency, form]);
+
+    const constituencies = selectedRegion ? Object.keys(locationData[selectedRegion]) : [];
+    const facilities = selectedRegion && selectedConstituency ? locationData[selectedRegion][selectedConstituency] : [];
 
     async function onSubmit(values: ReferralConsentFormData) {
         setIsSubmitting(true);
@@ -66,7 +94,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                     title: "Success!",
                     description: result.message,
                 });
-                onConsentSubmit(referral.id, values.facility);
+                onConsentSubmit(referral.id, values);
             } else {
                  toast({
                     title: "Error",
@@ -113,10 +141,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                         <FormControl>
                             <Checkbox
                             checked={field.value}
-                            onCheckedChange={(checked) => {
-                                field.onChange(checked)
-                                setHasAgreed(!!checked)
-                            }}
+                            onCheckedChange={field.onChange}
                             />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -130,33 +155,65 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
                  />
 
                 {hasAgreed && (
-                    <FormField
-                        control={form.control}
-                        name="facility"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-lg">Select a Facility</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Choose a healthcare facility" />
-                                    </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                    {mockFacilities.map(facility => (
-                                        <SelectItem key={facility} value={facility}>
-                                        {facility}
-                                        </SelectItem>
-                                    ))}
-                                    </SelectContent>
-                                </Select>
-                                <FormDescription>
-                                    Please select a facility where you would like to receive services.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    <div className="space-y-4 pt-4 border-t">
+                        <FormField
+                            control={form.control}
+                            name="region"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-lg">Region</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Choose a region" /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            {Object.keys(locationData).map(region => (
+                                                <SelectItem key={region} value={region}>{region}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="constituency"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-lg">Constituency</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={!selectedRegion}>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Choose a constituency" /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            {constituencies.map(constituency => (
+                                                <SelectItem key={constituency} value={constituency}>{constituency}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         <FormField
+                            control={form.control}
+                            name="facility"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-lg">Health Facility</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={!selectedConstituency}>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Choose a clinic or facility" /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            {facilities.map(facility => (
+                                                <SelectItem key={facility} value={facility}>{facility}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                     <FormDescription>
+                                        Please select a facility where you would like to receive services.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
                 )}
             </CardContent>
             <CardFooter>

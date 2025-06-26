@@ -28,6 +28,7 @@ import {
 import { deleteReferralAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import type { ReferralConsentFormData } from '@/lib/schemas';
 
 
 type ClientReferral = Omit<MockReferral, 'referralDate'> & {
@@ -111,22 +112,14 @@ export default function ReferralsPage() {
     return referrals;
   }, [role, referrals]);
 
-  const handleConsentSubmit = async (referralId: string, facility: string) => {
+  const handleConsentSubmit = async (referralId: string, data: ReferralConsentFormData) => {
     setReferrals(prevReferrals =>
       prevReferrals.map(r =>
         r.id === referralId
-          ? { ...r, consentStatus: 'agreed', status: 'Pending Review', facility: facility }
+          ? { ...r, consentStatus: 'agreed', status: 'Pending Review', facility: data.facility, region: data.region, constituency: data.constituency }
           : r
       )
     );
-
-    const referralRef = doc(db, 'referrals', referralId);
-    await updateDoc(referralRef, {
-      consentStatus: 'agreed',
-      facility: facility,
-      status: 'Pending Review'
-    });
-
     window.history.replaceState(null, '', '/referrals');
   };
 
@@ -144,6 +137,10 @@ export default function ReferralsPage() {
 
   const pageTitle = role === 'admin' ? "Manage All Referrals" : "Your Referrals";
   const pageDescription = role === 'admin' ? "View and manage all consented referrals." : "Complete pending referrals and view your referral history.";
+
+  const fullLocation = (referral: ClientReferral) => {
+    return [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
+  }
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -196,7 +193,7 @@ export default function ReferralsPage() {
                   </CardHeader>
                   <CardContent className="flex-grow">
                     <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
-                    <p className="text-sm text-accent font-medium mb-3">{referral.facility || 'N/A'}</p>
+                    <p className="text-sm text-accent font-medium mb-3">{fullLocation(referral) || 'N/A'}</p>
 
                     <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referral Reason:</p>
                     <p className="text-sm text-card-foreground/80 line-clamp-4">{referral.referralMessage}</p>
