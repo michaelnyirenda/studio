@@ -13,8 +13,8 @@ interface TimePickerInputProps {
 }
 
 export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
-  const [hour, setHour] = React.useState<string>(date ? String(date.getHours() % 12 || 12) : "");
-  const [minute, setMinute] = React.useState<string>(date ? String(date.getMinutes()) : "");
+  const [hour, setHour] = React.useState<string>(date ? String(date.getHours() % 12 || 12).padStart(2, '0') : "");
+  const [minute, setMinute] = React.useState<string>(date ? String(date.getMinutes()).padStart(2, '0') : "");
   const [period, setPeriod] = React.useState<'AM' | 'PM'>(date ? (date.getHours() >= 12 ? 'PM' : 'AM') : "AM");
 
   React.useEffect(() => {
@@ -89,39 +89,33 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="time-picker-hour">Enter time</Label>
-      <div className="flex items-end gap-2">
-        <div className="grid gap-1 text-center">
-            <Input
-                id="time-picker-hour"
-                value={hour}
-                onChange={handleHourChange}
-                onBlur={handleHourBlur}
-                className="w-16 text-center text-lg p-2 bg-background border-primary focus:border-2 h-12 font-mono"
-                maxLength={2}
-                placeholder="07"
-            />
-            <Label htmlFor="time-picker-hour" className="text-xs text-muted-foreground">Hour</Label>
-        </div>
-        <span className="text-xl font-bold pb-3">:</span>
-        <div className="grid gap-1 text-center">
-            <Input
-                id="time-picker-minute"
-                value={minute}
-                onChange={handleMinuteChange}
-                onBlur={handleMinuteBlur}
-                className="w-16 text-center text-lg p-2 bg-background h-12 font-mono"
-                maxLength={2}
-                placeholder="00"
-            />
-            <Label htmlFor="time-picker-minute" className="text-xs text-muted-foreground">Minute</Label>
-        </div>
-        <div className="flex flex-col gap-1">
+      <Label>Time</Label>
+      <div className="flex items-center gap-2">
+        <Input
+            id="time-picker-hour"
+            value={hour}
+            onChange={handleHourChange}
+            onBlur={handleHourBlur}
+            className="w-14 text-center text-lg p-2 h-10 font-mono"
+            maxLength={2}
+            placeholder="hh"
+        />
+        <span className="text-lg font-bold">:</span>
+        <Input
+            id="time-picker-minute"
+            value={minute}
+            onChange={handleMinuteChange}
+            onBlur={handleMinuteBlur}
+            className="w-14 text-center text-lg p-2 h-10 font-mono"
+            maxLength={2}
+            placeholder="mm"
+        />
+        <div className="flex items-center rounded-md border p-0.5">
           <Button
             type="button"
             variant={period === 'AM' ? 'secondary' : 'ghost'}
             size="sm"
-            className={cn("h-6 px-3", period === 'AM' && "bg-primary/20 text-primary")}
+            className={cn("h-8 px-2.5 rounded-sm", period === 'AM' && "shadow-sm")}
             onClick={() => handlePeriodClick('AM')}
           >
             AM
@@ -130,7 +124,7 @@ export function TimePickerInput({ date, setDate }: TimePickerInputProps) {
             type="button"
             variant={period === 'PM' ? 'secondary' : 'ghost'}
             size="sm"
-            className={cn("h-6 px-3", period === 'PM' && "bg-primary/20 text-primary")}
+            className={cn("h-8 px-2.5 rounded-sm", period === 'PM' && "shadow-sm")}
             onClick={() => handlePeriodClick('PM')}
           >
             PM
