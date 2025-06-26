@@ -46,7 +46,7 @@ const convertToCsv = (data: any[], preferredOrder: string[] = []): string => {
         if (key === 'id') return 'ID';
         if (key === 'userId') return 'User ID';
         if (key === 'screeningId') return 'Screening ID';
-        if (key === 'createdAt' || key === 'referralDate' || key === 'timestamp') {
+        if (key === 'createdAt' || key === 'referralDate' || key === 'timestamp' || key === 'appointmentDateTime') {
             return key.replace(/([A-Z])/g, ' $1').replace(/^\w/, c => c.toUpperCase());
         }
         
@@ -194,7 +194,7 @@ export default function DataExportPage() {
         'id', 'name', 'age', 'phoneNumber', 'email', 'createdAt', 'userId', 'diagnosedOrTreated', 'abnormalDischarge', 'vaginalItchiness', 'genitalSores'
     ],
     referral_data: [
-        'id', 'patientName', 'phoneNumber', 'email', 'referralDate', 'type', 'status', 'consentStatus', 'contactMethod', 'facility', 'services', 'referralMessage',
+        'id', 'patientName', 'phoneNumber', 'email', 'referralDate', 'type', 'status', 'consentStatus', 'contactMethod', 'appointmentDateTime', 'region', 'constituency', 'facility', 'services', 'referralMessage',
         'notes', 'screeningId', 'userId'
     ],
     get screening_data_all() {
