@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -37,7 +38,6 @@ export default function AdminNavbar() {
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                             <span className="font-bold">E</span>
                         </div>
-                        <span className="hidden font-bold sm:inline-block">EduNexus Admin</span>
                     </Link>
                     <nav className="flex items-center space-x-6 text-sm font-medium">
                         {navItems.map((item) => (
