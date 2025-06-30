@@ -24,7 +24,6 @@ const navItems = [
     { href: '/admin/referrals', label: 'Referrals', icon: ClipboardList },
     { href: '/admin/data-export', label: 'Data Export', icon: FileSpreadsheet },
     { href: '/admin/forum-management', label: 'Forum', icon: MessageSquareText },
-    { href: '/admin/user-management', label: 'Users', icon: UserCog },
 ];
 
 export default function AdminNavbar() {
@@ -49,7 +48,7 @@ export default function AdminNavbar() {
                                 {navItems.map((item) => (
                                     <DropdownMenuItem key={item.href} asChild>
                                         <Link href={item.href}>
-                                            <item.icon className="h-4 w-4" />
+                                            <item.icon className="mr-2 h-4 w-4" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
@@ -107,6 +106,12 @@ export default function AdminNavbar() {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/user-management">
+                                    <UserCog className="mr-2 h-4 w-4" />
+                                    <span>User Management</span>
+                                </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                  <Link href="/admin/login">
                                     <LogOut className="mr-2 h-4 w-4" />
