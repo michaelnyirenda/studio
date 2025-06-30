@@ -78,8 +78,3 @@ export default function AdminSidebar() {
     </SidebarProvider>
   );
 }
-
-// Minimal SidebarTitle component if not already in shadcn
-const SidebarTitle = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-lg font-semibold tracking-tight">{children}</h2>
-);
