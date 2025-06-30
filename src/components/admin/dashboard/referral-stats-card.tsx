@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -114,7 +113,7 @@ export default function ReferralStatsCard() {
         </div>
       </CardContent>
       <CardFooter className="pt-2 mt-auto">
-         <Link href="/referrals" passHref className="w-full">
+         <Link href="/admin/referrals" passHref className="w-full">
             <div className="flex items-center text-accent font-semibold w-full justify-end">
                 <span>Manage Referrals</span>
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

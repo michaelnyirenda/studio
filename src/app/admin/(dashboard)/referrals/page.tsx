@@ -6,14 +6,24 @@ import { Badge } from '@/components/ui/badge';
 import type { Referral } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import ReferralConsentForm from '@/components/referrals/referral-consent-form';
-import { useEffect, useState, useMemo } from 'react';
-import { FileText, Mail, MessageSquare, CalendarClock } from 'lucide-react';
+import UpdateReferralDialog from '@/components/referrals/update-referral-dialog';
+import { useEffect, useState } from 'react';
+import { FileText, Trash2, Mail, MessageSquare, CalendarClock } from 'lucide-react';
 import { collection, query, where, onSnapshot, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useSearchParams } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { deleteReferralAction } from '@/app/referrals/actions';
 import { useToast } from '@/hooks/use-toast';
-import type { ReferralConsentFormData } from '@/lib/schemas';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
 
@@ -38,20 +48,16 @@ function getStatusVariant(status: Referral['status']): 'default' | 'secondary' |
   }
 }
 
-export default function ReferralsPage() {
-  const searchParams = useSearchParams();
-  const pendingIdFromUrl = searchParams.get('pendingId');
-
+export default function AdminReferralsPage() {
   const [referrals, setReferrals] = useState<ClientReferral[]>([]);
   const [loading, setLoading] = useState(true);
+  const [referralToDelete, setReferralToDelete] = useState<ClientReferral | null>(null);
   const { toast } = useToast();
-
-  const MOCK_CURRENT_USER_ID = 'client-test-user';
 
   useEffect(() => {
     setLoading(true);
     const referralsCollection = collection(db, 'referrals');
-    const q = query(referralsCollection, where('userId', '==', MOCK_CURRENT_USER_ID), orderBy('referralDate', 'desc'));
+    const q = query(referralsCollection, where('consentStatus', '==', 'agreed'), orderBy('referralDate', 'desc'));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const referralsData: ClientReferral[] = querySnapshot.docs.map(doc => {
@@ -69,82 +75,52 @@ export default function ReferralsPage() {
       });
       setReferrals(referralsData);
       setLoading(false);
-    }, (error) => {
-      console.error("Error fetching referrals:", error);
-      setLoading(false);
-      toast({
-        title: "Error",
-        description: "Could not fetch your referrals. Please try again later.",
-        variant: "destructive",
-      });
     });
 
     return () => unsubscribe();
-  }, [toast]);
+  }, []);
 
-  const pendingUserReferral = useMemo(() => {
-    if (pendingIdFromUrl) {
-      const referral = referrals.find(r => r.id === pendingIdFromUrl);
-      if (referral) return referral;
+  const handleDelete = async () => {
+    if (!referralToDelete) return;
+
+    const result = await deleteReferralAction(referralToDelete.id);
+    if (result.success) {
+      toast({ title: "Success", description: result.message });
+    } else {
+      toast({ title: "Error", description: result.message, variant: "destructive" });
     }
-
-    return referrals.find(r => r.consentStatus === 'pending');
-  }, [referrals, pendingIdFromUrl]);
-
-  const displayReferrals = useMemo(() => {
-    return referrals.filter(r => r.consentStatus === 'agreed');
-  }, [referrals]);
-
-  const handleConsentSubmit = async (referralId: string, data: ReferralConsentFormData) => {
-    setReferrals(prevReferrals =>
-      prevReferrals.map(r =>
-        r.id === referralId
-          ? { ...r, consentStatus: 'agreed', status: 'Pending Review', facility: data.facility, region: data.region, constituency: data.constituency }
-          : r
-      )
-    );
-    window.history.replaceState(null, '', '/referrals');
+    setReferralToDelete(null);
   };
-  
+
   const fullLocation = (referral: ClientReferral) => {
     return [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 pb-20">
+    <div className="container mx-auto py-8 px-4">
       <PageHeader
-        title="Your Referrals"
-        description="Complete pending referrals and view your referral history."
+        title="Manage All Referrals"
+        description="View and manage all consented referrals."
       />
-
-      {pendingUserReferral && (
-        <div className="mb-12">
-          <ReferralConsentForm
-            referral={pendingUserReferral}
-            onConsentSubmit={handleConsentSubmit}
-          />
-          <Separator className="my-12" />
-        </div>
-      )}
 
       {loading ? (
         <div className="mt-8 text-center">Loading referrals...</div>
-      ) : displayReferrals.length === 0 && !pendingUserReferral ? (
+      ) : referrals.length === 0 ? (
         <div className="mt-8 text-center flex flex-col items-center justify-center rounded-2xl bg-card p-12">
           <FileText className="h-16 w-16 text-muted-foreground mb-4" />
           <p className="text-xl font-semibold text-card-foreground">
-            You have no active referrals.
+            No consented referrals to display.
           </p>
           <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-            Referrals will appear here after you complete a screening and give consent.
+            Consented referrals from users will appear here once they are submitted.
           </p>
         </div>
       ) : (
         <>
-          <h2 className="text-3xl font-semibold text-primary mb-6">Your Approved Referrals</h2>
+          <h2 className="text-3xl font-semibold text-primary mb-6">Consented Referrals</h2>
           <ScrollArea className="h-[calc(100vh-350px)]">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pr-4">
-              {displayReferrals.map((referral) => (
+              {referrals.map((referral) => (
                 <Card key={referral.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col bg-card">
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -185,6 +161,13 @@ export default function ReferralsPage() {
                   </CardContent>
                   <CardFooter className="flex justify-between items-center pt-4 mt-auto">
                     <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
+                    <div className="flex items-center gap-2">
+                        <UpdateReferralDialog referral={referral} />
+                        <Button variant="outline" size="icon" className="text-destructive border-destructive hover:bg-destructive/10 h-9 w-9" onClick={() => setReferralToDelete(referral)}>
+                            <span className="sr-only">Delete</span>
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
                   </CardFooter>
                 </Card>
               ))}
@@ -192,6 +175,23 @@ export default function ReferralsPage() {
           </ScrollArea>
         </>
       )}
+
+      <AlertDialog open={!!referralToDelete} onOpenChange={(open) => !open && setReferralToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the referral for "{referralToDelete?.patientName}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setReferralToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Yes, delete referral
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

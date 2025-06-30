@@ -1,32 +1,25 @@
-
 "use client";
 
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpenText, ShieldCheck, Home, ClipboardList, UserCog } from 'lucide-react';
+import { BookOpenText, ShieldCheck, Home, ClipboardList } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRole } from '@/contexts/role-context';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { role } = useRole();
 
-  const userNavItems = [
+  // Hide navbar on admin routes
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
+  const navItems = [
     { href: "/", label: "Home", icon: <Home /> },
     { href: "/forum", label: "Forum", icon: <BookOpenText /> },
     { href: "/hiv-screening", label: "Screening", icon: <ShieldCheck /> },
     { href: "/referrals", label: "Referrals", icon: <ClipboardList /> },
   ];
-
-  const adminNavItems = [
-    { href: "/", label: "Home", icon: <Home /> },
-    { href: "/forum", label: "Forum", icon: <BookOpenText /> },
-    { href: "/referrals", label: "Referrals", icon: <ClipboardList /> },
-    { href: "/admin/user-management", label: "Users", icon: <UserCog /> },
-  ];
-
-  const navItems = role === 'admin' ? adminNavItems : userNavItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/90 backdrop-blur-lg">

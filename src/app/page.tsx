@@ -1,16 +1,12 @@
-
 "use client";
 
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/shared/page-header";
-import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck, FileSpreadsheet, LineChart, Users, MessageSquareText, UserCog, BarChart3 } from 'lucide-react';
+import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
-import { useRole } from '@/contexts/role-context';
 import * as React from 'react';
-import ReferralStatsCard from '@/components/admin/dashboard/referral-stats-card';
-import ScreeningStatsCard from '@/components/admin/dashboard/screening-stats-card';
 
 interface FeatureCardProps {
   title: string;
@@ -20,14 +16,6 @@ interface FeatureCardProps {
   imageSrc: string;
   imageAlt: string;
   imageHint: string;
-}
-
-interface AdminFeatureCardProps {
-  title: string;
-  description: string;
-  link: string;
-  icon: React.ReactNode;
-  isExternal?: boolean;
 }
 
 function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, imageHint }: FeatureCardProps) {
@@ -66,76 +54,7 @@ function FeatureCard({ title, description, link, icon, imageSrc, imageAlt, image
   );
 }
 
-function AdminFeatureLinkCard({ title, description, link, icon }: AdminFeatureCardProps) {
-  return (
-    <Link href={link} passHref className="block h-full group">
-      <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col bg-card hover:-translate-y-1.5">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xl font-medium text-primary">{title}</CardTitle>
-          <div className="p-3 bg-secondary rounded-xl">
-            {React.cloneElement(icon as React.ReactElement, { className: "h-6 w-6 text-primary" })}
-          </div>
-        </CardHeader>
-        <CardContent className="flex-grow">
-          <p className="text-sm text-muted-foreground">
-            {description}
-          </p>
-        </CardContent>
-        <CardFooter className="pt-2 flex justify-end">
-          <div className="flex items-center text-accent font-semibold">
-            <span>View Details</span>
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </div>
-        </CardFooter>
-      </Card>
-    </Link>
-  );
-}
-
-
-function AdminDashboardContent() {
-  return (
-    <div className="container mx-auto py-8 px-4">
-      <PageHeader
-        title="Administrator Dashboard"
-        description="Access reports, data exports, and administrative functions."
-      />
-
-      <div className="mt-8 space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <ScreeningStatsCard />
-          <ReferralStatsCard />
-        </div>
-
-        <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
-          <AdminFeatureLinkCard
-            title="Data Export"
-            description="Generate and download reports for screenings, referrals, and other data."
-            link="/admin/data-export"
-            icon={<FileSpreadsheet />}
-          />
-          <AdminFeatureLinkCard
-            title="Forum Management"
-            description="Oversee forum discussions and manage posts. Create new posts via the Forum page."
-            link="/forum"
-            icon={<MessageSquareText />}
-          />
-          <AdminFeatureLinkCard
-            title="User Management"
-            description="Manage user accounts, roles, permissions, and view user activity."
-            link="/admin/user-management"
-            icon={<UserCog />}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
 export default function Home() {
-  const { role } = useRole();
-
   const features: FeatureCardProps[] = [
     {
       title: "Community Forum",
@@ -166,20 +85,18 @@ export default function Home() {
     },
   ];
 
-  if (role === 'admin') {
-    return <AdminDashboardContent />;
-  }
-
   return (
-    <div className="flex flex-col items-center">
-      <PageHeader
-        title="Welcome to i-BreakFree"
-        description="Your integrated platform for education, community engagement, and health awareness."
-      />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 w-full max-w-6xl">
-        {features.map((feature) => (
-          <FeatureCard key={feature.title} {...feature} />
-        ))}
+     <div className="container mx-auto px-4 pt-8 pb-20">
+      <div className="flex flex-col items-center">
+        <PageHeader
+          title="Welcome to i-BreakFree"
+          description="Your integrated platform for education, community engagement, and health awareness."
+        />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 w-full max-w-6xl">
+          {features.map((feature) => (
+            <FeatureCard key={feature.title} {...feature} />
+          ))}
+        </div>
       </div>
     </div>
   );

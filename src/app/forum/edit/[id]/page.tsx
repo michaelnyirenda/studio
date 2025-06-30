@@ -6,8 +6,6 @@ import { db } from '@/lib/firebase';
 import CreatePostForm from '@/components/forum/create-post-form';
 import PageHeader from '@/components/shared/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useRole } from '@/contexts/role-context';
-import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 
 interface PostData {
@@ -22,23 +20,8 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
   const [post, setPost] = useState<PostData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { role } = useRole();
-  const router = useRouter();
-
-  // Redirect if not admin
-  useEffect(() => {
-    // A short delay to allow role to initialize
-    const timer = setTimeout(() => {
-      if (role !== 'admin') {
-        router.push('/forum');
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [role, router]);
 
   useEffect(() => {
-    if (role !== 'admin') return;
-
     const fetchPost = async () => {
       setLoading(true);
       try {
@@ -68,15 +51,7 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
     if (params.id) {
       fetchPost();
     }
-  }, [params.id, role]);
-
-  if (role !== 'admin') {
-    return (
-      <div className="container mx-auto py-8 px-4 text-center">
-        <p>Redirecting...</p>
-      </div>
-    );
-  }
+  }, [params.id]);
 
   if (loading) {
     return (

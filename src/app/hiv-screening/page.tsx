@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useRole } from '@/contexts/role-context';
+import { useState } from 'react';
 import PageHeader from '@/components/shared/page-header';
 import ScreeningForm from '@/components/hiv-screening/screening-form';
 import GbvScreeningForm from '@/components/gbv-screening/gbv-screening-form';
@@ -15,23 +13,7 @@ import { ShieldCheck, ShieldAlert, Pill, ArrowLeft, TestTube2 } from 'lucide-rea
 type ScreeningType = 'hiv' | 'gbv' | 'prep' | 'sti' | null;
 
 export default function ScreeningPage() {
-  const { role } = useRole();
-  const router = useRouter();
   const [selectedScreening, setSelectedScreening] = useState<ScreeningType>(null);
-
-  useEffect(() => {
-    if (role === 'admin') {
-      router.push('/');
-    }
-  }, [role, router]);
-
-  if (role === 'admin') {
-    return (
-      <div className="container mx-auto py-8 px-4 text-center">
-        <p>Redirecting to dashboard...</p>
-      </div>
-    );
-  }
 
   const handleSelectScreening = (type: ScreeningType) => {
     setSelectedScreening(type);
