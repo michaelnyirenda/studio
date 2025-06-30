@@ -10,7 +10,8 @@ import {
   LogOut,
   MessageSquareText,
   UserCog,
-  ChevronDown
+  ChevronDown,
+  Menu,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
@@ -31,27 +32,60 @@ export default function AdminNavbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-16 items-center">
-                <div className="mr-4 hidden md:flex">
-                    <nav className="flex items-center space-x-6 text-sm font-medium">
-                        {navItems.map((item) => (
-                             <Link
-                                key={item.href}
-                                href={item.href}
-                                className={cn(
-                                'transition-colors hover:text-primary',
-                                pathname === item.href ? 'text-primary' : 'text-muted-foreground'
-                                )}
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
+            <div className="container flex h-16 items-center justify-between">
+                <div className="flex items-center gap-4">
+                    {/* Mobile Navigation */}
+                    <div className="md:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon">
+                                    <Menu className="h-5 w-5" />
+                                    <span className="sr-only">Open navigation menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start">
+                                <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {navItems.map((item) => (
+                                    <DropdownMenuItem key={item.href} asChild>
+                                        <Link href={item.href}>
+                                            <item.icon className="h-4 w-4" />
+                                            <span>{item.label}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    {/* Desktop Navigation */}
+                    <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
+                                        isActive
+                                            ? 'bg-secondary text-secondary-foreground'
+                                            : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+                                    )}
+                                >
+                                    <item.icon className="h-5 w-5" />
+                                    <span>{item.label}</span>
+                                </Link>
+                            )
+                        })}
                     </nav>
                 </div>
-                <div className="flex flex-1 items-center justify-end space-x-4">
+                
+                {/* User Menu */}
+                <div className="flex items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto">
+                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full">
                                <Avatar className="h-9 w-9">
                                     <AvatarImage src="https://placehold.co/100x100.png" alt="@admin" data-ai-hint="person avatar" />
                                     <AvatarFallback>AD</AvatarFallback>
@@ -77,7 +111,7 @@ export default function AdminNavbar() {
                                  <Link href="/admin/login">
                                     <LogOut className="mr-2 h-4 w-4" />
                                     <span>Log out</span>
-                                </Link>
+                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
