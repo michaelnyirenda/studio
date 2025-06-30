@@ -118,7 +118,7 @@ export default function AdminReferralsPage() {
       ) : (
         <>
           <h2 className="text-3xl font-semibold text-primary mb-6">Consented Referrals</h2>
-          <ScrollArea className="h-[calc(100vh-350px)]">
+          <ScrollArea>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pr-4">
               {referrals.map((referral) => (
                 <Card key={referral.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col bg-card">
