@@ -20,10 +20,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
     { href: '/admin/referrals', label: 'Referrals', icon: ClipboardList },
-    { href: '/admin/data-export', label: 'Data Export', icon: FileSpreadsheet },
     { href: '/admin/forum-management', label: 'Forum', icon: MessageSquareText },
+    { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
+    { href: '/admin/data-export', label: 'Data Export', icon: FileSpreadsheet },
 ];
 
 export default function AdminNavbar() {
