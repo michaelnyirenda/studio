@@ -1,3 +1,4 @@
+
 import type { FieldValue, Timestamp } from 'firebase/firestore';
 
 export interface Referral {
@@ -20,3 +21,23 @@ export interface Referral {
   appointmentDateTime?: Timestamp;
   services?: string[];
 }
+
+export interface ChatMessage {
+  id: string;
+  text: string;
+  createdAt: Timestamp;
+  senderId: string;
+  senderType: 'user' | 'ai';
+}
+
+export interface ChatSession {
+  id: string;
+  userId: string;
+  userName: string;
+  lastMessageText: string;
+  lastMessageAt: Timestamp | FieldValue;
+  userUnread: boolean;
+  adminUnread: boolean;
+}
+
+    

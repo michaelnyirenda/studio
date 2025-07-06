@@ -1,9 +1,10 @@
+
 "use client";
 
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpenText, ShieldCheck, Home, ClipboardList } from 'lucide-react';
+import { BookOpenText, ShieldCheck, Home, ClipboardList, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function Navbar() {
@@ -19,6 +20,7 @@ export default function Navbar() {
     { href: "/forum", label: "Forum", icon: <BookOpenText /> },
     { href: "/hiv-screening", label: "Screening", icon: <ShieldCheck /> },
     { href: "/referrals", label: "Referrals", icon: <ClipboardList /> },
+    { href: "/chat", label: "Chat", icon: <MessageSquare /> },
   ];
 
   return (
@@ -58,3 +60,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+    

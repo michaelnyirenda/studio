@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import {
   FileSpreadsheet,
   LayoutDashboard,
   LogOut,
+  MessageSquare,
   MessageSquareText,
   UserCog,
   ChevronDown,
@@ -21,6 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/referrals', label: 'Referrals', icon: ClipboardList },
+    { href: '/admin/chat', label: 'Chat', icon: MessageSquare },
     { href: '/admin/forum-management', label: 'Forum', icon: MessageSquareText },
     { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
     { href: '/admin/data-export', label: 'Data Export', icon: FileSpreadsheet },
@@ -125,3 +128,5 @@ export default function AdminNavbar() {
         </header>
     );
 }
+
+    
