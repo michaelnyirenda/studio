@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import ReferralConsentForm from '@/components/referrals/referral-consent-form';
 import { FileText, Mail, MessageSquare, CalendarClock, Loader2, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 type ClientReferral = Omit<Referral, 'referralDate' | 'appointmentDateTime'> & {
   referralDate: string;
@@ -191,7 +192,7 @@ export default function ReferralsList() {
             >
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-xl font-headline text-primary">Your Consented Referral</CardTitle>
+                  <CardTitle className="font-headline text-2xl text-primary">Your Consented Referral</CardTitle>
                   <Badge variant={getStatusVariant(referral.status)} className="ml-2 whitespace-nowrap text-xs">
                     {referral.status}
                   </Badge>
