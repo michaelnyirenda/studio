@@ -13,98 +13,133 @@ export async function generateReferralPdf(referral: Referral): Promise<Uint8Arra
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  let y = height - 50;
-  const x = 50;
-  const line_height = 18;
-  const heading_size = 18;
-  const body_size = 12;
-  const label_size = 10;
-  const section_gap = 25;
+  const margin = 50;
+  let y = height - margin;
 
-  const drawText = (text: string, xPos: number, yPos: number, size: number, textFont = font) => {
-    page.drawText(text, { x: xPos, y: yPos, size, font: textFont, color: rgb(0.1, 0.1, 0.1) });
-  };
+  const drawText = (
+    text: string,
+    x: number,
+    yPos: number,
+    size: number,
+    options: { font?: any; color?: any; maxWidth?: number; lineHeight?: number } = {}
+  ) => {
+    const {
+      font: textFont = font,
+      color = rgb(0, 0, 0),
+      maxWidth,
+      lineHeight = 16, // A bit more than the font size
+    } = options;
 
-  const drawLabelAndValue = (label: string, value: string | undefined | null) => {
-    if (value) {
-      drawText(`${label}:`, x, y, label_size, boldFont);
-      drawText(value, x + 120, y, body_size);
-      y -= line_height * 1.5;
+    if (maxWidth) {
+      let lines: string[] = [];
+      const paragraphs = text.split('\n');
+      for (const paragraph of paragraphs) {
+        const words = paragraph.split(' ');
+        let currentLine = '';
+        for (const word of words) {
+          const testLine = currentLine.length > 0 ? `${currentLine} ${word}` : word;
+          if (textFont.widthOfTextAtSize(testLine, size) > maxWidth) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        lines.push(currentLine);
+      }
+
+
+      for (const line of lines) {
+        page.drawText(line, { x, y: yPos, size, font: textFont, color });
+        yPos -= lineHeight;
+      }
+      return lines.length * lineHeight;
+    } else {
+      page.drawText(text, { x, y: yPos, size, font: textFont, color });
+      return lineHeight;
     }
   };
-
-  // Header
-  drawText('Patient Referral Document', x, y, heading_size, boldFont);
-  y -= section_gap * 1.5;
-
-  // Details
-  drawLabelAndValue('Patient Name', referral.patientName);
-  drawLabelAndValue('Referral Type', referral.type);
-  drawLabelAndValue('Status', referral.status);
-
-  const referralDate = (referral.referralDate as Timestamp)?.toDate();
-  drawLabelAndValue('Referral Date', referralDate ? format(referralDate, 'PPP') : 'N/A');
-
-  const appointmentDateTime = (referral.appointmentDateTime as Timestamp)?.toDate();
-  drawLabelAndValue('Appointment', appointmentDateTime ? format(appointmentDateTime, 'PPP p') : 'Not scheduled');
-
-  const fullLocation = [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
-  drawLabelAndValue('Referred To', fullLocation || 'N/A');
-
-  y -= section_gap / 2;
   
-  // Referral Message Section
-  if (referral.referralMessage) {
-    drawText('Referral Reason:', x, y, label_size, boldFont);
-    y -= line_height;
-    const messageLines = referral.referralMessage.split('\n');
-    messageLines.forEach(line => {
-      // Basic word wrap
-      const words = line.split(' ');
-      let currentLine = '';
-      for (const word of words) {
-        const testLine = currentLine.length > 0 ? `${currentLine} ${word}` : word;
-        if (font.widthOfTextAtSize(testLine, body_size) > width - 2 * x) {
-          drawText(currentLine, x, y, body_size);
-          y -= line_height;
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      }
-      drawText(currentLine, x, y, body_size);
-      y -= line_height;
-    });
-    y -= section_gap / 2;
-  }
+  // Title
+  const title = 'Referral Document';
+  const titleSize = 22;
+  const titleWidth = boldFont.widthOfTextAtSize(title, titleSize);
+  drawText(title, (width - titleWidth) / 2, y, titleSize, { font: boldFont });
+  y -= 50;
 
-  // Notes Section
-  if (referral.notes) {
-    drawText('Notes:', x, y, label_size, boldFont);
-    y -= line_height;
-    const noteLines = referral.notes.split('\n');
-     noteLines.forEach(line => {
-      const words = line.split(' ');
-      let currentLine = '';
-      for (const word of words) {
-        const testLine = currentLine.length > 0 ? `${currentLine} ${word}` : word;
-        if (font.widthOfTextAtSize(testLine, body_size) > width - 2 * x) {
-          drawText(currentLine, x, y, body_size);
-          y -= line_height;
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      }
-      drawText(currentLine, x, y, body_size);
-      y -= line_height;
-    });
-    y -= section_gap / 2;
-  }
+  // Section helper
+  const drawSection = (title: string, content: () => void) => {
+    if (y < margin + 60) {
+        page.addPage();
+        y = height - margin;
+    }
+    drawText(title, margin, y, 16, { font: boldFont });
+    y -= 25;
+    content();
+    y -= 20; // Space after section
+  };
+  
+  // Key-value pair helper
+  const drawKeyValue = (label: string, value: string | undefined | null) => {
+      if (value === undefined || value === null || value === '') return;
+      const valueX = margin + 150;
+      const valueMaxWidth = width - margin - valueX;
 
+      // Draw label
+      drawText(label, margin, y, 12, { font: boldFont });
+      
+      // Draw value and get its height
+      const valueHeight = drawText(value, valueX, y, 12, { maxWidth: valueMaxWidth, lineHeight: 16 });
+      
+      y -= valueHeight; // Move y down by the total height of the value
+      y -= 8; // Padding after the key-value pair
+  };
+  
+  // Patient Information section
+  drawSection('Patient Information', () => {
+    drawKeyValue('Patient Name:', referral.patientName);
+    drawKeyValue('Phone Number:', referral.phoneNumber);
+    drawKeyValue('Email:', referral.email);
+    drawKeyValue('Referral Type:', referral.type);
+  });
+  
+  // Referral Details section
+  drawSection('Referral Details', () => {
+    drawKeyValue('Referral ID:', referral.id);
+    const referralDate = (referral.referralDate as Timestamp)?.toDate();
+    drawKeyValue('Referral Date:', referralDate ? format(referralDate, 'PPP') : 'N/A');
+    drawKeyValue('Status:', referral.status);
+    const appointmentDateTime = (referral.appointmentDateTime as Timestamp)?.toDate();
+    drawKeyValue('Appointment:', appointmentDateTime ? format(appointmentDateTime, "PPP 'at' p") : 'Not scheduled');
+    const fullLocation = [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
+    drawKeyValue('Location:', fullLocation || 'N/A');
+  });
+
+  // Services Referred section
+  if (referral.services && referral.services.length > 0) {
+      drawSection('Services Referred', () => {
+        drawKeyValue('Services:', referral.services?.join(', '));
+      });
+  }
+  
+  // Referral Reason & Notes section
+  drawSection('Referral Reason & Notes', () => {
+    if (referral.referralMessage) {
+        drawText('Reason:', margin, y, 12, { font: boldFont });
+        y -= 20;
+        y -= drawText(referral.referralMessage, margin, y, 12, { maxWidth: width - (margin * 2), lineHeight: 16 });
+        y -= 15;
+    }
+    if (referral.notes) {
+        drawText('Admin Notes:', margin, y, 12, { font: boldFont });
+        y -= 20;
+        y -= drawText(referral.notes, margin, y, 12, { maxWidth: width - (margin * 2), lineHeight: 16 });
+    }
+  });
+  
   // Footer
-  const footerText = 'Generated by i-BreakFree Platform';
-  drawText(footerText, x, 50, 8);
+  const footerText = `Generated by i-BreakFree Platform | ${format(new Date(), 'PPP p')}`;
+  drawText(footerText, margin, 35, 8, {color: rgb(0.5, 0.5, 0.5)});
 
   return pdfDoc.save();
 }
