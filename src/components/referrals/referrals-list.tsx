@@ -52,6 +52,7 @@ export default function ReferralsList() {
   const [loading, setLoading] = useState(true);
   const [activeReferral, setActiveReferral] = useState<ClientReferral | null>(null);
   const [consentedReferrals, setConsentedReferrals] = useState<ClientReferral[]>([]);
+  const [loadingReferralId, setLoadingReferralId] = useState<string | null>(null);
 
   // New state for search functionality
   const [searchInput, setSearchInput] = useState('');
@@ -97,13 +98,14 @@ export default function ReferralsList() {
   }, []);
 
   const handleDownload = async (referral: ClientReferral) => {
+    setLoadingReferralId(referral.id);
     const result = await downloadReferralPdfAction(referral.id);
     if (result.success && result.pdfData) {
       try {
         const byteCharacters = atob(result.pdfData);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'application/pdf' });
@@ -117,12 +119,27 @@ export default function ReferralsList() {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
         toast({ title: "Success", description: "PDF download started." });
+
+        // Check if the downloaded referral is the active (searched) one.
+        if (activeReferral && activeReferral.id === referral.id) {
+          // Start the disappearance timer
+          setTimeout(() => {
+            setActiveReferral(prev => prev ? { ...prev, isDisappearing: true } : null);
+          }, 15000);
+
+          // Remove from state after animation
+          setTimeout(() => {
+            setActiveReferral(null);
+          }, 15500); // 15s wait + 0.5s animation
+        }
+
       } catch (e) {
-        toast({ title: "Error", description: "Failed to process PDF for download.", variant: "destructive" });
+         toast({ title: "Error", description: "Failed to process PDF for download.", variant: "destructive" });
       }
     } else {
       toast({ title: "Error", description: result.message || "Failed to generate PDF.", variant: "destructive" });
     }
+    setLoadingReferralId(null);
   };
 
   const handleConsentSubmit = async (referralId: string, data: ReferralConsentFormData) => {
@@ -242,7 +259,13 @@ export default function ReferralsList() {
                 onConsentSubmit={handleConsentSubmit}
               />
           ) : (
-            <Card key={activeReferral.id} className="shadow-lg transition-all duration-300 ease-in-out flex flex-col bg-card border-primary">
+            <Card
+                key={activeReferral.id}
+                className={cn(
+                    "shadow-lg transition-all duration-300 ease-in-out flex flex-col bg-card border-primary",
+                    activeReferral.isDisappearing && "animate-fade-out-up"
+                )}
+            >
                 <CardHeader>
                     <div className="flex justify-between items-start">
                         <CardTitle className="font-headline text-2xl text-primary">Referral Details</CardTitle>
@@ -252,6 +275,12 @@ export default function ReferralsList() {
                     </div>
                     <CardDescription className="text-sm text-muted-foreground pt-1 flex justify-between items-center flex-wrap gap-2">
                         <span>Referred on: {activeReferral.referralDate}</span>
+                         {activeReferral.contactMethod && (
+                            <span className="flex items-center gap-1 text-xs font-medium">
+                                {activeReferral.contactMethod === 'email' ? <Mail className="h-3 w-3 text-blue-600" /> : <MessageSquare className="h-3 w-3 text-green-600" />}
+                                Contact via {activeReferral.contactMethod === 'email' ? 'Email' : 'WhatsApp'}
+                            </span>
+                        )}
                         {activeReferral.appointmentDateTime && (
                           <span className="flex items-center gap-1 text-xs font-medium text-accent">
                             <CalendarClock className="h-3 w-3" />
@@ -261,13 +290,27 @@ export default function ReferralsList() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                     <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
-                    <p className="text-sm text-accent font-medium">{fullLocation(activeReferral) || 'N/A'}</p>
+                    <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
+                    <p className="text-sm text-accent font-medium mb-3">{fullLocation(activeReferral) || 'N/A'}</p>
+
+                    {activeReferral.services && activeReferral.services.length > 0 && (
+                        <div className="mb-3">
+                            <p className="text-sm font-semibold text-card-foreground/90 mb-1">Services Referred For:</p>
+                            <p className="text-sm text-muted-foreground">{activeReferral.services.join(', ')}</p>
+                        </div>
+                    )}
+                    
+                    <Alert className="mt-4">
+                        <AlertTitle>Your Referral Details</AlertTitle>
+                        <AlertDescription>
+                            Click "Download Again" to save another copy of your referral PDF. This card will disappear shortly for your privacy.
+                        </AlertDescription>
+                    </Alert>
                 </CardContent>
                  <CardFooter className="flex justify-between items-center pt-4 mt-auto">
                     <p className="text-xs text-muted-foreground">ID: {activeReferral.id}</p>
-                    <Button variant="outline" size="sm" onClick={() => handleDownload(activeReferral)}>
-                        <Download className="mr-2 h-4 w-4" />
+                    <Button variant="outline" size="sm" onClick={() => handleDownload(activeReferral)} disabled={loadingReferralId === activeReferral.id}>
+                        {loadingReferralId === activeReferral.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                         Download Again
                     </Button>
                 </CardFooter>
@@ -305,7 +348,13 @@ export default function ReferralsList() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
-                <p className="text-sm text-accent font-medium">{fullLocation(referral) || 'N/A'}</p>
+                <p className="text-sm text-accent font-medium mb-3">{fullLocation(referral) || 'N/A'}</p>
+                 {referral.services && referral.services.length > 0 && (
+                    <div className="mb-3">
+                        <p className="text-sm font-semibold text-card-foreground/90 mb-1">Services Referred For:</p>
+                        <p className="text-sm text-muted-foreground">{referral.services.join(', ')}</p>
+                    </div>
+                )}
                  <Alert className="mt-4">
                     <AlertTitle>Next Steps</AlertTitle>
                     <AlertDescription>
@@ -315,8 +364,8 @@ export default function ReferralsList() {
               </CardContent>
               <CardFooter className="flex justify-between items-center pt-4 mt-auto">
                 <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
-                <Button variant="outline" size="sm" onClick={() => handleDownload(referral)}>
-                    <Download className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={() => handleDownload(referral)} disabled={loadingReferralId === referral.id}>
+                    {loadingReferralId === referral.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                     Download Again
                 </Button>
               </CardFooter>
