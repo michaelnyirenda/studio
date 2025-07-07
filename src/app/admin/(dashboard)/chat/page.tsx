@@ -10,9 +10,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { Loader2, XCircle } from 'lucide-react';
+import { Loader2, Trash2, XCircle } from 'lucide-react';
 import ChatInterface from '@/components/chat/chat-interface';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { deleteChatSessionAction } from './actions';
 
 type ClientChatSession = Omit<ChatSession, 'lastMessageAt'> & { lastMessageAt: string };
 
@@ -20,6 +33,8 @@ export default function AdminChatPage() {
   const [sessions, setSessions] = useState<ClientChatSession[]>([]);
   const [selectedSession, setSelectedSession] = useState<ClientChatSession | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionToDelete, setSessionToDelete] = useState<ClientChatSession | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const sessionsCollection = collection(db, 'chatSessions');
@@ -59,6 +74,20 @@ export default function AdminChatPage() {
     return () => unsubscribe();
   }, []); // Only run once on mount
 
+  const handleDelete = async () => {
+    if (!sessionToDelete) return;
+
+    const result = await deleteChatSessionAction(sessionToDelete.id);
+    if (result.success) {
+      toast({ title: "Success", description: result.message });
+      if (selectedSession?.id === sessionToDelete.id) {
+          setSelectedSession(null);
+      }
+    } else {
+      toast({ title: "Error", description: result.message, variant: "destructive" });
+    }
+    setSessionToDelete(null); // Close the dialog
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -84,37 +113,50 @@ export default function AdminChatPage() {
                         <p className="p-4 text-sm text-center text-muted-foreground">No active chats.</p>
                     ) : (
                         sessions.map(session => (
-                            <button
+                            <div
                                 key={session.id}
-                                onClick={() => setSelectedSession(session)}
                                 className={cn(
-                                    "flex items-center gap-3 w-full text-left p-3 border-b hover:bg-muted/50 transition-colors",
+                                    "flex items-center justify-between w-full text-left p-3 border-b hover:bg-muted/50 transition-colors",
                                     selectedSession?.id === session.id && "bg-secondary",
                                     session.status === 'closed' && "opacity-60"
                                 )}
                             >
-                                <Avatar>
-                                    <AvatarFallback>{session.userName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-grow overflow-hidden">
-                                    <div className="flex justify-between items-center">
-                                      <p className="font-semibold truncate">{session.userName}</p>
-                                      <p className="text-xs text-muted-foreground shrink-0">{session.lastMessageAt}</p>
+                                <button
+                                  onClick={() => setSelectedSession(session)}
+                                  className="flex flex-grow items-center gap-3 overflow-hidden text-left"
+                                >
+                                    <Avatar>
+                                        <AvatarFallback>{session.userName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-grow overflow-hidden">
+                                        <div className="flex justify-between items-center">
+                                          <p className="font-semibold truncate">{session.userName}</p>
+                                          <p className="text-xs text-muted-foreground shrink-0">{session.lastMessageAt}</p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                        {session.status === 'closed' && <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />}
+                                        <p className={cn(
+                                            "text-sm text-muted-foreground truncate",
+                                            session.adminUnread && "font-bold text-primary"
+                                        )}>
+                                            {session.lastMessageText}
+                                        </p>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                    {session.status === 'closed' && <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />}
-                                    <p className={cn(
-                                        "text-sm text-muted-foreground truncate",
-                                        session.adminUnread && "font-bold text-primary"
-                                    )}>
-                                        {session.lastMessageText}
-                                    </p>
-                                    </div>
-                                </div>
-                                {session.adminUnread && (
-                                    <div className="w-2.5 h-2.5 rounded-full bg-accent shrink-0 ml-auto" />
-                                )}
-                            </button>
+                                    {session.adminUnread && (
+                                        <div className="w-2.5 h-2.5 rounded-full bg-accent shrink-0" />
+                                    )}
+                                </button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-destructive hover:bg-destructive/10 shrink-0 ml-2"
+                                  onClick={() => setSessionToDelete(session)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  <span className="sr-only">Delete Chat</span>
+                                </Button>
+                            </div>
                         ))
                     )}
                 </ScrollArea>
@@ -142,6 +184,23 @@ export default function AdminChatPage() {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!sessionToDelete} onOpenChange={(open) => !open && setSessionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the chat session with "{sessionToDelete?.userName}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Yes, delete chat
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

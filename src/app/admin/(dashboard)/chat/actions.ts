@@ -1,6 +1,6 @@
 'use server';
 
-import { collection, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { z } from 'zod';
 import { ChatMessageSchema } from '@/lib/schemas';
@@ -44,5 +44,24 @@ export async function sendAdminMessageAction(
   } catch (error) {
     console.error("Error sending admin message:", error);
     return { success: false, message: "Failed to send message." };
+  }
+}
+
+export async function deleteChatSessionAction(sessionId: string): Promise<{ success: boolean; message: string; }> {
+  if (!sessionId) {
+    return { success: false, message: "Session ID is required." };
+  }
+
+  try {
+    // Note: In a production environment, deleting a document doesn't delete its subcollections (e.g., messages).
+    // A more robust solution would use a Cloud Function to recursively delete subcollections.
+    // For this prototype, deleting the session document is sufficient to remove it from the admin view.
+    const sessionRef = doc(db, 'chatSessions', sessionId);
+    await deleteDoc(sessionRef);
+    
+    return { success: true, message: "Chat session deleted successfully." };
+  } catch (error) {
+    console.error("Error deleting chat session:", error);
+    return { success: false, message: "Failed to delete chat session." };
   }
 }
