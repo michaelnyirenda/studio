@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { collection, query, where, onSnapshot, getDocs, orderBy, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getDocs, orderBy, doc, updateDoc, Timestamp, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ import { ChatMessageSchema, type ChatMessageFormData } from '@/lib/schemas';
 import type { ChatMessage } from '@/lib/types';
 import { Send, Loader2, Bot, User } from 'lucide-react';
 import { sendMessageAction } from '@/app/chat/actions';
+import { sendAdminMessageAction } from '@/app/admin/(dashboard)/chat/actions';
 
 interface ChatInterfaceProps {
   userId: string;
@@ -39,7 +40,7 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
     const findOrCreateSession = async () => {
       if (isClientSide) {
         const chatsCollection = collection(db, 'chatSessions');
-        const q = query(chatsCollection, where('userId', '==', userId));
+        const q = query(chatsCollection, where('userId', '==', userId), where('status', '==', 'active'));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setSessionId(querySnapshot.docs[0].id);
@@ -66,14 +67,26 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
     const q = query(messagesCollection, orderBy('createdAt', 'asc'));
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      const msgs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage));
+      const msgs = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: (data.createdAt as Timestamp)?.toDate() ? (data.createdAt as Timestamp).toDate().toLocaleTimeString() : 'Sending...'
+          } as unknown as ChatMessage;
+        });
       setMessages(msgs);
       setLoading(false);
 
-      if (isClientSide) {
-         await updateDoc(sessionRef, { userUnread: false });
-      } else {
-         await updateDoc(sessionRef, { adminUnread: false });
+      const sessionDoc = await getDoc(sessionRef);
+      if(sessionDoc.exists()){
+        const batch = writeBatch(db);
+        if (isClientSide && sessionDoc.data().userUnread) {
+           batch.update(sessionRef, { userUnread: false });
+        } else if (!isClientSide && sessionDoc.data().adminUnread) {
+           batch.update(sessionRef, { adminUnread: false });
+        }
+        await batch.commit();
       }
 
     }, (error) => {
@@ -96,18 +109,19 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
   const onSubmit = async (data: ChatMessageFormData) => {
     if (!isClientSide) return;
     form.reset();
-    await sendMessageAction(data);
-    
-    // If it was the first message, we need to get the new session ID
-    if (!sessionId) {
-        const chatsCollection = collection(db, 'chatSessions');
-        const q = query(chatsCollection, where('userId', '==', userId));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          setSessionId(querySnapshot.docs[0].id);
-        }
+    const result = await sendMessageAction(data);
+
+    if (result.sessionId && !sessionId) {
+      setSessionId(result.sessionId);
     }
   };
+  
+  const onAdminSubmit = async (data: ChatMessageFormData) => {
+    if (isClientSide || !sessionId) return;
+    form.reset();
+    await sendAdminMessageAction(sessionId, data);
+  };
+
   
   return (
     <div className="flex flex-col h-full border rounded-lg bg-card shadow-lg">
@@ -137,6 +151,9 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
                       isUser ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted rounded-bl-none'
                     )}>
                       <p className="whitespace-pre-wrap">{message.text}</p>
+                       <p className="text-xs text-right mt-1 opacity-70">
+                        {message.createdAt?.toLocaleString()}
+                      </p>
                     </div>
                      {isUser && (
                       <Avatar className="h-8 w-8 self-start">
@@ -151,29 +168,35 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
         </ScrollArea>
       </div>
       
-      {isClientSide && (
-        <div className="p-4 border-t bg-background/80">
+       <div className="p-4 border-t bg-background/80">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-center gap-2">
+            <form 
+                onSubmit={form.handleSubmit(isClientSide ? onSubmit : onAdminSubmit)} 
+                className="flex items-center gap-2"
+            >
               <FormField
                 control={form.control}
                 name="message"
                 render={({ field }) => (
                   <FormItem className="flex-grow">
                     <FormControl>
-                      <Input placeholder="Type your message..." {...field} autoComplete="off" />
+                      <Input 
+                        placeholder={isClientSide ? "Type your message..." : "Type your response..."} 
+                        {...field} 
+                        autoComplete="off" 
+                        disabled={isSubmitting || (!isClientSide && !sessionId)}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="icon" disabled={isSubmitting}>
+              <Button type="submit" size="icon" disabled={isSubmitting || (!isClientSide && !sessionId)}>
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 <span className="sr-only">Send</span>
               </Button>
             </form>
           </Form>
         </div>
-      )}
     </div>
   );
 }
