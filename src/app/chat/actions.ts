@@ -1,38 +1,40 @@
 
 'use server';
 
-import { collection, addDoc, serverTimestamp, query, where, getDocs, updateDoc, doc, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, updateDoc, doc, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { z } from 'zod';
 import { ChatMessageSchema } from '@/lib/schemas';
 
-const MOCK_CURRENT_USER_ID = 'client-test-user';
-const MOCK_CURRENT_USER_NAME = 'Client User';
+// This function creates a new, anonymous chat session every time.
+export async function startChatAction(): Promise<{ success: boolean; sessionId?: string; userId?: string; }> {
+  try {
+    const anonymousUserId = `client-user-${Date.now()}`;
+    const anonymousUserName = `User ${anonymousUserId.slice(-4)}`;
 
-async function getOrCreateChatSession(): Promise<string> {
-    const chatsCollection = collection(db, 'chatSessions');
-    const q = query(chatsCollection, where('userId', '==', MOCK_CURRENT_USER_ID));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-        return querySnapshot.docs[0].id;
-    } else {
-        const newChatSession = {
-            userId: MOCK_CURRENT_USER_ID,
-            userName: MOCK_CURRENT_USER_NAME,
-            lastMessageText: "Chat initiated.",
-            lastMessageAt: serverTimestamp(),
-            userUnread: false,
-            adminUnread: true,
-        };
-        const docRef = await addDoc(chatsCollection, newChatSession);
-        return docRef.id;
-    }
+    const newChatSession = {
+        userId: anonymousUserId,
+        userName: anonymousUserName,
+        lastMessageText: "Chat started.",
+        lastMessageAt: serverTimestamp(),
+        userUnread: false,
+        adminUnread: true,
+        status: 'active' as const,
+    };
+    const docRef = await addDoc(collection(db, 'chatSessions'), newChatSession);
+    return { success: true, sessionId: docRef.id, userId: anonymousUserId };
+  } catch (error) {
+    console.error("Error starting chat session:", error);
+    return { success: false };
+  }
 }
 
+// This function sends a message to a *specific* session.
 export async function sendMessageAction(
+  sessionId: string,
+  userId: string,
   values: z.infer<typeof ChatMessageSchema>
-): Promise<{ success: boolean; message: string; sessionId?: string; }> {
+): Promise<{ success: boolean; message: string; }> {
   const validation = ChatMessageSchema.safeParse(values);
   if (!validation.success) {
       return { success: false, message: "Invalid message format." };
@@ -41,35 +43,47 @@ export async function sendMessageAction(
   const { message } = validation.data;
 
   try {
-    const sessionId = await getOrCreateChatSession();
     const sessionRef = doc(db, 'chatSessions', sessionId);
     const messagesCollection = collection(sessionRef, 'messages');
 
     const batch = writeBatch(db);
 
-    // 1. Add user's message
     const userMessage = {
         text: message,
         createdAt: serverTimestamp(),
-        senderId: MOCK_CURRENT_USER_ID,
+        senderId: userId,
         senderType: 'user' as const,
     };
-    // Use `addDoc` semantics within a batch by creating a new doc reference
     batch.set(doc(messagesCollection), userMessage);
     
-    // 2. Update the session document
     batch.update(sessionRef, {
         lastMessageText: message,
         lastMessageAt: serverTimestamp(),
-        adminUnread: true, // Mark as unread for the admin
-        userUnread: false, // User has just sent it, so it's not unread for them
+        adminUnread: true,
+        userUnread: false,
     });
 
     await batch.commit();
 
-    return { success: true, message: "Message sent.", sessionId };
+    return { success: true, message: "Message sent." };
   } catch (error) {
     console.error("Error sending message:", error);
     return { success: false, message: "Failed to send message." };
   }
+}
+
+// This function marks a chat as closed by the client.
+export async function closeChatAction(sessionId: string): Promise<{ success: boolean }> {
+    try {
+        const sessionRef = doc(db, 'chatSessions', sessionId);
+        await updateDoc(sessionRef, {
+            status: 'closed',
+            lastMessageText: "Chat closed by user.",
+            lastMessageAt: serverTimestamp(),
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error closing chat:", error);
+        return { success: false };
+    }
 }

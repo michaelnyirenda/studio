@@ -38,6 +38,7 @@ export interface ChatSession {
   lastMessageAt: Timestamp | FieldValue;
   userUnread: boolean;
   adminUnread: boolean;
+  status?: 'active' | 'closed';
 }
 
     

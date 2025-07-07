@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import { Loader2, XCircle } from 'lucide-react';
 import ChatInterface from '@/components/chat/chat-interface';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -37,22 +37,27 @@ export default function AdminChatPage() {
       setSessions(sessionsData);
       setLoading(false);
       
+      // Smartly update or set the selected session
       if (!selectedSession && sessionsData.length > 0) {
         setSelectedSession(sessionsData[0]);
       } else if (selectedSession) {
           const updatedSelected = sessionsData.find(s => s.id === selectedSession.id);
           if (updatedSelected) {
             setSelectedSession(updatedSelected);
+          } else if (sessionsData.length > 0) {
+            // If the previously selected session is gone, select the first available one.
+            setSelectedSession(sessionsData[0]);
+          } else {
+            setSelectedSession(null);
           }
       }
-
     }, (error) => {
       console.error("Error fetching chat sessions:", error);
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [selectedSession]);
+  }, []); // Only run once on mount
 
 
   return (
@@ -84,7 +89,8 @@ export default function AdminChatPage() {
                                 onClick={() => setSelectedSession(session)}
                                 className={cn(
                                     "flex items-center gap-3 w-full text-left p-3 border-b hover:bg-muted/50 transition-colors",
-                                    selectedSession?.id === session.id && "bg-secondary"
+                                    selectedSession?.id === session.id && "bg-secondary",
+                                    session.status === 'closed' && "opacity-60"
                                 )}
                             >
                                 <Avatar>
@@ -95,12 +101,15 @@ export default function AdminChatPage() {
                                       <p className="font-semibold truncate">{session.userName}</p>
                                       <p className="text-xs text-muted-foreground shrink-0">{session.lastMessageAt}</p>
                                     </div>
+                                    <div className="flex items-center gap-2">
+                                    {session.status === 'closed' && <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />}
                                     <p className={cn(
                                         "text-sm text-muted-foreground truncate",
                                         session.adminUnread && "font-bold text-primary"
                                     )}>
                                         {session.lastMessageText}
                                     </p>
+                                    </div>
                                 </div>
                                 {session.adminUnread && (
                                     <div className="w-2.5 h-2.5 rounded-full bg-accent shrink-0 ml-auto" />
@@ -115,15 +124,20 @@ export default function AdminChatPage() {
             <div className="hidden md:block">
                 {selectedSession ? (
                     <ChatInterface 
+                        key={selectedSession.id} // Add key to force re-render
                         userId={selectedSession.userId} 
                         isClientSide={false} 
-                        selectedSessionId={selectedSession.id} 
+                        sessionId={selectedSession.id} 
                     />
                 ) : !loading && sessions.length > 0 ? (
                      <div className="flex items-center justify-center h-full text-muted-foreground">
                         <p>Select a conversation to view messages.</p>
                     </div>
-                ): null}
+                ): !loading && sessions.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                        <p>No conversations yet.</p>
+                    </div>
+                ) : null}
             </div>
           </div>
         </CardContent>
@@ -131,5 +145,3 @@ export default function AdminChatPage() {
     </div>
   );
 }
-
-    
