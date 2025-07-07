@@ -37,10 +37,10 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
   const { isSubmitting } = form.formState;
 
   useEffect(() => {
-    const findOrCreateSession = async () => {
+    const findSession = async () => {
       if (isClientSide) {
         const chatsCollection = collection(db, 'chatSessions');
-        const q = query(chatsCollection, where('userId', '==', userId), where('status', '==', 'active'));
+        const q = query(chatsCollection, where('userId', '==', userId));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setSessionId(querySnapshot.docs[0].id);
@@ -51,7 +51,7 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
          setSessionId(selectedSessionId || null);
       }
     };
-    findOrCreateSession();
+    findSession();
   }, [userId, isClientSide, selectedSessionId]);
   
   useEffect(() => {
@@ -69,10 +69,11 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       const msgs = querySnapshot.docs.map(doc => {
           const data = doc.data();
+          const createdAt = (data.createdAt as Timestamp)?.toDate();
           return {
             id: doc.id,
             ...data,
-            createdAt: (data.createdAt as Timestamp)?.toDate() ? (data.createdAt as Timestamp).toDate().toLocaleTimeString() : 'Sending...'
+            createdAt: createdAt ? createdAt.toLocaleTimeString() : 'Sending...'
           } as unknown as ChatMessage;
         });
       setMessages(msgs);
@@ -86,7 +87,7 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
         } else if (!isClientSide && sessionDoc.data().adminUnread) {
            batch.update(sessionRef, { adminUnread: false });
         }
-        await batch.commit();
+        await batch.commit().catch(console.error);
       }
 
     }, (error) => {
@@ -200,5 +201,3 @@ export default function ChatInterface({ userId, isClientSide, selectedSessionId 
     </div>
   );
 }
-
-    

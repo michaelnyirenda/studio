@@ -1,9 +1,8 @@
 
 'use server';
 
-import { collection, addDoc, serverTimestamp, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, updateDoc, doc, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { sendChatMessage } from '@/ai/flows/chat-flow';
 import { z } from 'zod';
 import { ChatMessageSchema } from '@/lib/schemas';
 
@@ -33,7 +32,7 @@ async function getOrCreateChatSession(): Promise<string> {
 
 export async function sendMessageAction(
   values: z.infer<typeof ChatMessageSchema>
-): Promise<{ success: boolean; message: string; }> {
+): Promise<{ success: boolean; message: string; sessionId?: string; }> {
   const validation = ChatMessageSchema.safeParse(values);
   if (!validation.success) {
       return { success: false, message: "Invalid message format." };
@@ -46,6 +45,8 @@ export async function sendMessageAction(
     const sessionRef = doc(db, 'chatSessions', sessionId);
     const messagesCollection = collection(sessionRef, 'messages');
 
+    const batch = writeBatch(db);
+
     // 1. Add user's message
     const userMessage = {
         text: message,
@@ -53,37 +54,22 @@ export async function sendMessageAction(
         senderId: MOCK_CURRENT_USER_ID,
         senderType: 'user' as const,
     };
-    await addDoc(messagesCollection, userMessage);
-    await updateDoc(sessionRef, {
+    // Use `addDoc` semantics within a batch by creating a new doc reference
+    batch.set(doc(messagesCollection), userMessage);
+    
+    // 2. Update the session document
+    batch.update(sessionRef, {
         lastMessageText: message,
         lastMessageAt: serverTimestamp(),
-        adminUnread: true,
+        adminUnread: true, // Mark as unread for the admin
+        userUnread: false, // User has just sent it, so it's not unread for them
     });
-    
-    // 2. Get AI response
-    const aiResponse = await sendChatMessage({ userMessage: message });
-    
-    // 3. Add AI's message
-    if (aiResponse?.aiResponse) {
-        const aiMessage = {
-            text: aiResponse.aiResponse,
-            createdAt: serverTimestamp(),
-            senderId: 'ai-assistant',
-            senderType: 'ai' as const,
-        };
-        await addDoc(messagesCollection, aiMessage);
-         await updateDoc(sessionRef, {
-            lastMessageText: aiResponse.aiResponse,
-            lastMessageAt: serverTimestamp(),
-            userUnread: true, // User has not seen this new AI message
-        });
-    }
 
-    return { success: true, message: "Message sent." };
+    await batch.commit();
+
+    return { success: true, message: "Message sent.", sessionId };
   } catch (error) {
     console.error("Error sending message:", error);
     return { success: false, message: "Failed to send message." };
   }
 }
-
-    
