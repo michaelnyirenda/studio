@@ -125,12 +125,12 @@ export default function ReferralsList() {
           // Start the disappearance timer
           setTimeout(() => {
             setActiveReferral(prev => prev ? { ...prev, isDisappearing: true } : null);
-          }, 15000);
+          }, 10000); // 10s wait
 
           // Remove from state after animation
           setTimeout(() => {
             setActiveReferral(null);
-          }, 15500); // 15s wait + 0.5s animation
+          }, 10500); // 10s wait + 0.5s animation
         }
 
       } catch (e) {
@@ -171,12 +171,12 @@ export default function ReferralsList() {
       setConsentedReferrals(prev =>
         prev.map(r => r.id === referralId ? { ...r, isDisappearing: true } : r)
       );
-    }, 15000); // Wait 15 seconds before starting fade out
+    }, 10000); // Wait 10 seconds before starting fade out
 
     // 4. Remove card from DOM after animation
     setTimeout(() => {
         setConsentedReferrals(prev => prev.filter(r => r.id !== referralId));
-    }, 15500); // 15s wait + 0.5s animation
+    }, 10500); // 10s wait + 0.5s animation
   };
 
   const handleSearchReferral = async (e: React.FormEvent) => {
