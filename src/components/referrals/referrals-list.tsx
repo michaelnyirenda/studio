@@ -139,12 +139,12 @@ export default function ReferralsList() {
       setConsentedReferrals(prev =>
         prev.map(r => r.id === referralId ? { ...r, isDisappearing: true } : r)
       );
-    }, 4000); // Wait 4 seconds before starting fade out
+    }, 15000); // Wait 15 seconds before starting fade out
 
     // 4. Remove card from DOM after animation
     setTimeout(() => {
         setConsentedReferrals(prev => prev.filter(r => r.id !== referralId));
-    }, 4500); // 4s wait + 0.5s animation
+    }, 15500); // 15s wait + 0.5s animation
   };
   
   const fullLocation = (referral: ClientReferral) => {
