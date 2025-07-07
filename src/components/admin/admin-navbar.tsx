@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   BarChart3,
   ClipboardList,
@@ -31,6 +31,12 @@ const navItems = [
 
 export default function AdminNavbar() {
     const pathname = usePathname();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('isAdminLoggedIn');
+        router.push('/admin/login');
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -115,11 +121,9 @@ export default function AdminNavbar() {
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                 <Link href="/admin/login">
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Log out</span>
-                                 </Link>
+                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -128,5 +132,3 @@ export default function AdminNavbar() {
         </header>
     );
 }
-
-    

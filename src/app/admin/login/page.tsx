@@ -27,7 +27,8 @@ export default function AdminLoginPage() {
     setTimeout(() => {
       if (email === 'admin@ibreakfree.com' && password === 'password') {
         toast({ title: 'Success', description: 'Logged in successfully.' });
-        // In a real app, you'd set a session cookie or token here.
+        // Set a flag in session storage to indicate login
+        sessionStorage.setItem('isAdminLoggedIn', 'true');
         router.push('/admin/dashboard');
       } else {
         setError('Invalid email or password.');
