@@ -1,5 +1,4 @@
 "use client";
-
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,8 +6,8 @@ import type { Referral } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import ReferralConsentForm from '@/components/referrals/referral-consent-form';
-import { useEffect, useState, useMemo } from 'react';
-import { FileText, Mail, MessageSquare, CalendarClock } from 'lucide-react';
+import { useEffect, useState, useMemo, Suspense } from 'react';
+import { FileText, Mail, MessageSquare, CalendarClock, Loader2 } from 'lucide-react';
 import { collection, query, where, onSnapshot, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useSearchParams } from 'next/navigation';
@@ -38,7 +37,7 @@ function getStatusVariant(status: Referral['status']): 'default' | 'secondary' |
   }
 }
 
-export default function ReferralsPage() {
+function ReferralsComponent() {
   const searchParams = useSearchParams();
   const pendingIdFromUrl = searchParams.get('pendingId');
 
@@ -128,7 +127,9 @@ export default function ReferralsPage() {
       )}
 
       {loading ? (
-        <div className="mt-8 text-center">Loading referrals...</div>
+        <div className="flex justify-center items-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
       ) : displayReferrals.length === 0 && !pendingUserReferral ? (
         <div className="mt-8 text-center flex flex-col items-center justify-center rounded-2xl bg-card p-12">
           <FileText className="h-16 w-16 text-muted-foreground mb-4" />
@@ -194,4 +195,17 @@ export default function ReferralsPage() {
       )}
     </div>
   );
+}
+
+
+export default function ReferralsPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center py-20">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+        }>
+            <ReferralsComponent />
+        </Suspense>
+    )
 }
