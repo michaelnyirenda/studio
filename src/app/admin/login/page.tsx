@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
     // Placeholder for actual authentication logic.
     // In a real application, you would use Firebase Auth or another service.
     setTimeout(() => {
-      if (email === 'admin@edunexus.com' && password === 'password') {
+      if (email === 'admin@ibreakfree.com' && password === 'password') {
         toast({ title: 'Success', description: 'Logged in successfully.' });
         // In a real app, you'd set a session cookie or token here.
         router.push('/admin/dashboard');
@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@edunexus.com"
+                placeholder="admin@ibreakfree.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
           </form>
            <div className="mt-4 text-center text-xs text-muted-foreground">
               <p>This is a placeholder login for demonstration.</p>
-              <p>Use <strong>admin@edunexus.com</strong> and <strong>password</strong>.</p>
+              <p>Use <strong>admin@ibreakfree.com</strong> and <strong>password</strong>.</p>
             </div>
         </CardContent>
       </Card>

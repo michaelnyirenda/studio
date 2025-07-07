@@ -94,7 +94,7 @@ export default function AdminNavbar() {
                                 </Avatar>
                                 <div className="hidden md:flex flex-col items-start leading-tight">
                                     <span className="text-sm font-medium">Admin User</span>
-                                    <span className="text-xs text-muted-foreground">admin@edunexus.com</span>
+                                    <span className="text-xs text-muted-foreground">admin@ibreakfree.com</span>
                                 </div>
                                 <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
                             </Button>
@@ -104,7 +104,7 @@ export default function AdminNavbar() {
                                 <div className="flex flex-col space-y-1">
                                     <p className="text-sm font-medium leading-none">Admin User</p>
                                     <p className="text-xs leading-none text-muted-foreground">
-                                    admin@edunexus.com
+                                    admin@ibreakfree.com
                                     </p>
                                 </div>
                             </DropdownMenuLabel>
