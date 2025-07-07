@@ -32,17 +32,19 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-center transition-colors focus:outline-none focus-visible:bg-accent/50"
+              // Adjust padding to be more compact on smaller screens
+              className="flex flex-1 flex-col items-center justify-center gap-1 px-1 py-2 text-center transition-colors focus:outline-none focus-visible:bg-accent/50"
             >
               <div
                 className={cn(
-                  "flex h-8 w-16 items-center justify-center rounded-full transition-all duration-300",
+                  // Use padding for flexible width instead of a fixed width
+                  "flex h-8 items-center justify-center rounded-full px-4 transition-all duration-300",
                   isActive ? "bg-secondary" : ""
                 )}
               >
                 {React.cloneElement(item.icon, {
                   className: cn(
-                    "h-6 w-6 transition-colors",
+                    "h-6 w-6 shrink-0 transition-colors",
                     isActive ? "text-primary" : "text-muted-foreground"
                   ),
                 })}
@@ -60,5 +62,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
-    
