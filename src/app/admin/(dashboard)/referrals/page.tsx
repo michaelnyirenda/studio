@@ -1,3 +1,4 @@
+
 "use client";
 
 import PageHeader from '@/components/shared/page-header';
@@ -8,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import UpdateReferralDialog from '@/components/referrals/update-referral-dialog';
 import { useEffect, useState } from 'react';
-import { FileText, Trash2, Mail, MessageSquare, CalendarClock } from 'lucide-react';
+import { FileText, Trash2, Mail, MessageSquare, CalendarClock, Download, Loader2 } from 'lucide-react';
 import { collection, query, where, onSnapshot, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
@@ -21,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { deleteReferralAction } from '@/app/referrals/actions';
+import { deleteReferralAction, downloadReferralPdfAction } from '@/app/referrals/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -52,6 +53,7 @@ export default function AdminReferralsPage() {
   const [referrals, setReferrals] = useState<ClientReferral[]>([]);
   const [loading, setLoading] = useState(true);
   const [referralToDelete, setReferralToDelete] = useState<ClientReferral | null>(null);
+  const [loadingReferralId, setLoadingReferralId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -90,6 +92,37 @@ export default function AdminReferralsPage() {
       toast({ title: "Error", description: result.message, variant: "destructive" });
     }
     setReferralToDelete(null);
+  };
+  
+  const handleDownload = async (referral: ClientReferral) => {
+    setLoadingReferralId(referral.id);
+    const result = await downloadReferralPdfAction(referral.id);
+    if (result.success && result.pdfData) {
+      try {
+        const byteCharacters = atob(result.pdfData);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `Referral_${referral.patientName.replace(/\s+/g, '_')}_${referral.id.slice(0,5)}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        toast({ title: "Success", description: "PDF download started." });
+      } catch (e) {
+         toast({ title: "Error", description: "Failed to process PDF for download.", variant: "destructive" });
+      }
+    } else {
+      toast({ title: "Error", description: result.message || "Failed to generate PDF.", variant: "destructive" });
+    }
+    setLoadingReferralId(null);
   };
 
   const fullLocation = (referral: ClientReferral) => {
@@ -162,6 +195,16 @@ export default function AdminReferralsPage() {
                   <CardFooter className="flex justify-between items-center pt-4 mt-auto">
                     <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
                     <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-accent border-accent hover:bg-accent/10 h-9 w-9"
+                          onClick={() => handleDownload(referral)}
+                          disabled={loadingReferralId === referral.id}
+                        >
+                          <span className="sr-only">Download</span>
+                          {loadingReferralId === referral.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                        </Button>
                         <UpdateReferralDialog referral={referral} />
                         <Button variant="outline" size="icon" className="text-destructive border-destructive hover:bg-destructive/10 h-9 w-9" onClick={() => setReferralToDelete(referral)}>
                             <span className="sr-only">Delete</span>

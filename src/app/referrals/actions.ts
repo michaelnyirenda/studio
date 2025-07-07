@@ -6,6 +6,8 @@ import { db } from '@/lib/firebase';
 import type { ReferralConsentFormData } from '@/lib/schemas';
 import { ReferralConsentSchema } from '@/lib/schemas';
 import type * as z from 'zod';
+import { generateReferralPdf } from '@/services/pdf-service';
+import type { Referral } from '@/lib/types';
 
 export async function submitReferralConsentAction(
   referralId: string,
@@ -66,5 +68,28 @@ export async function deleteReferralAction(
   } catch (error) {
     console.error("Error deleting referral:", error);
     return { success: false, message: "An error occurred while deleting the referral." };
+  }
+}
+
+export async function downloadReferralPdfAction(
+  referralId: string
+): Promise<{ success: boolean; pdfData?: string; message?: string }> {
+  try {
+    const referralRef = doc(db, 'referrals', referralId);
+    const referralSnap = await getDoc(referralRef);
+
+    if (!referralSnap.exists()) {
+      return { success: false, message: "Referral not found." };
+    }
+
+    const referralData = { id: referralSnap.id, ...referralSnap.data() } as Referral;
+    const pdfBytes = await generateReferralPdf(referralData);
+    const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
+
+    return { success: true, pdfData: pdfBase64 };
+
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    return { success: false, message: "An error occurred while generating the PDF." };
   }
 }
