@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -375,7 +376,7 @@ export default function DataExportPage() {
       
       <Card className="w-full max-w-2xl mx-auto shadow-xl mt-8">
         <CardHeader>
-          <CardTitle className="text-xl font-medium text-primary flex items-center">
+          <CardTitle className="text-xl font-bold text-primary flex items-center">
             <Download className="mr-2 h-6 w-6" /> Configure Your Export
           </CardTitle>
           <CardDescription>Select the data, date range, and format for your report.</CardDescription>

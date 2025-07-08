@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -42,7 +43,7 @@ export default function UserManagementPage() {
       
       <Card className="shadow-xl mt-8">
         <CardHeader>
-          <CardTitle className="text-xl font-medium text-primary flex items-center justify-between">
+          <CardTitle className="text-xl font-bold text-primary flex items-center justify-between">
             <span>User List</span>
             <Button>
               <UserPlus className="mr-2 h-5 w-5" /> Add New User

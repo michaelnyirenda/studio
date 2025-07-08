@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -32,7 +33,7 @@ export default function ChatStatsCard() {
     return (
       <Card className="shadow-lg h-full flex flex-col">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xl font-medium text-primary">Live Chat</CardTitle>
+            <CardTitle className="text-xl font-bold text-primary">Live Chat</CardTitle>
             <div className="p-3 bg-secondary rounded-xl">
                 <MessageSquare className="h-6 w-6 text-primary" />
             </div>
@@ -56,7 +57,7 @@ export default function ChatStatsCard() {
           </Badge>
         )}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xl font-medium text-primary">Live Chat</CardTitle>
+          <CardTitle className="text-xl font-bold text-primary">Live Chat</CardTitle>
            <div className="p-3 bg-secondary rounded-xl">
             <MessageSquare className="h-6 w-6 text-primary" />
           </div>

@@ -55,7 +55,7 @@ export default function ScreeningStatsCard() {
     return (
         <Card className="shadow-lg h-full flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xl font-medium text-primary">Screening Data</CardTitle>
+                <CardTitle className="text-xl font-bold text-primary">Screening Data</CardTitle>
                  <div className="p-3 bg-secondary rounded-xl">
                     <BarChart3 className="h-6 w-6 text-primary" />
                 </div>
@@ -79,7 +79,7 @@ export default function ScreeningStatsCard() {
   return (
     <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col bg-card hover:-translate-y-1.5 group">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-medium text-primary">Screening Data</CardTitle>
+        <CardTitle className="text-xl font-bold text-primary">Screening Data</CardTitle>
         <div className="p-3 bg-secondary rounded-xl">
           <BarChart3 className="h-6 w-6 text-primary" />
         </div>

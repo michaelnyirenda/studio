@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -198,7 +199,7 @@ export default function ScreeningDataPage() {
         <TabsContent value="overall_summary">
           <Card className="shadow-lg mb-6">
             <CardHeader>
-              <CardTitle className="text-xl font-medium text-primary flex items-center">
+              <CardTitle className="text-xl font-bold text-primary flex items-center">
                 <LucideBarChart className="mr-2 h-6 w-6" /> Screening Trends
               </CardTitle>
               <CardDescription>Monthly screening counts across all categories.</CardDescription>
@@ -225,7 +226,7 @@ export default function ScreeningDataPage() {
           
            <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="text-xl font-medium text-primary">Screening Data Table</CardTitle>
+              <CardTitle className="text-xl font-bold text-primary">Screening Data Table</CardTitle>
               <CardDescription>Browse and filter individual screening records.</CardDescription>
             </CardHeader>
             <CardContent>

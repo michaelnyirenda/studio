@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -22,7 +23,7 @@ function AdminFeatureLinkCard({ title, description, link, icon }: AdminFeatureCa
     <Link href={link} passHref className="block h-full group">
       <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col bg-card hover:-translate-y-1.5">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xl font-medium text-primary">{title}</CardTitle>
+          <CardTitle className="text-xl font-bold text-primary">{title}</CardTitle>
           <div className="p-3 bg-secondary rounded-xl">
             {React.cloneElement(icon as React.ReactElement, { className: "h-6 w-6 text-primary" })}
           </div>
