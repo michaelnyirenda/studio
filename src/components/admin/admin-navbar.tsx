@@ -121,12 +121,12 @@ export default function AdminNavbar() {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild className="cursor-pointer py-4 text-xl">
-                                <Link href="/admin/user-management" className="flex items-center">
+                                <Link href="/admin/user-management" className="flex items-center font-semibold">
                                     <UserCog className="mr-4 h-6 w-6" />
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer py-4 text-xl text-destructive focus:bg-destructive/10 focus:text-destructive flex items-center">
+                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer py-4 text-xl text-destructive focus:bg-destructive/10 focus:text-destructive flex items-center font-semibold">
                                 <LogOut className="mr-4 h-6 w-6" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
