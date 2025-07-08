@@ -74,12 +74,17 @@ export default function ReferralsList() {
             const referralSnap = await getDoc(referralRef);
             if (referralSnap.exists()) {
                 const data = referralSnap.data();
-                setActiveReferral({
-                    id: referralSnap.id,
-                    ...data,
-                    referralDate: (data.referralDate as Timestamp)?.toDate().toLocaleDateString() || 'N/A',
-                    appointmentDateTime: data.appointmentDateTime,
-                } as ClientReferral);
+                if (data.consentStatus === 'pending') {
+                  setActiveReferral({
+                      id: referralSnap.id,
+                      ...data,
+                      referralDate: (data.referralDate as Timestamp)?.toDate().toLocaleDateString() || 'N/A',
+                      appointmentDateTime: data.appointmentDateTime,
+                  } as ClientReferral);
+                } else {
+                  toast({ title: "Already Consented", description: "This referral has already been consented to. You can find it by searching its ID.", variant: "default" });
+                  router.replace('/referrals', { scroll: false });
+                }
             } else {
                 toast({ title: "Not Found", description: "The referral ID in the URL was not found.", variant: "destructive" });
                 router.replace('/referrals', { scroll: false });
@@ -122,17 +127,24 @@ export default function ReferralsList() {
 
         // Check if the downloaded referral is the active (searched) one.
         if (activeReferral && activeReferral.id === referral.id) {
-          // Start the disappearance timer
           setTimeout(() => {
             setActiveReferral(prev => prev ? { ...prev, isDisappearing: true } : null);
-          }, 10000); // 10s wait
-
-          // Remove from state after animation
+          }, 10000);
           setTimeout(() => {
             setActiveReferral(null);
-          }, 10500); // 10s wait + 0.5s animation
+          }, 10500);
         }
-
+        
+        // Check if it's from the consented list and handle its disappearance.
+        const isFromConsentedList = consentedReferrals.some(r => r.id === referral.id);
+        if (isFromConsentedList) {
+            setTimeout(() => {
+                setConsentedReferrals(prev => prev.map(r => (r.id === referral.id ? { ...r, isDisappearing: true } : r)));
+            }, 10000);
+            setTimeout(() => {
+                setConsentedReferrals(prev => prev.filter(r => r.id !== referral.id));
+            }, 10500);
+        }
       } catch (e) {
          toast({ title: "Error", description: "Failed to process PDF for download.", variant: "destructive" });
       }
@@ -145,10 +157,6 @@ export default function ReferralsList() {
   const handleConsentSubmit = async (referralId: string, data: ReferralConsentFormData) => {
     if (!activeReferral) return;
     
-    // 1. Download PDF
-    await handleDownload(activeReferral);
-
-    // 2. Update local state
     const newlyConsentedReferral: ClientReferral = {
       ...activeReferral,
       consentStatus: 'agreed',
@@ -164,19 +172,6 @@ export default function ReferralsList() {
     if (searchParams.get('pendingId')) {
         router.replace('/referrals', { scroll: false });
     }
-
-
-    // 3. Set timer to hide the card
-    setTimeout(() => {
-      setConsentedReferrals(prev =>
-        prev.map(r => r.id === referralId ? { ...r, isDisappearing: true } : r)
-      );
-    }, 10000); // Wait 10 seconds before starting fade out
-
-    // 4. Remove card from DOM after animation
-    setTimeout(() => {
-        setConsentedReferrals(prev => prev.filter(r => r.id !== referralId));
-    }, 10500); // 10s wait + 0.5s animation
   };
 
   const handleSearchReferral = async (e: React.FormEvent) => {
@@ -216,6 +211,66 @@ export default function ReferralsList() {
   const fullLocation = (referral: ClientReferral) => {
     return [referral.region, referral.constituency, referral.facility].filter(Boolean).join(', ');
   }
+
+  const renderReferralCard = (referral: ClientReferral, isSearchedResult: boolean) => (
+       <Card
+          key={referral.id}
+          className={cn(
+              "shadow-lg transition-all duration-500 ease-in-out flex flex-col bg-card",
+              isSearchedResult && "border-2 border-primary",
+              referral.isDisappearing && "animate-fade-out-up"
+          )}
+      >
+          <CardHeader>
+              <div className="flex justify-between items-start">
+                  <CardTitle className="font-headline text-2xl text-primary">{isSearchedResult ? 'Referral Details' : 'Your Consented Referral'}</CardTitle>
+                  <Badge variant={getStatusVariant(referral.status)} className="ml-2 whitespace-nowrap text-xs">
+                      {referral.status}
+                  </Badge>
+              </div>
+              <CardDescription className="text-sm text-muted-foreground pt-1 flex justify-between items-center flex-wrap gap-2">
+                  <span>Referred on: {referral.referralDate}</span>
+                   {referral.contactMethod && (
+                      <span className="flex items-center gap-1 text-xs font-medium">
+                          {referral.contactMethod === 'email' ? <Mail className="h-3 w-3 text-blue-600" /> : <MessageSquare className="h-3 w-3 text-green-600" />}
+                          Contact via {referral.contactMethod === 'email' ? 'Email' : 'WhatsApp'}
+                      </span>
+                  )}
+                  {referral.appointmentDateTime && (
+                    <span className="flex items-center gap-1 text-xs font-medium text-accent">
+                      <CalendarClock className="h-3 w-3" />
+                      Appt: {format(referral.appointmentDateTime.toDate(), "PPp")}
+                    </span>
+                  )}
+              </CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow">
+              <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
+              <p className="text-sm text-accent font-medium mb-3">{fullLocation(referral) || 'N/A'}</p>
+
+              {referral.services && referral.services.length > 0 && (
+                  <div className="mb-3">
+                      <p className="text-sm font-semibold text-card-foreground/90 mb-1">Services Referred For:</p>
+                      <p className="text-sm text-muted-foreground">{referral.services.join(', ')}</p>
+                  </div>
+              )}
+              
+              <Alert className="mt-4">
+                  <AlertTitle>Your Referral PDF</AlertTitle>
+                  <AlertDescription>
+                      Click the download button to save your referral PDF. For your privacy, this card will disappear 10 seconds after downloading.
+                  </AlertDescription>
+              </Alert>
+          </CardContent>
+           <CardFooter className="flex justify-between items-center pt-4 mt-auto">
+              <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
+              <Button variant="outline" size="sm" onClick={() => handleDownload(referral)} disabled={loadingReferralId === referral.id}>
+                  {loadingReferralId === referral.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+                  Download PDF
+              </Button>
+          </CardFooter>
+      </Card>
+  );
 
   if (loading) {
     return (
@@ -259,118 +314,15 @@ export default function ReferralsList() {
                 onConsentSubmit={handleConsentSubmit}
               />
           ) : (
-            <Card
-                key={activeReferral.id}
-                className={cn(
-                    "shadow-lg transition-all duration-300 ease-in-out flex flex-col bg-card border-primary",
-                    activeReferral.isDisappearing && "animate-fade-out-up"
-                )}
-            >
-                <CardHeader>
-                    <div className="flex justify-between items-start">
-                        <CardTitle className="font-headline text-2xl text-primary">Referral Details</CardTitle>
-                        <Badge variant={getStatusVariant(activeReferral.status)} className="ml-2 whitespace-nowrap text-xs">
-                            {activeReferral.status}
-                        </Badge>
-                    </div>
-                    <CardDescription className="text-sm text-muted-foreground pt-1 flex justify-between items-center flex-wrap gap-2">
-                        <span>Referred on: {activeReferral.referralDate}</span>
-                         {activeReferral.contactMethod && (
-                            <span className="flex items-center gap-1 text-xs font-medium">
-                                {activeReferral.contactMethod === 'email' ? <Mail className="h-3 w-3 text-blue-600" /> : <MessageSquare className="h-3 w-3 text-green-600" />}
-                                Contact via {activeReferral.contactMethod === 'email' ? 'Email' : 'WhatsApp'}
-                            </span>
-                        )}
-                        {activeReferral.appointmentDateTime && (
-                          <span className="flex items-center gap-1 text-xs font-medium text-accent">
-                            <CalendarClock className="h-3 w-3" />
-                            Appt: {format(activeReferral.appointmentDateTime.toDate(), "PPp")}
-                          </span>
-                        )}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
-                    <p className="text-sm text-accent font-medium mb-3">{fullLocation(activeReferral) || 'N/A'}</p>
-
-                    {activeReferral.services && activeReferral.services.length > 0 && (
-                        <div className="mb-3">
-                            <p className="text-sm font-semibold text-card-foreground/90 mb-1">Services Referred For:</p>
-                            <p className="text-sm text-muted-foreground">{activeReferral.services.join(', ')}</p>
-                        </div>
-                    )}
-                    
-                    <Alert className="mt-4">
-                        <AlertTitle>Your Referral Details</AlertTitle>
-                        <AlertDescription>
-                            Click "Download Again" to save another copy of your referral PDF. This card will disappear shortly for your privacy.
-                        </AlertDescription>
-                    </Alert>
-                </CardContent>
-                 <CardFooter className="flex justify-between items-center pt-4 mt-auto">
-                    <p className="text-xs text-muted-foreground">ID: {activeReferral.id}</p>
-                    <Button variant="outline" size="sm" onClick={() => handleDownload(activeReferral)} disabled={loadingReferralId === activeReferral.id}>
-                        {loadingReferralId === activeReferral.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-                        Download Again
-                    </Button>
-                </CardFooter>
-            </Card>
+            renderReferralCard(activeReferral, true)
           )}
         </div>
       )}
 
       {consentedReferrals.length > 0 && (
         <div className="space-y-6">
-          {consentedReferrals.map((referral) => (
-             <Card 
-                key={referral.id} 
-                className={cn(
-                    "shadow-lg transition-all duration-300 ease-in-out flex flex-col bg-card",
-                    referral.isDisappearing && "animate-fade-out-up"
-                )}
-            >
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="font-headline text-2xl text-primary">Your Consented Referral</CardTitle>
-                  <Badge variant={getStatusVariant(referral.status)} className="ml-2 whitespace-nowrap text-xs">
-                    {referral.status}
-                  </Badge>
-                </div>
-                 <CardDescription className="text-sm text-muted-foreground pt-1 flex justify-between items-center flex-wrap gap-2">
-                    <span>Referred on: {referral.referralDate}</span>
-                    {referral.contactMethod && (
-                        <span className="flex items-center gap-1 text-xs font-medium">
-                            {referral.contactMethod === 'email' ? <Mail className="h-3 w-3 text-blue-600" /> : <MessageSquare className="h-3 w-3 text-green-600" />}
-                            Contact via {referral.contactMethod === 'email' ? 'Email' : 'WhatsApp'}
-                        </span>
-                    )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm font-semibold text-card-foreground/90 mb-1">Referred to:</p>
-                <p className="text-sm text-accent font-medium mb-3">{fullLocation(referral) || 'N/A'}</p>
-                 {referral.services && referral.services.length > 0 && (
-                    <div className="mb-3">
-                        <p className="text-sm font-semibold text-card-foreground/90 mb-1">Services Referred For:</p>
-                        <p className="text-sm text-muted-foreground">{referral.services.join(', ')}</p>
-                    </div>
-                )}
-                 <Alert className="mt-4">
-                    <AlertTitle>Next Steps</AlertTitle>
-                    <AlertDescription>
-                        This card will disappear shortly. A PDF of your referral has been downloaded to your device for your records.
-                    </AlertDescription>
-                </Alert>
-              </CardContent>
-              <CardFooter className="flex justify-between items-center pt-4 mt-auto">
-                <p className="text-xs text-muted-foreground">ID: {referral.id}</p>
-                <Button variant="outline" size="sm" onClick={() => handleDownload(referral)} disabled={loadingReferralId === referral.id}>
-                    {loadingReferralId === referral.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-                    Download Again
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+          <h2 className="text-xl font-semibold text-primary pl-1">Ready for Download</h2>
+          {consentedReferrals.map((referral) => renderReferralCard(referral, false))}
         </div>
       )}
 
