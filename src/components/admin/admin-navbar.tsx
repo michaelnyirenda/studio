@@ -48,7 +48,7 @@ export default function AdminNavbar() {
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="w-12 rounded-lg">
+                                <Button variant="outline" size="icon" className="w-12 rounded-lg border-2 border-destructive">
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">Open navigation menu</span>
                                 </Button>
@@ -61,7 +61,7 @@ export default function AdminNavbar() {
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
                                     <DropdownMenuItem key={item.href} asChild className="w-full py-2 text-sm">
-                                        <Link href={item.href} className="flex items-center text-primary font-semibold">
+                                        <Link href={item.href} className="flex items-center font-semibold text-primary">
                                             <item.icon className="mr-3 h-4 w-4" />
                                             <span>{item.label}</span>
                                         </Link>
@@ -80,10 +80,10 @@ export default function AdminNavbar() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors border',
+                                        'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors border-2',
                                         isActive
                                             ? 'bg-secondary text-primary font-bold border-primary/20'
-                                            : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-border'
+                                            : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-primary/20'
                                     )}
                                 >
                                     <item.icon className="h-5 w-5" />
@@ -98,7 +98,7 @@ export default function AdminNavbar() {
                 <div className="flex items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full">
+                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full border-2 border-destructive">
                                <Avatar className="h-9 w-9">
                                     <AvatarFallback>AD</AvatarFallback>
                                 </Avatar>
@@ -119,14 +119,14 @@ export default function AdminNavbar() {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild className="w-full py-2 text-sm">
-                                <Link href="/admin/user-management" className="cursor-pointer flex items-center font-semibold">
-                                    <UserCog className="mr-3 h-4 w-4" />
+                            <DropdownMenuItem asChild className="w-full py-2.5 text-base">
+                                <Link href="/admin/user-management" className="cursor-pointer flex items-center font-bold">
+                                    <UserCog className="mr-3 h-5 w-5" />
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout} className="w-full py-2 text-sm text-destructive focus:text-destructive cursor-pointer flex items-center font-semibold">
-                                <LogOut className="mr-3 h-4 w-4" />
+                            <DropdownMenuItem onClick={handleLogout} className="w-full py-2.5 text-base text-destructive focus:text-destructive cursor-pointer flex items-center font-bold">
+                                <LogOut className="mr-3 h-5 w-5" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
