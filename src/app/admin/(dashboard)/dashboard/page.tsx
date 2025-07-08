@@ -7,6 +7,7 @@ import * as React from 'react';
 import ReferralStatsCard from '@/components/admin/dashboard/referral-stats-card';
 import ScreeningStatsCard from '@/components/admin/dashboard/screening-stats-card';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import ChatStatsCard from '@/components/admin/dashboard/chat-stats-card';
 
 interface AdminFeatureCardProps {
   title: string;
@@ -56,7 +57,8 @@ export default function AdminDashboardPage() {
           <ReferralStatsCard />
         </div>
 
-        <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 pt-2 md:grid-cols-2">
+          <ChatStatsCard />
           <AdminFeatureLinkCard
             title="Data Export"
             description="Generate and download reports for screenings, referrals, and other data."
