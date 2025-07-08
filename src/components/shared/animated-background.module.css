@@ -1,13 +1,4 @@
 
-@keyframes drift {
-  from {
-    transform: translateX(0) translateY(calc(var(--scroll-y, 0px) * var(--parallax-speed, 0)));
-  }
-  to {
-    transform: translateX(-50%) translateY(calc(var(--scroll-y, 0px) * var(--parallax-speed, 0)));
-  }
-}
-
 .waveContainer {
   position: fixed;
   inset: 0;
@@ -21,37 +12,31 @@
 .wave3,
 .wave4 {
   position: absolute;
-  left: -50%;
+  left: 0;
   bottom: 0;
-  width: 200vw;
+  width: 100vw;
   height: auto;
   min-width: 1440px; 
   transition: transform 0.4s ease-out;
-  animation-name: drift;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  transform: translateY(calc(var(--scroll-y, 0px) * var(--parallax-speed, 0)));
 }
 
 .wave1 {
   fill: var(--wave-1);
   --parallax-speed: 0.4;
-  animation-duration: 35s;
 }
 
 .wave2 {
   fill: var(--wave-2);
   --parallax-speed: 0.3;
-  animation-duration: 30s;
 }
 
 .wave3 {
   fill: var(--wave-3);
   --parallax-speed: 0.2;
-  animation-duration: 25s;
 }
 
 .wave4 {
   fill: var(--wave-4);
   --parallax-speed: 0.1;
-  animation-duration: 20s;
 }
