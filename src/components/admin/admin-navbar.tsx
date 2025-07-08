@@ -81,10 +81,10 @@ export default function AdminNavbar() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors',
+                                        'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors border',
                                         isActive
-                                            ? 'bg-secondary text-primary font-bold'
-                                            : 'text-muted-foreground hover:bg-muted/50'
+                                            ? 'bg-secondary text-primary font-bold border-primary/20'
+                                            : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-border'
                                     )}
                                 >
                                     <item.icon className="h-5 w-5" />
