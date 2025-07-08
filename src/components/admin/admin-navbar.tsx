@@ -48,7 +48,7 @@ export default function AdminNavbar() {
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="w-12 rounded-lg border-2 border-primary">
+                                <Button variant="outline" size="icon" className="h-12 w-12 rounded-lg border-2 border-primary">
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">Open navigation menu</span>
                                 </Button>
