@@ -1,7 +1,10 @@
 
 .waveContainer {
   position: fixed;
-  inset: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70vh;
   z-index: -10;
   overflow: hidden;
   background-color: transparent;
@@ -17,26 +20,20 @@
   width: 100vw;
   height: auto;
   min-width: 1440px; 
-  transition: transform 0.4s ease-out;
-  transform: translateY(calc(var(--scroll-y, 0px) * var(--parallax-speed, 0)));
 }
 
 .wave1 {
   fill: var(--wave-1);
-  --parallax-speed: 0.4;
 }
 
 .wave2 {
   fill: var(--wave-2);
-  --parallax-speed: 0.3;
 }
 
 .wave3 {
   fill: var(--wave-3);
-  --parallax-speed: 0.2;
 }
 
 .wave4 {
   fill: var(--wave-4);
-  --parallax-speed: 0.1;
 }

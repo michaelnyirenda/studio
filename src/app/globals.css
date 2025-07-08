@@ -119,10 +119,4 @@ body {
   .animate-fade-out-up {
     animation: fade-out-up 0.5s ease-out forwards;
   }
-
-  .scroll-fade-out {
-    transition: opacity 0.3s ease-out;
-    /* Starts fading after 10px, fully faded at 110px */
-    opacity: calc(1 - clamp(0, var(--scroll-y, 0) - 10, 100) / 100);
-  }
 }

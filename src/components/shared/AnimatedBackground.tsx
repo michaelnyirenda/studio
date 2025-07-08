@@ -1,24 +1,9 @@
 // src/components/shared/AnimatedBackground.tsx
 'use client';
 
-import { useEffect } from 'react';
 import styles from './animated-background.module.css';
 
 const AnimatedBackground = () => {
-  useEffect(() => {
-    const handleScroll = () => {
-      // Set a CSS variable on the body for the current scroll position
-      document.body.style.setProperty('--scroll-y', `${window.scrollY}`);
-    };
-
-    // Add scroll listener and set initial value
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    // Cleanup listener on component unmount
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div className={styles.waveContainer}>
       <svg
