@@ -39,9 +39,9 @@ export default function AdminNavbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-16 items-center justify-between gap-4">
+            <div className="container flex h-16 items-center justify-between">
                 {/* Left side: Hamburger on mobile, placeholder on desktop */}
-                <div className="md:flex-1">
+                <div>
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -67,7 +67,7 @@ export default function AdminNavbar() {
                 </div>
 
                 {/* Desktop Navigation */}
-                <nav className="hidden items-center gap-4 text-sm font-medium md:flex">
+                <nav className="hidden flex-grow items-center justify-center gap-x-8 text-sm font-medium md:flex">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
                         return (
@@ -75,7 +75,7 @@ export default function AdminNavbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
+                                    'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors',
                                     isActive
                                         ? 'bg-secondary text-secondary-foreground'
                                         : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
@@ -89,7 +89,7 @@ export default function AdminNavbar() {
                 </nav>
 
                 {/* Right side: User Menu */}
-                <div className="flex flex-1 justify-end">
+                <div className="flex items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full ring-2 ring-primary">
