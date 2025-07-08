@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/shared/page-header";
-import { ArrowRight, BookOpenText, ClipboardList, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenText, ClipboardList, MessageSquare, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 
@@ -83,6 +83,15 @@ export default function Home() {
       imageAlt: "Image representing referral tracking and management",
       imageHint: "referrals tracking"
     },
+    {
+      title: "Chat with Support",
+      description: "Speak with our support staff anonymously and confidentially.",
+      link: "/chat",
+      icon: <MessageSquare />,
+      imageSrc: "https://images.unsplash.com/photo-1543269865-cbf427effbad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjaGF0fGVufDB8fHx8MTc1MDMxMjkzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      imageAlt: "People having a conversation",
+      imageHint: "conversation support"
+    }
   ];
 
   return (
@@ -92,7 +101,7 @@ export default function Home() {
           title="Welcome to #iBreakFree"
           description="Your integrated platform for education, community engagement, and health awareness."
         />
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 w-full max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 w-full max-w-5xl">
           {features.map((feature) => (
             <FeatureCard key={feature.title} {...feature} />
           ))}
