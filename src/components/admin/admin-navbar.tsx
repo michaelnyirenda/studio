@@ -58,9 +58,9 @@ export default function AdminNavbar() {
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="w-full py-2 text-base">
+                                    <DropdownMenuItem key={item.href} asChild className="w-full py-2 text-sm">
                                         <Link href={item.href} className="flex items-center text-primary font-semibold">
-                                            <item.icon className="mr-3 h-5 w-5" />
+                                            <item.icon className="mr-3 h-4 w-4" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
@@ -119,14 +119,14 @@ export default function AdminNavbar() {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/admin/user-management" className="cursor-pointer flex items-center">
-                                    <UserCog className="mr-2 h-4 w-4" />
+                            <DropdownMenuItem asChild className="w-full py-2 text-sm">
+                                <Link href="/admin/user-management" className="cursor-pointer flex items-center font-semibold">
+                                    <UserCog className="mr-3 h-4 w-4" />
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer flex items-center">
-                                <LogOut className="mr-2 h-4 w-4" />
+                            <DropdownMenuItem onClick={handleLogout} className="w-full py-2 text-sm text-destructive focus:text-destructive cursor-pointer flex items-center font-semibold">
+                                <LogOut className="mr-3 h-4 w-4" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
