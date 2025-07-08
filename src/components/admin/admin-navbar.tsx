@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -59,9 +58,9 @@ export default function AdminNavbar() {
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="w-full py-4 text-2xl">
+                                    <DropdownMenuItem key={item.href} asChild className="w-full py-2 text-base">
                                         <Link href={item.href} className="flex items-center text-primary font-semibold">
-                                            <item.icon className="mr-4 h-8 w-8" />
+                                            <item.icon className="mr-3 h-5 w-5" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
@@ -120,14 +119,14 @@ export default function AdminNavbar() {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild className="cursor-pointer py-4 text-xl">
-                                <Link href="/admin/user-management" className="flex items-center font-semibold">
-                                    <UserCog className="mr-4 h-6 w-6" />
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/user-management" className="cursor-pointer flex items-center">
+                                    <UserCog className="mr-2 h-4 w-4" />
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer py-4 text-xl text-destructive focus:bg-destructive/10 focus:text-destructive flex items-center font-semibold">
-                                <LogOut className="mr-4 h-6 w-6" />
+                            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer flex items-center">
+                                <LogOut className="mr-2 h-4 w-4" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
