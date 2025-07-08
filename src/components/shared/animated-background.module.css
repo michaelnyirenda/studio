@@ -36,4 +36,5 @@
 
 .wave4 {
   fill: var(--wave-4);
+  bottom: -10px;
 }
