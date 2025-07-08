@@ -88,7 +88,7 @@ export default function ScreeningPage() {
         title="Select Screening Type"
         description="Choose the type of screening you would like to proceed with. All screenings are confidential."
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         <ScreeningTypeCard
           title="HIV Screening"
           description="Assess your risk for HIV and receive guidance on next steps. Confidential and informative."

@@ -69,7 +69,7 @@ export default function ForumPage() {
         description="Browse discussions, share insights, and connect with others."
       />
       
-      <div className="grid gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {loading ? (
            Array.from({ length: 3 }).map((_, index) => (
             <Card key={index} className="shadow-lg overflow-hidden flex flex-col">
