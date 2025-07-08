@@ -101,7 +101,7 @@ export default function Home() {
           title={<>Welcome to <span className="font-cursive text-5xl">#iBreakFree</span></>}
           description="Your integrated platform for education, community engagement, and health awareness."
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
+        <div className="mt-[10px] grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
           {features.map((feature) => (
             <FeatureCard key={feature.title} {...feature} />
           ))}
