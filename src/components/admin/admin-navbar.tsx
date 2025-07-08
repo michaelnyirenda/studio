@@ -17,7 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 
 const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -39,9 +39,9 @@ export default function AdminNavbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-16 items-center justify-between">
-                <div className="flex items-center gap-4">
-                    {/* Mobile Navigation */}
+            <div className="container flex h-16 items-center justify-between gap-4">
+                {/* Left side: Hamburger on mobile, placeholder on desktop */}
+                <div className="md:flex-1">
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -64,32 +64,32 @@ export default function AdminNavbar() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-
-                    {/* Desktop Navigation */}
-                    <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
-                        {navItems.map((item) => {
-                            const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={cn(
-                                        'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
-                                        isActive
-                                            ? 'bg-secondary text-secondary-foreground'
-                                            : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
-                                    )}
-                                >
-                                    <item.icon className="h-5 w-5" />
-                                    <span>{item.label}</span>
-                                </Link>
-                            )
-                        })}
-                    </nav>
                 </div>
-                
-                {/* User Menu */}
-                <div className="flex items-center">
+
+                {/* Desktop Navigation */}
+                <nav className="hidden items-center gap-4 text-sm font-medium md:flex">
+                    {navItems.map((item) => {
+                        const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
+                                    isActive
+                                        ? 'bg-secondary text-secondary-foreground'
+                                        : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+                                )}
+                            >
+                                <item.icon className="h-5 w-5" />
+                                <span>{item.label}</span>
+                            </Link>
+                        )
+                    })}
+                </nav>
+
+                {/* Right side: User Menu */}
+                <div className="flex flex-1 justify-end">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full ring-2 ring-primary">
