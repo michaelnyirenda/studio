@@ -58,9 +58,9 @@ export default function AdminNavbar() {
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="px-8 py-5 text-2xl">
+                                    <DropdownMenuItem key={item.href} asChild className="px-8 py-4 text-2xl">
                                         <Link href={item.href} className="text-primary font-semibold">
-                                            <item.icon className="mr-6 h-12 w-12" />
+                                            <item.icon className="mr-6 h-16 w-16" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
