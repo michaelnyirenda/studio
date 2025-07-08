@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -39,25 +40,25 @@ export default function AdminNavbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-16 items-center justify-between">
+            <div className="container flex h-16 items-center">
                 {/* Left side: Hamburger on mobile, placeholder on desktop */}
-                <div>
+                <div className="flex-none">
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="w-12 rounded-lg ring-2 ring-primary">
+                                <Button variant="outline" size="icon" className="w-12 rounded-lg">
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">Open navigation menu</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                                 align="start"
-                                className="w-80 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+                                className="w-[95vw] max-w-[280px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
                             >
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="w-[95vw] max-w-[280px] py-4 text-2xl md:w-80">
+                                    <DropdownMenuItem key={item.href} asChild className="w-full py-4 text-2xl md:w-80">
                                         <Link href={item.href} className="flex items-center text-primary font-semibold">
                                             <item.icon className="mr-4 h-8 w-8" />
                                             <span>{item.label}</span>
@@ -92,10 +93,10 @@ export default function AdminNavbar() {
                 </nav>
 
                 {/* Right side: User Menu */}
-                <div className="flex items-center">
+                <div className="flex-none items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full ring-2 ring-primary">
+                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full">
                                <Avatar className="h-9 w-9">
                                     <AvatarFallback>AD</AvatarFallback>
                                 </Avatar>
@@ -106,7 +107,7 @@ export default function AdminNavbar() {
                                 <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56" align="end" forceMount>
+                        <DropdownMenuContent className="w-56 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" align="end" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
                                     <p className="text-sm font-medium leading-none">Admin User</p>
@@ -116,14 +117,14 @@ export default function AdminNavbar() {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/admin/user-management">
-                                    <UserCog className="mr-2 h-4 w-4" />
+                            <DropdownMenuItem asChild className="cursor-pointer py-3 text-base">
+                                <Link href="/admin/user-management" className="flex items-center">
+                                    <UserCog className="mr-3 h-5 w-5" />
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                                <LogOut className="mr-2 h-4 w-4" />
+                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer py-3 text-base text-destructive focus:bg-destructive/10 focus:text-destructive">
+                                <LogOut className="mr-3 h-5 w-5" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
