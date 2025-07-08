@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -59,7 +60,7 @@ export default function AdminNavbar() {
                                 {navItems.map((item) => (
                                     <DropdownMenuItem key={item.href} asChild className="px-8 py-5 text-2xl">
                                         <Link href={item.href} className="text-primary font-semibold">
-                                            <item.icon className="mr-4 h-10 w-10" />
+                                            <item.icon className="mr-6 h-12 w-12" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
