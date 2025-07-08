@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -58,9 +57,9 @@ export default function AdminNavbar() {
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="p-4 text-lg">
-                                        <Link href={item.href}>
-                                            <item.icon className="mr-4 h-6 w-6" />
+                                    <DropdownMenuItem key={item.href} asChild className="p-8 text-2xl">
+                                        <Link href={item.href} className="text-primary font-semibold">
+                                            <item.icon className="mr-4 h-8 w-8" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
