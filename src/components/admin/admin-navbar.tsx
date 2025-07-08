@@ -48,7 +48,7 @@ export default function AdminNavbar() {
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="w-12 rounded-lg border-2 border-destructive">
+                                <Button variant="outline" size="icon" className="w-12 rounded-lg border-2 border-primary">
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">Open navigation menu</span>
                                 </Button>
@@ -98,7 +98,7 @@ export default function AdminNavbar() {
                 <div className="flex items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full border-2 border-destructive">
+                            <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full border-2 border-primary">
                                <Avatar className="h-9 w-9">
                                     <AvatarFallback>AD</AvatarFallback>
                                 </Avatar>
