@@ -18,7 +18,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['"PT Sans"', 'sans-serif'],
+        body: ['"Quicksand"', 'sans-serif'],
         headline: ['"Quicksand"', 'sans-serif'],
         cursive: ['"Dancing Script"', 'cursive'],
         code: ['monospace'],
