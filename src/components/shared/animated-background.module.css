@@ -16,7 +16,7 @@
 .wave4 {
   position: absolute;
   left: 0;
-  bottom: 0;
+  bottom: -15px;
   width: 100vw;
   height: auto;
   min-width: 1440px; 
