@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from '@/components/shared/navbar';
+import AnimatedBackground from '@/components/shared/AnimatedBackground';
 
 export const metadata: Metadata = {
   title: '#iBreakFree',
@@ -21,7 +22,8 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
-          <main className="flex-grow">
+          <AnimatedBackground />
+          <main className="flex-grow z-10">
             {children}
           </main>
           <Toaster />
