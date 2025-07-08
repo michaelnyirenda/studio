@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -75,10 +76,10 @@ export default function AdminNavbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors',
+                                    'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors',
                                     isActive
-                                        ? 'bg-secondary text-secondary-foreground'
-                                        : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+                                        ? 'bg-primary/10 text-primary font-semibold'
+                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                 )}
                             >
                                 <item.icon className="h-5 w-5" />
