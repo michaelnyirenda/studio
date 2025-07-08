@@ -19,7 +19,7 @@ export async function createForumPostAction(
   try {
     // In a real app, you would get the author's name from the authenticated user session.
     // For now, we'll hardcode it as the admin.
-    const authorName = "i-BreakFree Admin"; 
+    const authorName = "#iBreakFree Admin"; 
 
     await addDoc(collection(db, 'posts'), {
       ...validationResult.data,

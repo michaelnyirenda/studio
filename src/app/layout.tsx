@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Navbar from '@/components/shared/navbar';
 
 export const metadata: Metadata = {
-  title: 'i-BreakFree',
+  title: '#iBreakFree',
   description: 'Educational Platform for community engagement and health awareness.',
 };
 

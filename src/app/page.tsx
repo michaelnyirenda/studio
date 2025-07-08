@@ -89,7 +89,7 @@ export default function Home() {
      <div className="container mx-auto px-4 pt-8 pb-20">
       <div className="flex flex-col items-center">
         <PageHeader
-          title="Welcome to i-BreakFree"
+          title="Welcome to #iBreakFree"
           description="Your integrated platform for education, community engagement, and health awareness."
         />
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 w-full max-w-6xl">

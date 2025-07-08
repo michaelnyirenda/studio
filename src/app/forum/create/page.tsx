@@ -6,7 +6,7 @@ export default function CreateForumPostPage() {
     <div className="container mx-auto py-8 px-4">
       <PageHeader
         title="Create a Forum Post"
-        description="Contribute to the i-BreakFree community by sharing your thoughts and expertise."
+        description="Contribute to the #iBreakFree community by sharing your thoughts and expertise."
       />
       <CreatePostForm />
     </div>
