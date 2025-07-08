@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -39,10 +40,11 @@ export default function AdminNavbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-20 items-center">
+            <div className="container flex h-20 items-center justify-between">
                 
                 {/* Left Aligned Items */}
-                <div className="flex flex-1 justify-start">
+                <div className="flex items-center gap-x-4">
+                     {/* Mobile Menu Trigger */}
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -68,11 +70,9 @@ export default function AdminNavbar() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                </div>
 
-                {/* Centered Desktop Navigation */}
-                <div className="flex flex-1 justify-center">
-                    <nav className="hidden items-center justify-center gap-x-8 text-sm font-medium md:flex">
+                    {/* Desktop Navigation */}
+                    <nav className="hidden items-center gap-x-6 text-sm font-medium md:flex">
                         {navItems.map((item) => {
                             const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
                             return (
@@ -95,7 +95,7 @@ export default function AdminNavbar() {
                 </div>
 
                 {/* Right Aligned Items */}
-                <div className="flex flex-1 justify-end">
+                <div className="flex items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full">
