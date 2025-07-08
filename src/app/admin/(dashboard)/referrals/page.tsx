@@ -150,7 +150,7 @@ export default function AdminReferralsPage() {
         </div>
       ) : (
         <>
-          <h2 className="text-3xl font-semibold text-primary mb-6">Consented Referrals</h2>
+          <h2 className="text-3xl font-headline font-semibold text-primary mb-6">Consented Referrals</h2>
           <ScrollArea>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pr-4">
               {referrals.map((referral) => (
