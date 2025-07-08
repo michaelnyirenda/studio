@@ -34,9 +34,19 @@ import { Info, Loader2, Mail, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const locationData = {
-  "Region 1": {
-    "Constituency 1.1": ["Clinic A", "Clinic B", "Clinic C"],
-    "Constituency 1.2": ["Clinic D", "Clinic E"],
+  "Ohangwena": {
+    "Eenhana": ["Eenhana district hospital", "Eenhana clinic", "Onambutu", "Oshaango"],
+    "Endola": ["Endola", "Ohaulushu", "Ongha"],
+    "Engela": ["Engela district hospital", "Engela clinic", "Eudafano", "Omundudu"],
+    "Epembe": ["Epembe", "Omuhongo", "Onangolo"],
+    "Ohangwena": ["Ohangwena", "Okatope", "Onekwaya"],
+    "Okongo": ["Okongo district hospital", "Ekoka", "Okongo clinic", "Olukula", "Omauni clinic – opening soon", "Omboloka"],
+    "Omulonga": ["Ohaukelo", "Onamukulo", "Ongulayanetanga"],
+    "Omundaungilo": ["Epinga", "Omundaungilo"],
+    "Ondobe": ["Hamukoto wakappa", "Ondobe", "Oshandi"],
+    "Ongenga": ["Okambebe", "Omungwelume", "Ongenga"],
+    "Oshikango": ["Edundja", "Odibo Health Centre"],
+    "Oshikunde": ["Oshikunde"],
   },
   "Region 2": {
     "Constituency 2.1": ["Clinic F", "Clinic G"],
@@ -85,7 +95,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
         form.setValue('facility', undefined, { shouldValidate: true });
     }, [selectedConstituency, form]);
 
-    const constituencies = selectedRegion ? Object.keys(locationData[selectedRegion]) : [];
+    const constituencies = selectedRegion ? Object.keys(locationData[selectedRegion]).sort() : [];
     const facilities = selectedRegion && selectedConstituency ? locationData[selectedRegion][selectedConstituency] : [];
 
     async function onSubmit(values: ReferralConsentFormData) {
