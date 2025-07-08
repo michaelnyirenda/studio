@@ -48,14 +48,11 @@ const locationData = {
     "Oshikango": ["Edundja", "Odibo Health Centre"],
     "Oshikunde": ["Oshikunde"],
   },
-  "Region 2": {
-    "Constituency 2.1": ["Clinic F", "Clinic G"],
-    "Constituency 2.2": ["Clinic H", "Clinic I", "Clinic J"],
+  "Omusati": {
+    "All Facilities": [
+        "Okahao District Hospital", "Okahao Clinic", "Indira Gandhi H/C", "Eendombe Clinic", "Onamatanga Clinic", "Uutsathima Clinic", "Nujoma-Eya Clinic", "Otamanzi Clinic", "Etilyasa Clinic", "Oluteyi Clinic", "Amarika Clinic", "Oshikuku District Hospital", "Okalongo H.C.", "Elim H/C", "St. Benedict Clinic (Oshitutuma)", "Omuthitugwonyama Clinic", "Omutundungu Clinic", "Odibwa Clinic", "Omagalanga Clinic", "Onaanda Clinic", "Onkani Clinic", "Olutsiidhi Clinic", "Onheleiwa Clinic", "Othika Clinic", "Okathitu Clinic", "Epoko Clinic", "Olupandu Clinic", "Iipandayaamiti Clinic", "Ogongo Clinic", "Okando Clinic", "Sheetekela", "Outapi District Hospital", "Omonawatjihozu H.C", "Mahenene H C", "Oshaala clinic", "Outapi Clinic", "Onawa Clinic", "Anamulenge Clinic", "Eunda Clinic", "Ruacana clinic", "Eengolo Clinic", "Tsandi District Hospital", "Onesi H/C", "Tsandi Clinic", "Oshitudha Clinic", "Okatseidhi Clinic", "Ongulumbashe Clinic", "Onamandongo Clinic", "Iilyateko Clinic", "Omakange Clinic"
+    ]
   },
-  "Region 3": {
-    "Constituency 3.1": ["Clinic K"],
-    "Constituency 3.2": ["Clinic L", "Clinic M"],
-  }
 };
 
 type LocationData = typeof locationData;
