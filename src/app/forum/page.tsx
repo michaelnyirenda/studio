@@ -63,13 +63,13 @@ export default function ForumPage() {
   }, []);
 
   return (
-    <div className="container mx-auto py-8 px-4 relative">
+    <div className="container mx-auto py-8 px-4 relative pb-20">
       <PageHeader
         title="Community Forum"
         description="Browse discussions, share insights, and connect with others."
       />
       
-      <div className="grid gap-8 mt-8 mb-24 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3">
         {loading ? (
            Array.from({ length: 3 }).map((_, index) => (
             <Card key={index} className="shadow-lg overflow-hidden flex flex-col">
