@@ -60,7 +60,7 @@ export default function AdminNavbar() {
                                 {navItems.map((item) => (
                                     <DropdownMenuItem key={item.href} asChild className="w-full py-4 text-2xl md:w-80">
                                         <Link href={item.href} className="flex items-center text-primary font-semibold">
-                                            <item.icon className="mr-4 h-8 w-8" />
+                                            <item.icon className="mr-4 h-6 w-6" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
@@ -118,13 +118,13 @@ export default function AdminNavbar() {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild className="cursor-pointer py-3 text-base">
-                                <Link href="/admin/user-management" className="flex items-center">
-                                    <UserCog className="mr-3 h-5 w-5" />
+                                <Link href="/admin/user-management">
+                                    <UserCog className="h-5 w-5" />
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handleLogout} className="cursor-pointer py-3 text-base text-destructive focus:bg-destructive/10 focus:text-destructive">
-                                <LogOut className="mr-3 h-5 w-5" />
+                                <LogOut className="h-5 w-5" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
