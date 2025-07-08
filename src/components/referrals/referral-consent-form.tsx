@@ -57,7 +57,7 @@ const locationData = {
 
 type LocationData = typeof locationData;
 type Region = keyof LocationData;
-type Constituency = keyof LocationData[Region];
+type Constituency = keyof LocationData['Ohangwena'] | keyof LocationData['Omusati'];
 
 interface ReferralConsentFormProps {
     referral: Referral;
@@ -93,7 +93,7 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
     }, [selectedConstituency, form]);
 
     const constituencies = selectedRegion ? Object.keys(locationData[selectedRegion]).sort() : [];
-    const facilities = selectedRegion && selectedConstituency ? locationData[selectedRegion][selectedConstituency] : [];
+    const facilities = (selectedRegion && selectedConstituency ? (locationData[selectedRegion] as Record<string, string[]>)[selectedConstituency] : undefined) ?? [];
 
     async function onSubmit(values: ReferralConsentFormData) {
         setIsSubmitting(true);
