@@ -143,6 +143,9 @@ export default function ReferralsList() {
             }, 10000);
             setTimeout(() => {
                 setConsentedReferrals(prev => prev.filter(r => r.id !== referral.id));
+                if (searchParams.get('pendingId') === referral.id) {
+                    router.replace('/referrals', { scroll: false });
+                }
             }, 10500);
         }
       } catch (e) {
@@ -169,9 +172,6 @@ export default function ReferralsList() {
     
     setConsentedReferrals(prev => [newlyConsentedReferral, ...prev]);
     setActiveReferral(null);
-    if (searchParams.get('pendingId')) {
-        router.replace('/referrals', { scroll: false });
-    }
   };
 
   const handleSearchReferral = async (e: React.FormEvent) => {
