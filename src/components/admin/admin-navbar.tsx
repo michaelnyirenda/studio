@@ -41,8 +41,9 @@ export default function AdminNavbar() {
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-16 items-center">
-                {/* Left side: Hamburger on mobile, placeholder on desktop */}
-                <div className="flex-none">
+                
+                {/* Left Aligned Items */}
+                <div className="flex flex-1 justify-start">
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -58,9 +59,9 @@ export default function AdminNavbar() {
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="w-full py-4 text-2xl md:w-80">
+                                    <DropdownMenuItem key={item.href} asChild className="w-full py-4 text-2xl">
                                         <Link href={item.href} className="flex items-center text-primary font-semibold">
-                                            <item.icon className="mr-4 h-6 w-6" />
+                                            <item.icon className="mr-4 h-8 w-8" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
@@ -70,30 +71,32 @@ export default function AdminNavbar() {
                     </div>
                 </div>
 
-                {/* Desktop Navigation */}
-                <nav className="hidden flex-grow items-center justify-center gap-x-8 text-sm font-medium md:flex">
-                    {navItems.map((item) => {
-                        const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={cn(
-                                    'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors',
-                                    isActive
-                                        ? 'bg-primary/10 text-primary font-semibold'
-                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                                )}
-                            >
-                                <item.icon className="h-5 w-5" />
-                                <span>{item.label}</span>
-                            </Link>
-                        )
-                    })}
-                </nav>
+                {/* Centered Desktop Navigation */}
+                <div className="flex flex-1 justify-center">
+                    <nav className="hidden items-center justify-center gap-x-8 text-sm font-medium md:flex">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors',
+                                        isActive
+                                            ? 'bg-secondary text-primary font-bold'
+                                            : 'text-muted-foreground hover:bg-muted/50'
+                                    )}
+                                >
+                                    <item.icon className="h-5 w-5" />
+                                    <span>{item.label}</span>
+                                </Link>
+                            )
+                        })}
+                    </nav>
+                </div>
 
-                {/* Right side: User Menu */}
-                <div className="flex-none items-center">
+                {/* Right Aligned Items */}
+                <div className="flex flex-1 justify-end">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full">
@@ -117,14 +120,14 @@ export default function AdminNavbar() {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild className="cursor-pointer py-3 text-base">
-                                <Link href="/admin/user-management">
-                                    <UserCog className="h-5 w-5" />
+                            <DropdownMenuItem asChild className="cursor-pointer py-4 text-xl">
+                                <Link href="/admin/user-management" className="flex items-center">
+                                    <UserCog className="mr-4 h-6 w-6" />
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer py-3 text-base text-destructive focus:bg-destructive/10 focus:text-destructive">
-                                <LogOut className="h-5 w-5" />
+                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer py-4 text-xl text-destructive focus:bg-destructive/10 focus:text-destructive flex items-center">
+                                <LogOut className="mr-4 h-6 w-6" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
