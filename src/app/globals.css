@@ -119,13 +119,4 @@ body {
   .animate-fade-out-up {
     animation: fade-out-up 0.5s ease-out forwards;
   }
-
-  @keyframes drift {
-    from {
-      transform: translateX(0) translateY(calc(var(--scroll-y, 0px) * var(--parallax-speed, 0)));
-    }
-    to {
-      transform: translateX(-50%) translateY(calc(var(--scroll-y, 0px) * var(--parallax-speed, 0)));
-    }
-  }
 }
