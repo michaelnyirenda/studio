@@ -46,9 +46,9 @@ body {
     --chart-5: 280 60% 65%; /* a soft purple */
 
     /* New wave colors */
-    --wave-1: hsl(5, 62%, 74%);
-    --wave-2: hsl(5, 62%, 62%);
-    --wave-3: hsl(5, 62%, 50%);
+    --wave-1: hsl(5, 50%, 94%);
+    --wave-2: hsl(5, 55%, 85%);
+    --wave-3: hsl(5, 60%, 70%);
     --wave-4: hsl(5, 62%, 38%);
   }
 
@@ -88,9 +88,9 @@ body {
     --chart-5: 280 60% 70%;
     
     /* New wave colors for dark mode */
-    --wave-1: hsl(5, 40%, 35%);
-    --wave-2: hsl(5, 40%, 30%);
-    --wave-3: hsl(5, 40%, 25%);
+    --wave-1: hsl(5, 20%, 14%);
+    --wave-2: hsl(5, 25%, 16%);
+    --wave-3: hsl(5, 30%, 18%);
     --wave-4: hsl(5, 40%, 20%);
   }
 }
