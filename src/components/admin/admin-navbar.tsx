@@ -94,7 +94,6 @@ export default function AdminNavbar() {
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full ring-2 ring-primary">
                                <Avatar className="h-9 w-9">
-                                    <AvatarImage src="https://placehold.co/100x100.png" alt="@admin" data-ai-hint="person avatar" />
                                     <AvatarFallback>AD</AvatarFallback>
                                 </Avatar>
                                 <div className="hidden md:flex flex-col items-start leading-tight">
