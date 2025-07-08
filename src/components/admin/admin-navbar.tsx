@@ -52,12 +52,12 @@ export default function AdminNavbar() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                                 align="start"
-                                className="w-56 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+                                className="w-72 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
                             >
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="p-8 text-2xl">
+                                    <DropdownMenuItem key={item.href} asChild className="px-8 py-6 text-2xl">
                                         <Link href={item.href} className="text-primary font-semibold">
                                             <item.icon className="mr-4 h-8 w-8" />
                                             <span>{item.label}</span>
