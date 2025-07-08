@@ -19,7 +19,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['"PT Sans"', 'sans-serif'],
-        headline: ['"PT Sans"', 'sans-serif'],
+        headline: ['"Quicksand"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
