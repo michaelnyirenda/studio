@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -46,21 +45,21 @@ export default function AdminNavbar() {
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="ring-2 ring-primary">
+                                <Button variant="outline" size="icon" className="w-12 rounded-lg ring-2 ring-primary">
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">Open navigation menu</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                                 align="start"
-                                className="w-72 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+                                className="w-80 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
                             >
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="px-8 py-4 text-2xl">
-                                        <Link href={item.href} className="text-primary font-semibold">
-                                            <item.icon className="mr-6 h-16 w-16" />
+                                    <DropdownMenuItem key={item.href} asChild className="px-6 py-3 text-2xl">
+                                        <Link href={item.href} className="flex items-center text-primary font-semibold">
+                                            <item.icon className="mr-6 h-10 w-10" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
