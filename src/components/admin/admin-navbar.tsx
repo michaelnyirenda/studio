@@ -51,13 +51,16 @@ export default function AdminNavbar() {
                                     <span className="sr-only">Open navigation menu</span>
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
+                            <DropdownMenuContent
+                                align="start"
+                                className="w-56 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+                            >
                                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
-                                    <DropdownMenuItem key={item.href} asChild className="p-3 text-base">
+                                    <DropdownMenuItem key={item.href} asChild className="p-4 text-lg">
                                         <Link href={item.href}>
-                                            <item.icon className="mr-3 h-5 w-5" />
+                                            <item.icon className="mr-4 h-6 w-6" />
                                             <span>{item.label}</span>
                                         </Link>
                                     </DropdownMenuItem>
