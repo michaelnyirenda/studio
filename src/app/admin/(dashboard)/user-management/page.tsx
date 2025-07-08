@@ -167,15 +167,6 @@ export default function UserManagementPage() {
           </div>
         </CardContent>
       </Card>
-
-      <div className="mt-12 text-center border-t pt-8">
-        <h2 className="text-2xl font-semibold text-primary mb-4">Prototype Notes</h2>
-        <p className="text-muted-foreground">
-          This is a mock user management interface. Full functionality (creating, editing, deleting users,
-          managing roles/permissions, and real-time activity logs) requires backend integration,
-          a robust authentication and authorization system.
-        </p>
-      </div>
     </div>
   );
 }
