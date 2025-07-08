@@ -53,11 +53,14 @@ const locationData = {
         "Okahao District Hospital", "Okahao Clinic", "Indira Gandhi H/C", "Eendombe Clinic", "Onamatanga Clinic", "Uutsathima Clinic", "Nujoma-Eya Clinic", "Otamanzi Clinic", "Etilyasa Clinic", "Oluteyi Clinic", "Amarika Clinic", "Oshikuku District Hospital", "Okalongo H.C.", "Elim H/C", "St. Benedict Clinic (Oshitutuma)", "Omuthitugwonyama Clinic", "Omutundungu Clinic", "Odibwa Clinic", "Omagalanga Clinic", "Onaanda Clinic", "Onkani Clinic", "Olutsiidhi Clinic", "Onheleiwa Clinic", "Othika Clinic", "Okathitu Clinic", "Epoko Clinic", "Olupandu Clinic", "Iipandayaamiti Clinic", "Ogongo Clinic", "Okando Clinic", "Sheetekela", "Outapi District Hospital", "Omonawatjihozu H.C", "Mahenene H C", "Oshaala clinic", "Outapi Clinic", "Onawa Clinic", "Anamulenge Clinic", "Eunda Clinic", "Ruacana clinic", "Eengolo Clinic", "Tsandi District Hospital", "Onesi H/C", "Tsandi Clinic", "Oshitudha Clinic", "Okatseidhi Clinic", "Ongulumbashe Clinic", "Onamandongo Clinic", "Iilyateko Clinic", "Omakange Clinic"
     ]
   },
+  "Erongo": {
+    "Walvis Bay": ["Walvis Bay Corridor Group (WBCG)"]
+  }
 };
 
 type LocationData = typeof locationData;
 type Region = keyof LocationData;
-type Constituency = keyof LocationData['Ohangwena'] | keyof LocationData['Omusati'];
+type Constituency = keyof LocationData['Ohangwena'] | keyof LocationData['Omusati'] | keyof LocationData['Erongo'];
 
 interface ReferralConsentFormProps {
     referral: Referral;
@@ -93,7 +96,9 @@ export default function ReferralConsentForm({ referral, onConsentSubmit }: Refer
     }, [selectedConstituency, form]);
 
     const constituencies = selectedRegion ? Object.keys(locationData[selectedRegion]).sort() : [];
-    const facilities = (selectedRegion && selectedConstituency ? (locationData[selectedRegion] as Record<string, string[]>)[selectedConstituency] : undefined) ?? [];
+    const facilities = (selectedRegion && selectedConstituency && (locationData[selectedRegion] as Record<string, string[]>)[selectedConstituency])
+        ? (locationData[selectedRegion] as Record<string, string[]>)[selectedConstituency]
+        : [];
 
     async function onSubmit(values: ReferralConsentFormData) {
         setIsSubmitting(true);
