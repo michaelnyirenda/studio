@@ -20,6 +20,7 @@ export default {
       fontFamily: {
         body: ['"PT Sans"', 'sans-serif'],
         headline: ['"Quicksand"', 'sans-serif'],
+        cursive: ['"Dancing Script"', 'cursive'],
         code: ['monospace'],
       },
       colors: {

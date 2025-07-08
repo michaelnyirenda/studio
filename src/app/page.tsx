@@ -98,7 +98,7 @@ export default function Home() {
      <div className="container mx-auto px-4 pt-8 pb-20">
       <div className="flex flex-col items-center">
         <PageHeader
-          title="Welcome to #iBreakFree"
+          title={<>Welcome to <span className="font-cursive text-5xl">#iBreakFree</span></>}
           description="Your integrated platform for education, community engagement, and health awareness."
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 w-full max-w-5xl">
