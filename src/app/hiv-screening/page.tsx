@@ -72,7 +72,7 @@ export default function ScreeningPage() {
 
   if (selectedScreening) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="container mx-auto py-8 px-4 pb-20">
         <Button variant="ghost" onClick={handleBackToSelection} className="mb-4 text-accent hover:text-accent/80 pl-0 font-semibold">
           <ArrowLeft className="mr-2 h-5 w-5" />
           Back to Screening Selection
@@ -83,7 +83,7 @@ export default function ScreeningPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 pb-20">
       <PageHeader
         title="Select Screening Type"
         description="Choose the type of screening you would like to proceed with. All screenings are confidential."
