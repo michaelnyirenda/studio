@@ -5,7 +5,7 @@ import PageHeader from '@/components/shared/page-header';
 
 export default function ReferralsPage() {
     return (
-        <div className="container mx-auto py-8 px-4 pb-20">
+        <div className="container mx-auto py-8 px-4 pb-24">
             <PageHeader
                 title="Your Referrals"
                 description="Complete pending referrals and view your referral history."

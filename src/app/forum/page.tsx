@@ -63,7 +63,7 @@ export default function ForumPage() {
   }, []);
 
   return (
-    <div className="container mx-auto py-8 px-4 relative pb-20">
+    <div className="container mx-auto py-8 px-4 relative pb-24">
       <PageHeader
         title="Community Forum"
         description="Browse discussions, share insights, and connect with others."

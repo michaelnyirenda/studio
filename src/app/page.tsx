@@ -95,7 +95,7 @@ export default function Home() {
   ];
 
   return (
-     <div className="container mx-auto px-4 pt-8 pb-20">
+     <div className="container mx-auto px-4 pt-8 pb-24">
       <div className="flex flex-col items-center">
         <PageHeader
           title={<>Welcome to <span className="font-cursive text-5xl">#iBreakFree</span></>}

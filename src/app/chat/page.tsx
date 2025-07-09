@@ -56,7 +56,7 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="container mx-auto py-8 px-4 pb-20">
+        <div className="container mx-auto py-8 px-4 pb-24">
             <PageHeader
                 title="Chat with Support"
                 description={activeSession ? "Get help or ask questions. Our support staff is here for you." : "Start a confidential conversation with our support staff."}
