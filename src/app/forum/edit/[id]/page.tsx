@@ -55,7 +55,7 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
 
   if (loading) {
     return (
-       <div className="container mx-auto py-8 px-4">
+       <div className="container mx-auto py-8 px-4 pb-20">
         <PageHeader
             title="Edit Post"
             description="Loading post details..."
@@ -74,14 +74,14 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
 
   if (error) {
     return (
-        <div className="container mx-auto py-8 px-4 text-center">
+        <div className="container mx-auto py-8 px-4 text-center pb-20">
             <h1 className="text-2xl font-bold text-destructive">{error}</h1>
         </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 pb-20">
       <PageHeader
         title="Edit Post"
         description="Refine your message and update the community."
