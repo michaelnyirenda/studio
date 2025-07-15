@@ -6,7 +6,6 @@ import AnimatedBackground from '@/components/shared/AnimatedBackground';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { HelpCircle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export const metadata: Metadata = {
   title: '#iBreakFree',
@@ -35,7 +34,7 @@ export default function RootLayout({
              <Button
                variant="outline"
                aria-label="Frequently Asked Questions"
-               className="fixed bottom-24 left-8 h-16 w-16 p-0 rounded-full shadow-2xl bg-card hover:bg-secondary border-4 border-primary z-50 flex items-center justify-center group"
+               className="fixed top-8 right-8 h-16 w-16 p-0 rounded-full shadow-2xl bg-card hover:bg-secondary border-4 border-primary z-50 flex items-center justify-center group"
              >
                <HelpCircle className="h-12 w-12 text-primary transition-transform group-hover:scale-110" strokeWidth={3} />
              </Button>
