@@ -1,3 +1,4 @@
+
 // src/app/faq/page.tsx
 "use client";
 
@@ -8,27 +9,31 @@ import { Card, CardContent } from "@/components/ui/card";
 const faqs = [
     {
         question: "What is #iBreakFree?",
-        answer: "#iBreakFree is an integrated platform designed to provide education, community engagement, and health awareness. Our goal is to empower users with information and confidential access to health services."
+        answer: "#iBreakFree is an integrated, confidential platform designed to empower you with health education, community engagement, and direct access to health services. Our features include a community forum, confidential health screenings (HIV, GBV, PrEP, STI), a referral system to connect you with care, and an anonymous chat with support staff."
     },
     {
-        question: "How does the Community Forum work?",
-        answer: "The forum is a space for users to browse discussions, share insights, and connect with others. You can read posts from the community and our admin team. Admins can create new posts to share important information."
+        question: "How do I use the Community Forum?",
+        answer: "To visit the forum, click the 'Forum' icon in the navigation bar. You can browse and read any post. To create a new post, you must be logged in as an administrator and visit the 'Forum Management' page in the admin dashboard. There, you can click the 'Create Post' button to open the editor."
     },
     {
-        question: "What are Screenings?",
-        answer: "Our confidential screening tools (HIV, GBV, PrEP, STI) help you assess your health risks. Based on your answers, the system provides guidance and can generate a referral for professional health services if needed."
+        question: "How do I take a screening?",
+        answer: "1. Navigate to the 'Screening' page from the main navigation bar.\n2. Select the type of screening you'd like to take (e.g., HIV, PrEP).\n3. Answer the questions honestly. Your answers are confidential.\n4. After submitting, you will receive a recommendation based on your answers. If a referral is recommended, it will be generated for you."
     },
     {
-        question: "How do Referrals work?",
-        answer: "If a screening indicates that you might benefit from professional support, a referral is generated. You can find this referral in the 'Referrals' section. You must provide consent and choose a health facility before the referral is sent to our support team."
+        question: "How do I complete a referral?",
+        answer: "If a screening generates a referral, you will be directed to the 'Referrals' page. You can also get there by clicking the 'Referrals' icon in the navigation bar.\n1. A card will appear asking for your consent.\n2. You must check the consent box to proceed.\n3. Select your region, constituency, and a specific health facility from the dropdown menus.\n4. Choose your preferred contact method.\n5. Click 'Confirm Referral'. Our support team will then be notified and will contact you."
     },
     {
-        question: "Is the Chat feature confidential?",
-        answer: "Yes. The chat feature allows you to speak with our support staff anonymously. Your privacy is a top priority, and conversations are handled with the utmost confidentiality."
+        question: "How do I find a referral I completed in the past?",
+        answer: "On the 'Referrals' page, there is a search box. Enter the unique Referral ID you received when you first created the referral and click 'Find Referral'. The details of that referral will appear, allowing you to download the PDF again."
     },
     {
-        question: "How is my data protected?",
-        answer: "We are committed to protecting your privacy. All screenings and chats are confidential. Personal information is handled securely and is only used to provide you with the services you request, such as generating a referral."
+        question: "How does the confidential chat work?",
+        answer: "Go to the 'Chat' page from the navigation bar. Click 'Start Anonymous Chat' to be connected with a support staff member. Your identity remains anonymous. When you're finished, you can click the 'Close Chat' button to end the session."
+    },
+    {
+        question: "Is my data secure?",
+        answer: "Yes. We are committed to protecting your privacy. All screenings and chats are confidential. Personal information is handled securely and is only used to provide you with the services you request, such as generating a referral for a healthcare provider."
     }
 ];
 
@@ -48,7 +53,7 @@ export default function FaqPage() {
                                 <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
                                     {faq.question}
                                 </AccordionTrigger>
-                                <AccordionContent className="text-base text-muted-foreground pt-2">
+                                <AccordionContent className="text-base text-muted-foreground pt-2 whitespace-pre-line">
                                     {faq.answer}
                                 </AccordionContent>
                             </AccordionItem>
