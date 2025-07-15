@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 export default function Navbar() {
   const pathname = usePathname();
 
-  // Hide navbar on admin routes
   if (pathname.startsWith('/admin')) {
     return null;
   }
