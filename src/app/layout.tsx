@@ -40,7 +40,7 @@ export default function RootLayout({
                     aria-label="Frequently Asked Questions"
                     className="fixed bottom-24 left-8 h-16 w-16 p-0 rounded-full shadow-2xl bg-card hover:bg-secondary border-4 border-primary z-50 flex items-center justify-center group"
                   >
-                    <HelpCircle className="h-14 w-14 text-primary transition-transform group-hover:scale-110" strokeWidth={3} />
+                    <HelpCircle className="h-12 w-12 text-primary transition-transform group-hover:scale-110" strokeWidth={3} />
                   </Button>
                 </Link>
               </TooltipTrigger>
