@@ -13,7 +13,7 @@ const faqs = [
     },
     {
         question: "How do I use the Community Forum?",
-        answer: "To visit the forum, click the 'Forum' icon in the navigation bar. You can browse and read any post. To create a new post, you must be logged in as an administrator and visit the 'Forum Management' page in the admin dashboard. There, you can click the 'Create Post' button to open the editor."
+        answer: "To visit the forum, click the 'Forum' icon in the navigation bar. You can browse and read any post."
     },
     {
         question: "How do I take a screening?",
