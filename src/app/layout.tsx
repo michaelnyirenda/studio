@@ -36,10 +36,11 @@ export default function RootLayout({
               <TooltipTrigger asChild>
                 <Link href="/faq" passHref>
                   <Button
+                    variant="outline"
                     aria-label="Frequently Asked Questions"
-                    className="fixed bottom-24 left-8 h-16 w-16 rounded-full shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground z-50 flex items-center justify-center"
+                    className="fixed bottom-24 left-8 h-16 w-16 rounded-full shadow-xl bg-card hover:bg-secondary border-2 border-primary z-50 flex items-center justify-center group"
                   >
-                    <HelpCircle className="h-8 w-8" />
+                    <HelpCircle className="h-10 w-10 text-primary transition-transform group-hover:scale-110" />
                   </Button>
                 </Link>
               </TooltipTrigger>
