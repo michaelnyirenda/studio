@@ -31,24 +31,15 @@ export default function RootLayout({
             {children}
           </main>
           <Toaster />
-           <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href="/faq" passHref>
-                  <Button
-                    variant="outline"
-                    aria-label="Frequently Asked Questions"
-                    className="fixed bottom-24 left-8 h-16 w-16 p-0 rounded-full shadow-2xl bg-card hover:bg-secondary border-4 border-primary z-50 flex items-center justify-center group"
-                  >
-                    <HelpCircle className="h-12 w-12 text-primary transition-transform group-hover:scale-110" strokeWidth={3} />
-                  </Button>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="bg-primary text-primary-foreground">
-                <p>Frequently Asked Questions</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+           <Link href="/faq" passHref>
+             <Button
+               variant="outline"
+               aria-label="Frequently Asked Questions"
+               className="fixed bottom-24 left-8 h-16 w-16 p-0 rounded-full shadow-2xl bg-card hover:bg-secondary border-4 border-primary z-50 flex items-center justify-center group"
+             >
+               <HelpCircle className="h-12 w-12 text-primary transition-transform group-hover:scale-110" strokeWidth={3} />
+             </Button>
+           </Link>
           <Navbar />
       </body>
     </html>
