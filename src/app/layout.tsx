@@ -3,6 +3,10 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from '@/components/shared/navbar';
 import AnimatedBackground from '@/components/shared/AnimatedBackground';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { HelpCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export const metadata: Metadata = {
   title: '#iBreakFree',
@@ -27,6 +31,23 @@ export default function RootLayout({
             {children}
           </main>
           <Toaster />
+           <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href="/faq" passHref>
+                  <Button
+                    aria-label="Frequently Asked Questions"
+                    className="fixed bottom-8 left-8 h-16 w-16 rounded-full shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground z-50 flex items-center justify-center"
+                  >
+                    <HelpCircle className="h-8 w-8" />
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="bg-primary text-primary-foreground">
+                <p>Frequently Asked Questions</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <Navbar />
       </body>
     </html>
