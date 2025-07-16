@@ -63,7 +63,7 @@ export default function AdminChatPage() {
           if (sessionToSelect) {
             setSelectedSession(sessionToSelect);
           }
-          // Clear the URL param after using it
+          // Clear the URL param after using it by replacing the current state
           const newUrl = window.location.pathname;
           window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
 

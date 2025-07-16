@@ -75,6 +75,7 @@ export default function ChatInterface({ userId, isClientSide, sessionId }: ChatI
               if (isClientSide && sessionData.userUnread) {
                  await updateDoc(sessionRef, { userUnread: false }).catch(console.error);
               } else if (!isClientSide && sessionData.adminUnread) {
+                 // Only update if it's actually unread to prevent unnecessary writes
                  await updateDoc(sessionRef, { adminUnread: false }).catch(console.error);
               }
             };

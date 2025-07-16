@@ -22,7 +22,7 @@ function ChatNotificationListener() {
     const { toast, dismiss } = useToast();
     const router = useRouter();
     const pathname = usePathname();
-    const notifiedSessionIds = useRef(new Set<string>());
+    const activeToasts = useRef(new Map<string, string>()); // Map<sessionId, toastId>
 
     useEffect(() => {
         const sessionsCollection = collection(db, 'chatSessions');
@@ -32,16 +32,26 @@ function ChatNotificationListener() {
         const unsubscribe = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                  const session = { id: change.doc.id, ...change.doc.data() } as ChatSession;
+                 const existingToastId = activeToasts.current.get(session.id);
+                 
                 // Only show notification for new messages or newly unread sessions
-                if (change.type === "added" || change.type === "modified") {
-                    // Avoid re-notifying for a session we just showed a toast for
-                    if (notifiedSessionIds.current.has(session.id) && change.type === "modified") {
-                        return;
-                    }
+                if ((change.type === "added" || change.type === "modified") && pathname !== '/admin/chat') {
                     
-                    // Avoid showing a notification if we're already in the chat view for that specific session
-                    if (pathname !== '/admin/chat') {
-                       const { id: toastId } = toast({
+                    if (existingToastId) {
+                        // If a toast for this session is already active, update it
+                        toast({
+                           id: existingToastId,
+                           title: (
+                                <div className="flex items-center font-bold">
+                                    <MessageSquare className="mr-2 h-5 w-5 text-accent" />
+                                    New Message
+                                </div>
+                            ),
+                            description: `New message from ${session.userName}.`,
+                        });
+                    } else {
+                        // Otherwise, create a new toast
+                       const { id: newToastId } = toast({
                             title: (
                                 <div className="flex items-center font-bold">
                                     <MessageSquare className="mr-2 h-5 w-5 text-accent" />
@@ -54,17 +64,17 @@ function ChatNotificationListener() {
                                     variant="outline"
                                     onClick={() => {
                                         router.push(`/admin/chat?sessionId=${session.id}`);
-                                        dismiss(toastId); // Dismiss the toast on click
+                                        dismiss(newToastId); 
                                     }}
                                 >
                                     View Chat
                                 </Button>
                             ),
                             duration: 20000, // Increased duration
+                            onDismiss: () => activeToasts.current.delete(session.id),
+                            onAutoClose: () => activeToasts.current.delete(session.id),
                         });
-                        notifiedSessionIds.current.add(session.id);
-                        // Remove from set after a while to allow new notifications for the same chat
-                        setTimeout(() => notifiedSessionIds.current.delete(session.id), 30000);
+                        activeToasts.current.set(session.id, newToastId);
                     }
                 }
             });
