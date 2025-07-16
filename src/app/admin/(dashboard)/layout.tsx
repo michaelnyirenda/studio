@@ -2,7 +2,7 @@
 "use client";
 
 import AdminNavbar from "@/components/admin/admin-navbar";
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, createContext, useContext } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
@@ -11,52 +11,70 @@ import { useToast } from '@/hooks/use-toast';
 import type { ChatSession } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
+// 1. Create a context for the unread count
+const UnreadChatContext = createContext<{ count: number }>({ count: 0 });
+
+// Custom hook to use the context
+export const useUnreadChatCount = () => useContext(UnreadChatContext);
+
+
 function ChatNotificationListener() {
-    const { toast } = useToast();
+    const { toast, dismiss } = useToast();
     const router = useRouter();
     const pathname = usePathname();
-    const mountTimeRef = useRef(new Date());
+    const notifiedSessionIds = useRef(new Set<string>());
 
     useEffect(() => {
         const sessionsCollection = collection(db, 'chatSessions');
-        // Listen for new sessions created after the component has mounted.
-        const q = query(sessionsCollection, where('createdAt', '>', mountTimeRef.current));
+        // Listen for any session that has unread messages for the admin
+        const q = query(sessionsCollection, where('adminUnread', '==', true));
         
         const unsubscribe = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
-                    const newSession = { id: change.doc.id, ...change.doc.data() } as ChatSession;
-                    // Avoid showing a notification if we're already in the chat view
+                 const session = { id: change.doc.id, ...change.doc.data() } as ChatSession;
+                // Only show notification for new messages or newly unread sessions
+                if (change.type === "added" || change.type === "modified") {
+                    // Avoid re-notifying for a session we just showed a toast for
+                    if (notifiedSessionIds.current.has(session.id) && change.type === "modified") {
+                        return;
+                    }
+                    
+                    // Avoid showing a notification if we're already in the chat view for that specific session
                     if (pathname !== '/admin/chat') {
-                       toast({
+                       const { id: toastId } = toast({
                             title: (
                                 <div className="flex items-center font-bold">
                                     <MessageSquare className="mr-2 h-5 w-5 text-accent" />
-                                    New Chat Session Started
+                                    New Chat Message
                                 </div>
                             ),
-                            description: `${newSession.userName} has started a new conversation.`,
+                            description: `New message from ${session.userName}.`,
                             action: (
                                 <Button
                                     variant="outline"
-                                    onClick={() => router.push(`/admin/chat?sessionId=${newSession.id}`)}
+                                    onClick={() => {
+                                        router.push(`/admin/chat?sessionId=${session.id}`);
+                                        dismiss(toastId); // Dismiss the toast on click
+                                    }}
                                 >
                                     View Chat
                                 </Button>
                             ),
-                            duration: 15000,
+                            duration: 20000, // Increased duration
                         });
+                        notifiedSessionIds.current.add(session.id);
+                        // Remove from set after a while to allow new notifications for the same chat
+                        setTimeout(() => notifiedSessionIds.current.delete(session.id), 30000);
                     }
                 }
             });
         });
 
         return () => unsubscribe();
-    }, [pathname, router, toast]);
+    }, [pathname, router, toast, dismiss]);
 
     return null; // This component does not render anything itself
 }
-
 
 export default function AdminDashboardLayout({
   children,
@@ -65,6 +83,7 @@ export default function AdminDashboardLayout({
 }) {
   const router = useRouter();
   const [isVerified, setIsVerified] = useState(false);
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
 
   useEffect(() => {
     const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
@@ -74,6 +93,20 @@ export default function AdminDashboardLayout({
       setIsVerified(true);
     }
   }, [router]);
+  
+  // Set up a listener for the unread count for the context provider
+  useEffect(() => {
+    if (!isVerified) return;
+
+    const chatSessionsCollection = collection(db, 'chatSessions');
+    const q = query(chatSessionsCollection, where('adminUnread', '==', true));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      setUnreadChatCount(querySnapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, [isVerified]);
+
 
   if (!isVerified) {
     return (
@@ -84,12 +117,14 @@ export default function AdminDashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <AdminNavbar />
-      <ChatNotificationListener />
-      <main className="flex-1">
-        {children}
-      </main>
-    </div>
+    <UnreadChatContext.Provider value={{ count: unreadChatCount }}>
+        <div className="flex min-h-screen flex-col">
+            <AdminNavbar />
+            <ChatNotificationListener />
+            <main className="flex-1">
+                {children}
+            </main>
+        </div>
+    </UnreadChatContext.Provider>
   );
 }

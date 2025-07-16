@@ -19,11 +19,13 @@ import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '../ui/avatar';
+import { useUnreadChatCount } from '@/app/admin/(dashboard)/layout';
+import { Badge } from '../ui/badge';
 
 const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/referrals', label: 'Referrals', icon: ClipboardList },
-    { href: '/admin/chat', label: 'Chat', icon: MessageSquare },
+    { href: '/admin/chat', label: 'Chat', icon: MessageSquare, id: 'chat-nav' },
     { href: '/admin/forum-management', label: 'Forum', icon: MessageSquareText },
     { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
     { href: '/admin/data-export', label: 'Data Export', icon: FileSpreadsheet },
@@ -32,6 +34,7 @@ const navItems = [
 export default function AdminNavbar() {
     const pathname = usePathname();
     const router = useRouter();
+    const { count: unreadChatCount } = useUnreadChatCount();
 
     const handleLogout = () => {
         sessionStorage.removeItem('isAdminLoggedIn');
@@ -61,9 +64,12 @@ export default function AdminNavbar() {
                                 <DropdownMenuSeparator />
                                 {navItems.map((item) => (
                                     <DropdownMenuItem key={item.href} asChild className="w-full py-2 text-sm">
-                                        <Link href={item.href} className="flex items-center font-semibold text-primary">
+                                        <Link href={item.href} className="relative flex items-center font-semibold text-primary">
                                             <item.icon className="mr-3 h-4 w-4" />
                                             <span>{item.label}</span>
+                                            {item.id === 'chat-nav' && unreadChatCount > 0 && (
+                                                <Badge variant="destructive" className="absolute right-4 top-1/2 -translate-y-1/2">{unreadChatCount}</Badge>
+                                            )}
                                         </Link>
                                     </DropdownMenuItem>
                                 ))}
@@ -80,7 +86,7 @@ export default function AdminNavbar() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        'flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors border-2',
+                                        'relative flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors border-2',
                                         isActive
                                             ? 'bg-secondary text-primary font-bold border-primary/20'
                                             : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-primary/20'
@@ -88,6 +94,9 @@ export default function AdminNavbar() {
                                 >
                                     <item.icon className="h-5 w-5" />
                                     <span>{item.label}</span>
+                                     {item.id === 'chat-nav' && unreadChatCount > 0 && (
+                                        <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0">{unreadChatCount}</Badge>
+                                    )}
                                 </Link>
                             )
                         })}
