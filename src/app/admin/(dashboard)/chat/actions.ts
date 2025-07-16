@@ -22,17 +22,18 @@ export async function sendAdminMessageAction(
     const sessionRef = doc(db, 'chatSessions', sessionId);
     const messagesCollection = collection(sessionRef, 'messages');
 
-    // 1. Add admin's message
+    // Add admin's message
     const adminMessage = {
         text: message,
         createdAt: serverTimestamp(),
         senderId: MOCK_ADMIN_USER_ID,
         // We use 'ai' as senderType to reuse existing styling for non-user messages.
+        // This is a stylistic choice and doesn't mean an AI is responding.
         senderType: 'ai' as const, 
     };
     await addDoc(messagesCollection, adminMessage);
     
-    // 2. Update the session document
+    // Update the session document
     await updateDoc(sessionRef, {
         lastMessageText: message,
         lastMessageAt: serverTimestamp(),
