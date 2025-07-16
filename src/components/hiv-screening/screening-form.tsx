@@ -1,3 +1,4 @@
+
 "use client";
 
 import type * as z from 'zod';
@@ -63,6 +64,7 @@ export default function ScreeningForm() {
     defaultValues: {
       name: '',
       age: undefined,
+      gender: undefined,
       phoneNumber: '',
       email: '',
       knowsHivStatus: undefined,
@@ -79,6 +81,7 @@ export default function ScreeningForm() {
     },
   });
 
+  const watchGender = form.watch("gender");
   const watchLastTestDate = form.watch("lastTestDate");
   const watchLastTestResult = form.watch("lastTestResult");
   const watchConsumedAlcohol = form.watch("consumedAlcohol");
@@ -186,6 +189,27 @@ export default function ScreeningForm() {
             <div className="space-y-4">
               <FormField control={form.control} name="name" render={({ field }) => (<FormItem><FormLabel className="text-lg">Full Name</FormLabel><FormControl><Input placeholder="Enter your full name" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={form.control} name="age" render={({ field }) => (<FormItem><FormLabel className="text-lg">Age</FormLabel><FormControl><Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value, 10) || undefined)} /></FormControl><FormMessage /></FormItem>)} />
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg">Gender</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField control={form.control} name="phoneNumber" render={({ field }) => (<FormItem><FormLabel className="text-lg">Phone Number</FormLabel><FormControl><Input type="tel" placeholder="Enter your phone number" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel className="text-lg">Email Address (Optional)</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl><FormMessage /></FormItem>)} />
             </div>
@@ -264,47 +288,51 @@ export default function ScreeningForm() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="pregnancyHistory"
-                render={() => (
-                  <FormItem>
-                    <FormLabel className="text-lg">A13. Have you ever been pregnant? (Tick all that apply)</FormLabel>
-                    <div className="space-y-2 pt-2">
-                      {pregnancyItems.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="pregnancyHistory"
-                          render={({ field }) => (
-                            <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(item.id)}
-                                  onCheckedChange={(checked) => {
-                                    const currentVal = field.value || [];
-                                    if (item.id === 'never_pregnant') {
-                                      return field.onChange(checked ? ['never_pregnant'] : []);
-                                    } else {
-                                      const newArr = currentVal.filter(v => v !== 'never_pregnant');
-                                      return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
-                                    }
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">{item.label}</FormLabel>
-                            </FormItem>
-                          )
-                          }
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {watchGender === 'female' && (
+                <>
+                <FormField
+                  control={form.control}
+                  name="pregnancyHistory"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel className="text-lg">A13. Have you ever been pregnant? (Tick all that apply)</FormLabel>
+                      <div className="space-y-2 pt-2">
+                        {pregnancyItems.map((item) => (
+                          <FormField
+                            key={item.id}
+                            control={form.control}
+                            name="pregnancyHistory"
+                            render={({ field }) => (
+                              <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(item.id)}
+                                    onCheckedChange={(checked) => {
+                                      const currentVal = field.value || [];
+                                      if (item.id === 'never_pregnant') {
+                                        return field.onChange(checked ? ['never_pregnant'] : []);
+                                      } else {
+                                        const newArr = currentVal.filter(v => v !== 'never_pregnant');
+                                        return checked ? field.onChange([...newArr, item.id]) : field.onChange(newArr.filter((value) => value !== item.id));
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">{item.label}</FormLabel>
+                              </FormItem>
+                            )
+                            }
+                          />
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {watchPregnancyHistory && !watchPregnancyHistory.includes('never_pregnant') && watchPregnancyHistory.length > 0 && renderQuestion("attendingAnc", "A14. If you are pregnant or had a child in the past 6 weeks, are you attending care?", [{ value: 'attending_anc', label: 'Attending ANC/PMTCT' }, { value: 'attending_post_natal', label: 'Attending Post Natal Care' }, { value: 'eligible_not_attending', label: 'Eligible but not attending' }, { value: 'na', label: 'N/A' }])}
+                {watchPregnancyHistory && !watchPregnancyHistory.includes('never_pregnant') && watchPregnancyHistory.length > 0 && renderQuestion("attendingAnc", "A14. If you are pregnant or had a child in the past 6 weeks, are you attending care?", [{ value: 'attending_anc', label: 'Attending ANC/PMTCT' }, { value: 'attending_post_natal', label: 'Attending Post Natal Care' }, { value: 'eligible_not_attending', label: 'Eligible but not attending' }, { value: 'na', label: 'N/A' }])}
+                </>
+              )}
 
               {renderQuestion("isOrphan", "A15. Are you an orphan?", [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }])}
               {watchIsOrphan === 'yes' && renderQuestion("orphanStatus", "If yes, please specify:", [{ value: 'single', label: 'Single (lost one parent)' }, { value: 'double', label: 'Double (lost both parents)' }, { value: 'child_headed', label: 'Child-headed household (no adult carer)' }])}

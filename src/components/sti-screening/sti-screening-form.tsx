@@ -1,3 +1,4 @@
+
 "use client";
 
 import type * as z from 'zod';
@@ -40,6 +41,7 @@ export default function StiScreeningForm() {
     defaultValues: {
       name: '',
       age: undefined,
+      gender: undefined,
       phoneNumber: '',
       email: '',
       diagnosedOrTreated: undefined,
@@ -48,6 +50,8 @@ export default function StiScreeningForm() {
       genitalSores: undefined,
     },
   });
+
+  const watchGender = form.watch("gender");
 
   async function onSubmit(values: StiScreeningFormData) {
     setIsSubmitting(true);
@@ -173,13 +177,34 @@ export default function StiScreeningForm() {
                 </FormItem>
               )}
             />
+            <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg">Gender</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
              <FormField control={form.control} name="phoneNumber" render={({ field }) => (<FormItem><FormLabel className="text-lg">Phone Number</FormLabel><FormControl><Input type="tel" placeholder="Enter your phone number" {...field} /></FormControl><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel className="text-lg">Email Address (Optional)</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl><FormMessage /></FormItem>)} />
 
 
             {renderQuestion("diagnosedOrTreated", "D1. Have you ever been diagnosed or treated for STI?")}
-            {renderQuestion("abnormalDischarge", "D2. Do you have any abnormal vaginal discharge (more than normal, abnormal colour? foul smelling)?")}
-            {renderQuestion("vaginalItchiness", "D3. Do you have any vaginal itchiness or abnormal discomfort?")}
+            {watchGender === 'female' && renderQuestion("abnormalDischarge", "D2. Do you have any abnormal vaginal discharge (more than normal, abnormal colour? foul smelling)?")}
+            {watchGender === 'female' && renderQuestion("vaginalItchiness", "D3. Do you have any vaginal itchiness or abnormal discomfort?")}
             {renderQuestion("genitalSores", "D4. Do you have sore, ulcers, or wounds on your genitals?")}
 
           </CardContent>

@@ -1,3 +1,4 @@
+
 // src/lib/schemas.ts
 
 import { z } from 'zod';
@@ -14,6 +15,7 @@ export type ForumPostFormData = z.infer<typeof ForumPostSchema>;
 export const HivScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
+  gender: z.enum(['male', 'female'], { required_error: "Please select a gender." }),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   
@@ -46,9 +48,7 @@ export const HivScreeningSchema = z.object({
     message: "You have to select at least one item.",
   }).optional(),
   // A13
-  pregnancyHistory: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
-  }).optional(),
+  pregnancyHistory: z.array(z.string()).optional(),
   // A14
   attendingAnc: z.enum(['attending_anc', 'attending_post_natal', 'eligible_not_attending', 'na']).optional(),
   // A15
@@ -102,12 +102,20 @@ export const HivScreeningSchema = z.object({
             message: 'Registration status is required if you have a disability.',
         });
     }
-    if (data.pregnancyHistory && data.pregnancyHistory.length > 0 && !data.pregnancyHistory.includes('never_pregnant') && !data.attendingAnc) {
-       ctx.addIssue({
-            code: 'custom',
-            path: ['attendingAnc'],
-            message: 'This field is required based on your pregnancy history.',
+    if (data.gender === 'female') {
+      if (!data.pregnancyHistory || data.pregnancyHistory.length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['pregnancyHistory'],
+          message: 'Pregnancy history is required for female users.',
         });
+      } else if (data.pregnancyHistory.length > 0 && !data.pregnancyHistory.includes('never_pregnant') && !data.attendingAnc) {
+         ctx.addIssue({
+              code: 'custom',
+              path: ['attendingAnc'],
+              message: 'This field is required based on your pregnancy history.',
+          });
+      }
     }
 });
 export type HivScreeningFormData = z.infer<typeof HivScreeningSchema>;
@@ -119,6 +127,7 @@ const sexualViolenceOptions = z.enum(['touched', 'forced', 'no']);
 export const GbvScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
+  gender: z.enum(['male', 'female'], { required_error: "Please select a gender." }),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   
@@ -157,6 +166,7 @@ export type GbvScreeningFormData = z.infer<typeof GbvScreeningSchema>;
 export const PrEpScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
+  gender: z.enum(['male', 'female'], { required_error: "Please select a gender." }),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   multiplePartners: z.enum(['yes', 'no'], { required_error: "Please answer this question." }),
@@ -174,12 +184,22 @@ export type PrEpScreeningFormData = z.infer<typeof PrEpScreeningSchema>;
 export const StiScreeningSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(14, { message: "You must be at least 14 years old to use this service." }).max(120, { message: "Please enter a valid age."}),
+  gender: z.enum(['male', 'female'], { required_error: "Please select a gender." }),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   diagnosedOrTreated: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
-  abnormalDischarge: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
-  vaginalItchiness: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
+  abnormalDischarge: z.enum(['yes', 'no']).optional(),
+  vaginalItchiness: z.enum(['yes', 'no']).optional(),
   genitalSores: z.enum(['yes', 'no'], { required_error: "Please select an option." }),
+}).superRefine((data, ctx) => {
+  if (data.gender === 'female') {
+    if (data.abnormalDischarge === undefined) {
+      ctx.addIssue({ code: 'custom', path: ['abnormalDischarge'], message: 'This question is required.' });
+    }
+    if (data.vaginalItchiness === undefined) {
+      ctx.addIssue({ code: 'custom', path: ['vaginalItchiness'], message: 'This question is required.' });
+    }
+  }
 });
 export type StiScreeningFormData = z.infer<typeof StiScreeningSchema>;
 

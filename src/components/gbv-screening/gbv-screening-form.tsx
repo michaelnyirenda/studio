@@ -1,3 +1,4 @@
+
 "use client";
 
 import type * as z from 'zod';
@@ -62,6 +63,7 @@ export default function GbvScreeningForm() {
     defaultValues: {
       name: '',
       age: undefined,
+      gender: undefined,
       phoneNumber: '',
       email: '',
       emotionalViolence: [],
@@ -207,6 +209,27 @@ export default function GbvScreeningForm() {
             <div className="space-y-4">
               <FormField control={form.control} name="name" render={({ field }) => (<FormItem><FormLabel className="text-lg">Full Name</FormLabel><FormControl><Input placeholder="Enter your full name" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={form.control} name="age" render={({ field }) => (<FormItem><FormLabel className="text-lg">Age</FormLabel><FormControl><Input type="number" placeholder="Enter your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(parseInt(e.target.value, 10) || undefined)} /></FormControl><FormMessage /></FormItem>)} />
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg">Gender</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField control={form.control} name="phoneNumber" render={({ field }) => (<FormItem><FormLabel className="text-lg">Phone Number</FormLabel><FormControl><Input type="tel" placeholder="Enter your phone number" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel className="text-lg">Email Address (Optional)</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl><FormMessage /></FormItem>)} />
             </div>
