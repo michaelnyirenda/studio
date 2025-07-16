@@ -59,22 +59,22 @@ export default function AdminChatPage() {
       
       const currentSelectedId = selectedSession?.id;
 
-      if (sessionIdFromUrl) {
+      // Handle initial load from URL parameter
+      if (sessionIdFromUrl && !selectedSession) {
           const sessionToSelect = sessionsData.find(s => s.id === sessionIdFromUrl);
           if (sessionToSelect) {
             handleSelectSession(sessionToSelect);
           }
+          // Clean the URL
           const newUrl = window.location.pathname;
           window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
 
       } else if (currentSelectedId) {
+          // Keep the selected session's data up-to-date
           const updatedSelected = sessionsData.find(s => s.id === currentSelectedId);
           if (updatedSelected) {
-            // If the selected session still exists, update its data locally
-            // This is important for seeing new messages appear in the session list
             setSelectedSession(updatedSelected);
           } else {
-            // If the selected session was deleted, clear the selection
             setSelectedSession(null);
           }
       }
