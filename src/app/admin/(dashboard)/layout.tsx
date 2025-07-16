@@ -79,7 +79,7 @@ export default function AdminDashboardLayout({
                                 View Chat
                             </Button>
                         ),
-                        duration: 15000,
+                        duration: Infinity, // Make the toast persist until acted upon
                         onDismiss: () => notifiedSessionIds.current.delete(session.id),
                         onAutoClose: () => notifiedSessionIds.current.delete(session.id),
                     });
