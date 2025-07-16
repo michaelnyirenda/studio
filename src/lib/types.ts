@@ -36,6 +36,7 @@ export interface ChatSession {
   userName: string;
   lastMessageText: string;
   lastMessageAt: Timestamp | FieldValue;
+  createdAt?: Timestamp | FieldValue; // Add createdAt for new session detection
   userUnread: boolean;
   adminUnread: boolean;
   status?: 'active' | 'closed';

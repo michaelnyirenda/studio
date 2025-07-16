@@ -17,6 +17,7 @@ export async function startChatAction(): Promise<{ success: boolean; sessionId?:
         userName: anonymousUserName,
         lastMessageText: "Chat started.",
         lastMessageAt: serverTimestamp(),
+        createdAt: serverTimestamp(), // Add createdAt for new session detection
         userUnread: false,
         adminUnread: true,
         status: 'active' as const,

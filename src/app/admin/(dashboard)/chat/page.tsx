@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { ChatSession } from '@/lib/types';
@@ -36,6 +37,10 @@ export default function AdminChatPage() {
   const [sessionToDelete, setSessionToDelete] = useState<ClientChatSession | null>(null);
   const { toast } = useToast();
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const sessionIdFromUrl = useMemo(() => searchParams.get('sessionId'), [searchParams]);
+
   useEffect(() => {
     const sessionsCollection = collection(db, 'chatSessions');
     const q = query(sessionsCollection, orderBy('lastMessageAt', 'desc'));
@@ -52,8 +57,18 @@ export default function AdminChatPage() {
       setSessions(sessionsData);
       setLoading(false);
       
-      // Smartly update or set the selected session
-      if (!selectedSession && sessionsData.length > 0) {
+      // If a session ID is in the URL, select it.
+      if (sessionIdFromUrl) {
+          const sessionToSelect = sessionsData.find(s => s.id === sessionIdFromUrl);
+          if (sessionToSelect) {
+            setSelectedSession(sessionToSelect);
+          }
+          // Clear the URL param after using it
+          const newUrl = window.location.pathname;
+          window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+
+      } else if (!selectedSession && sessionsData.length > 0) {
+        // Otherwise, smartly update or set the selected session
         setSelectedSession(sessionsData[0]);
       } else if (selectedSession) {
           const updatedSelected = sessionsData.find(s => s.id === selectedSession.id);
@@ -72,7 +87,7 @@ export default function AdminChatPage() {
     });
 
     return () => unsubscribe();
-  }, []); // Only run once on mount
+  }, [sessionIdFromUrl]); // Re-run if the URL param changes
 
   const handleDelete = async () => {
     if (!sessionToDelete) return;
