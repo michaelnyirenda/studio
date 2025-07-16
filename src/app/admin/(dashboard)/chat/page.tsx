@@ -57,26 +57,15 @@ export default function AdminChatPage() {
       setSessions(sessionsData);
       setLoading(false);
       
-      const currentSelectedId = selectedSession?.id;
-
-      // Handle initial load from URL parameter
-      if (sessionIdFromUrl && !selectedSession) {
+      // Handle initial selection from URL if it exists
+      if (sessionIdFromUrl) {
           const sessionToSelect = sessionsData.find(s => s.id === sessionIdFromUrl);
           if (sessionToSelect) {
             handleSelectSession(sessionToSelect);
           }
-          // Clean the URL
+          // Clean the URL by replacing the current history entry
           const newUrl = window.location.pathname;
           window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
-
-      } else if (currentSelectedId) {
-          // Keep the selected session's data up-to-date
-          const updatedSelected = sessionsData.find(s => s.id === currentSelectedId);
-          if (updatedSelected) {
-            setSelectedSession(updatedSelected);
-          } else {
-            setSelectedSession(null);
-          }
       }
     }, (error) => {
       console.error("Error fetching chat sessions:", error);
@@ -85,7 +74,7 @@ export default function AdminChatPage() {
 
     return () => unsubscribe();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionIdFromUrl]);
+  }, []);
 
   const handleSelectSession = async (session: ClientChatSession) => {
     setSelectedSession(session);
