@@ -6,9 +6,10 @@ import ChatInterface from '@/components/chat/chat-interface';
 import PageHeader from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, MessageSquare, XCircle } from 'lucide-react';
+import { Loader2, MessageSquare, XCircle, AlertTriangle } from 'lucide-react';
 import { startChatAction, closeChatAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface ActiveSession {
     id: string;
@@ -69,6 +70,17 @@ export default function ChatPage() {
                             <CardDescription>Your conversation is anonymous and will be connected to an available support staff member.</CardDescription>
                         </CardHeader>
                         <CardContent>
+                             <Alert variant="default" className="text-left mb-6 border-accent">
+                                <AlertTriangle className="h-5 w-5 text-accent" />
+                                <AlertTitle className="font-bold text-accent">Chat Guidelines</AlertTitle>
+                                <AlertDescription>
+                                    <ul className="list-disc pl-5 space-y-1.5 mt-2 text-sm">
+                                    <li>This chat is confidential. However, for your safety, please avoid sharing overly specific personal details (like ID numbers or exact home addresses) unless required for a referral.</li>
+                                    <li>Our support staff are here to help. Please communicate with respect. Abusive language will not be tolerated.</li>
+                                    <li>This chat is for support and guidance. If you are in immediate danger, please contact your local emergency services.</li>
+                                    </ul>
+                                </AlertDescription>
+                            </Alert>
                             <Button size="lg" onClick={handleStartChat} disabled={isLoading}>
                                 {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageSquare className="mr-2 h-5 w-5" />}
                                 {isLoading ? 'Starting...' : 'Start Anonymous Chat'}
