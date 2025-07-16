@@ -52,13 +52,11 @@ export default function AdminDashboardLayout({
         // Only show toast notifications if not on the chat page
         if (pathname !== '/admin/chat') {
             snapshot.docChanges().forEach((change) => {
-                const session = { id: change.doc.id, ...change.doc.data() } as ChatSession;
-
-                // Notify for new or modified unread sessions
-                if ((change.type === 'added' || change.type === 'modified') && !notifiedSessionIds.current.has(session.id)) {
+                if ((change.type === 'added' || change.type === 'modified') && !notifiedSessionIds.current.has(change.doc.id)) {
+                    const session = { id: change.doc.id, ...change.doc.data() } as ChatSession;
                     notifiedSessionIds.current.add(session.id); // Mark as notified
 
-                    const { id: toastId } = toast({
+                    const { dismiss } = toast({
                         title: (
                             <div className="flex items-center font-bold">
                                 <MessageSquare className="mr-2 h-5 w-5 text-accent" />
@@ -71,6 +69,11 @@ export default function AdminDashboardLayout({
                                 variant="outline"
                                 onClick={() => {
                                     router.push(`/admin/chat?sessionId=${session.id}`);
+                                    // Dismiss the toast after a delay
+                                    setTimeout(() => {
+                                        dismiss();
+                                        notifiedSessionIds.current.delete(session.id);
+                                    }, 3000);
                                 }}
                             >
                                 View Chat
