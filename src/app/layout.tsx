@@ -3,9 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from '@/components/shared/navbar';
 import AnimatedBackground from '@/components/shared/AnimatedBackground';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { HelpCircle } from 'lucide-react';
+import FaqButton from '@/components/shared/faq-button';
 
 export const metadata: Metadata = {
   title: '#iBreakFree',
@@ -30,15 +28,7 @@ export default function RootLayout({
             {children}
           </main>
           <Toaster />
-           <Link href="/faq" passHref>
-             <Button
-               variant="outline"
-               aria-label="Frequently Asked Questions"
-               className="fixed top-8 right-8 h-16 w-16 p-0 rounded-full shadow-2xl bg-card hover:bg-secondary border-4 border-primary z-50 flex items-center justify-center group"
-             >
-               <HelpCircle className="h-12 w-12 text-primary transition-transform group-hover:scale-110" strokeWidth={3} />
-             </Button>
-           </Link>
+          <FaqButton />
           <Navbar />
       </body>
     </html>
