@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { ChatMessageSchema, type ChatMessageFormData } from '@/lib/schemas';
 import type { ChatMessage, ChatSession } from '@/lib/types';
 import { Send, Loader2, Bot, User, XCircle } from 'lucide-react';
-import { sendMessageAction } from '@/app/chat/actions';
+import { sendMessageAction, getAiResponseAction } from '@/app/chat/actions';
 import { sendAdminMessageAction } from '@/app/admin/(dashboard)/chat/actions';
 
 interface ChatInterfaceProps {
@@ -98,8 +98,17 @@ export default function ChatInterface({ userId, isClientSide, sessionId }: ChatI
 
   const onSubmit = async (data: ChatMessageFormData) => {
     if (!isClientSide) return;
+    const userMessage = data.message;
     form.reset();
-    await sendMessageAction(sessionId, userId, data);
+
+    // Send the user's message immediately. This is fast.
+    const sendResult = await sendMessageAction(sessionId, userId, data);
+
+    if (sendResult.success) {
+        // After the user's message is sent, trigger the AI response.
+        // We don't await this, so the UI is not blocked.
+        getAiResponseAction(sessionId, userMessage);
+    }
   };
   
   const onAdminSubmit = async (data: ChatMessageFormData) => {
@@ -125,7 +134,7 @@ export default function ChatInterface({ userId, isClientSide, sessionId }: ChatI
           ) : (
             <div className="space-y-6">
               {messages.map((message) => {
-                const isUserMessage = message.senderId === userId;
+                const isUserMessage = message.senderType === 'user';
                 return (
                   <div key={message.id} className={cn('flex items-end gap-2', isUserMessage ? 'justify-end' : 'justify-start')}>
                     {!isUserMessage && (

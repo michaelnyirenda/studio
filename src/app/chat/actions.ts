@@ -5,6 +5,7 @@ import { collection, addDoc, serverTimestamp, updateDoc, doc, writeBatch } from 
 import { db } from '@/lib/firebase';
 import { z } from 'zod';
 import { ChatMessageSchema } from '@/lib/schemas';
+import { sendChatMessage } from '@/ai/flows/chat-flow';
 
 // This function creates a new, anonymous chat session every time.
 export async function startChatAction(): Promise<{ success: boolean; sessionId?: string; userId?: string; }> {
@@ -29,7 +30,7 @@ export async function startChatAction(): Promise<{ success: boolean; sessionId?:
   }
 }
 
-// This function sends a message to a *specific* session.
+// This function ONLY sends the user's message. The AI response is handled separately.
 export async function sendMessageAction(
   sessionId: string,
   userId: string,
@@ -71,6 +72,45 @@ export async function sendMessageAction(
     return { success: false, message: "Failed to send message." };
   }
 }
+
+// This new action gets the AI response and saves it. It's called separately.
+export async function getAiResponseAction(sessionId: string, userMessage: string): Promise<{ success: boolean }> {
+    try {
+        // 1. Get AI response from Genkit flow
+        const aiResult = await sendChatMessage({ userMessage });
+        const aiResponseText = aiResult.aiResponse;
+
+        // 2. Save AI response to the chat
+        const sessionRef = doc(db, 'chatSessions', sessionId);
+        const messagesCollection = collection(sessionRef, 'messages');
+
+        const batch = writeBatch(db);
+
+        const aiMessage = {
+            text: aiResponseText,
+            createdAt: serverTimestamp(),
+            senderId: 'ai-support-bot',
+            senderType: 'ai' as const,
+        };
+        batch.set(doc(messagesCollection), aiMessage);
+
+        // 3. Update the session with the AI's last message
+        batch.update(sessionRef, {
+            lastMessageText: aiResponseText,
+            lastMessageAt: serverTimestamp(),
+            adminUnread: false, // AI message doesn't need admin attention by default
+            userUnread: true, // Mark as unread for the user
+        });
+        
+        await batch.commit();
+        
+        return { success: true };
+    } catch (error) {
+        console.error("Error getting AI response or saving it:", error);
+        return { success: false };
+    }
+}
+
 
 // This function marks a chat as closed by the client.
 export async function closeChatAction(sessionId: string): Promise<{ success: boolean }> {
