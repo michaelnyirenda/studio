@@ -56,16 +56,15 @@ export default function AdminChatPage() {
       setSessions(sessionsData);
       setLoading(false);
 
-      // Select session from URL if it exists
+      // Handle selecting a session from a notification click.
       const sessionIdFromUrl = searchParams.get('sessionId');
       if (sessionIdFromUrl) {
           const sessionToSelect = sessionsData.find(s => s.id === sessionIdFromUrl);
           if (sessionToSelect) {
             handleSelectSession(sessionToSelect);
           }
-          // Clean the URL by replacing the current history entry
-          const newUrl = window.location.pathname;
-          window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+          // Clean the URL to prevent re-selection on refresh.
+          router.replace('/admin/chat', { scroll: false });
       }
     }, (error) => {
       console.error("Error fetching chat sessions:", error);

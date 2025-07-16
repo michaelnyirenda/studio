@@ -21,7 +21,6 @@ export default function AdminDashboardLayout({
   const pathname = usePathname();
   const [isVerified, setIsVerified] = useState(false);
   const [showNotificationBadge, setShowNotificationBadge] = useState(false);
-  const notificationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const notifiedSessionIds = useRef(new Set());
 
   useEffect(() => {
@@ -33,79 +32,68 @@ export default function AdminDashboardLayout({
     }
   }, [router]);
   
-  // Centralized listener for new/unread chats
   useEffect(() => {
     if (!isVerified) return;
 
     const sessionsCollection = collection(db, 'chatSessions');
-    // Listen to any session that becomes unread for the admin
     const q = query(sessionsCollection, where('adminUnread', '==', true));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-        const changes = snapshot.docChanges();
-        
-        // Only trigger notifications for new messages, not initial data load
-        if (changes.length > 0 && changes.some(c => c.type === 'added' || c.type === 'modified')) {
-            // Trigger the visual badge indicator
-            setShowNotificationBadge(true);
-            
-            // Clear any existing timer to reset the fade-out duration
-            if (notificationTimerRef.current) {
-                clearTimeout(notificationTimerRef.current);
-            }
-            // Set the badge to disappear after 5 seconds
-            notificationTimerRef.current = setTimeout(() => {
-                setShowNotificationBadge(false);
-            }, 5000);
-        }
+      const hasUnread = !snapshot.empty;
+      
+      // Show badge if there are unread messages AND we are not on the chat page.
+      if (hasUnread && pathname !== '/admin/chat') {
+        setShowNotificationBadge(true);
+      } else {
+        setShowNotificationBadge(false);
+      }
+      
+      const changes = snapshot.docChanges();
 
-        // Handle toast pop-up notifications
-        if (pathname !== '/admin/chat') {
-            changes.forEach((change) => {
-                // Show a toast only for newly unread messages
-                if ((change.type === 'added' || change.type === 'modified') && !notifiedSessionIds.current.has(change.doc.id)) {
-                    const session = { id: change.doc.id, ...change.doc.data() } as ChatSession;
-                    notifiedSessionIds.current.add(session.id); // Mark as notified for this browser session
+      // Handle toast pop-up notifications for new messages
+      if (pathname !== '/admin/chat') {
+          changes.forEach((change) => {
+              if ((change.type === 'added' || change.type === 'modified') && !notifiedSessionIds.current.has(change.doc.id)) {
+                  const session = { id: change.doc.id, ...change.doc.data() } as ChatSession;
+                  notifiedSessionIds.current.add(session.id);
 
-                    const { dismiss } = toast({
-                        title: (
-                            <div className="flex items-center font-bold">
-                                <MessageSquare className="mr-2 h-5 w-5 text-accent" />
-                                New Chat Message
-                            </div>
-                        ),
-                        description: `New message from ${session.userName}.`,
-                        action: (
-                            <Button
-                                variant="outline"
-                                onClick={() => {
-                                    router.push(`/admin/chat?sessionId=${session.id}`);
-                                    // Dismiss the toast after a delay when clicked
-                                    setTimeout(() => {
-                                        dismiss();
-                                        notifiedSessionIds.current.delete(session.id);
-                                    }, 3000);
-                                }}
-                            >
-                                View Chat
-                            </Button>
-                        ),
-                        duration: Infinity, // Make the toast persist until acted upon
-                        onDismiss: () => notifiedSessionIds.current.delete(session.id),
-                        onAutoClose: () => notifiedSessionIds.current.delete(session.id),
-                    });
-                }
-            });
-        }
+                  const { dismiss } = toast({
+                      title: (
+                          <div className="flex items-center font-bold">
+                              <MessageSquare className="mr-2 h-5 w-5 text-accent" />
+                              New Chat Message
+                          </div>
+                      ),
+                      description: `New message from ${session.userName}.`,
+                      action: (
+                          <Button
+                              variant="outline"
+                              onClick={() => {
+                                  router.push(`/admin/chat?sessionId=${session.id}`);
+                                  setTimeout(() => dismiss(), 3000);
+                              }}
+                          >
+                              View Chat
+                          </Button>
+                      ),
+                      duration: Infinity,
+                      onDismiss: () => notifiedSessionIds.current.delete(session.id),
+                      onAutoClose: () => notifiedSessionIds.current.delete(session.id),
+                  });
+              }
+          });
+      }
     });
 
-    return () => {
-        unsubscribe();
-        if (notificationTimerRef.current) {
-            clearTimeout(notificationTimerRef.current);
-        }
-    };
+    return () => unsubscribe();
   }, [isVerified, pathname, router, toast]);
+
+  // Effect to hide badge when navigating to the chat page
+  useEffect(() => {
+    if (pathname === '/admin/chat') {
+      setShowNotificationBadge(false);
+    }
+  }, [pathname]);
 
 
   if (!isVerified) {

@@ -9,18 +9,25 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Badge } from '@/components/ui/badge';
+import { usePathname } from 'next/navigation';
 
 
 export default function ChatStatsCard() {
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotificationBadge, setShowNotificationBadge] = useState(false);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
     const sessionsCollection = collection(db, 'chatSessions');
     const q = query(sessionsCollection, where('adminUnread', '==', true));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-        setUnreadCount(snapshot.size);
+        const hasUnread = !snapshot.empty;
+        if (hasUnread && pathname !== '/admin/chat') {
+            setShowNotificationBadge(true);
+        } else {
+            setShowNotificationBadge(false);
+        }
         setLoading(false);
     }, (error) => {
         console.error("Error fetching unread chat count:", error);
@@ -28,7 +35,13 @@ export default function ChatStatsCard() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (pathname === '/admin/chat') {
+        setShowNotificationBadge(false);
+    }
+  }, [pathname]);
 
 
   if (loading) {
@@ -53,9 +66,9 @@ export default function ChatStatsCard() {
   return (
     <Link href="/admin/chat" passHref className="block h-full group">
       <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col bg-card hover:-translate-y-1.5 relative">
-        {unreadCount > 0 && (
-          <Badge className="absolute top-4 right-4 animate-pulse bg-accent text-accent-foreground text-base px-3 py-1">
-            {unreadCount} New
+        {showNotificationBadge && (
+          <Badge className="absolute top-4 right-4 animate-in fade-in zoom-in bg-accent text-accent-foreground text-base px-3 py-1">
+            1 New
           </Badge>
         )}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

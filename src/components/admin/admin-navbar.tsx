@@ -70,7 +70,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                                             <item.icon className="mr-3 h-4 w-4" />
                                             <span>{item.label}</span>
                                             {item.id === 'chat-nav' && showNotificationBadge && (
-                                                <Badge variant="destructive" className="absolute right-4 top-1/2 -translate-y-1/2 transition-all duration-300 animate-in fade-in zoom-in">+1 New</Badge>
+                                                <Badge variant="destructive" className="absolute right-4 top-1/2 -translate-y-1/2 transition-all duration-300 animate-in fade-in zoom-in">1 New</Badge>
                                             )}
                                         </Link>
                                     </DropdownMenuItem>
@@ -97,7 +97,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                                     <item.icon className="h-5 w-5" />
                                     <span>{item.label}</span>
                                      {item.id === 'chat-nav' && showNotificationBadge && (
-                                        <Badge variant="destructive" className="absolute -top-2 -right-3 transition-all duration-300 animate-in fade-in zoom-in">+1 New</Badge>
+                                        <Badge variant="destructive" className="absolute -top-2 -right-3 transition-all duration-300 animate-in fade-in zoom-in">1 New</Badge>
                                     )}
                                 </Link>
                             )
