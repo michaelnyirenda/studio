@@ -2,12 +2,10 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import Link from 'next/link';
-import { db } from '@/lib/firebase';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, MessageSquare, Loader2 } from 'lucide-react';
+import { ArrowRight, MessageSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUnreadChatCount } from '@/app/admin/(dashboard)/layout';
 
@@ -17,9 +15,12 @@ export default function ChatStatsCard() {
 
   // We still need a loading state to show skeletons on initial mount
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500); // Simulate initial load
-    return () => clearTimeout(timer);
-  }, []);
+    // The unreadCount will be 0 initially, then update.
+    // We can use its arrival to stop the loading skeleton.
+    if (typeof unreadCount === 'number') {
+        setLoading(false);
+    }
+  }, [unreadCount]);
 
   if (loading) {
     return (

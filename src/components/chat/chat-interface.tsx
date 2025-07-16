@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { collection, query, onSnapshot, orderBy, doc, updateDoc, Timestamp, getDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,20 +48,18 @@ export default function ChatInterface({ userId, isClientSide, sessionId }: ChatI
     const messagesCollection = collection(sessionRef, 'messages');
     const q = query(messagesCollection, orderBy('createdAt', 'asc'));
 
-    const unsubscribeMessages = onSnapshot(q, async (querySnapshot) => {
+    const unsubscribeMessages = onSnapshot(q, (querySnapshot) => {
       const msgs = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          const createdAt = (data.createdAt as Timestamp); // Keep as Timestamp for now
           return {
             id: doc.id,
             ...data,
-            createdAt: createdAt,
+            createdAt: data.createdAt as Timestamp,
           } as unknown as ChatMessage;
         });
       setMessages(msgs);
     }, (error) => {
       console.error("Error fetching messages:", error);
-      setLoading(false);
     });
 
     const unsubscribeSession = onSnapshot(sessionRef, async (sessionDoc) => {
@@ -69,22 +67,13 @@ export default function ChatInterface({ userId, isClientSide, sessionId }: ChatI
             const sessionData = sessionDoc.data() as ChatSession;
             setSessionStatus(sessionData.status || 'active');
 
-            // Add a small delay before marking as read to avoid race conditions.
-            // This ensures the admin has a moment to see the notification before it clears.
-            const markAsRead = async () => {
-              if (isClientSide && sessionData.userUnread) {
-                 await updateDoc(sessionRef, { userUnread: false }).catch(console.error);
-              } else if (!isClientSide && sessionData.adminUnread) {
-                 // Only update if it's actually unread to prevent unnecessary writes
-                 await updateDoc(sessionRef, { adminUnread: false }).catch(console.error);
-              }
-            };
-            
-            setTimeout(markAsRead, 2000); // 2-second delay
+            // Client-side logic to mark messages as read by the user
+            if (isClientSide && sessionData.userUnread) {
+                await updateDoc(sessionRef, { userUnread: false }).catch(console.error);
+            }
         }
         setLoading(false);
     });
-
 
     return () => {
         unsubscribeMessages();
@@ -104,7 +93,6 @@ export default function ChatInterface({ userId, isClientSide, sessionId }: ChatI
   const onSubmit = async (data: ChatMessageFormData) => {
     if (!isClientSide) return;
     form.reset();
-
     await sendMessageAction(sessionId, userId, data);
   };
   

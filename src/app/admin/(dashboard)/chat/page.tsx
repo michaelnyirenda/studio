@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, Timestamp, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { ChatSession } from '@/lib/types';
 import PageHeader from '@/components/shared/page-header';
@@ -57,27 +57,24 @@ export default function AdminChatPage() {
       setSessions(sessionsData);
       setLoading(false);
       
-      // If a session ID is in the URL, select it.
+      const currentSelectedId = selectedSession?.id;
+
       if (sessionIdFromUrl) {
           const sessionToSelect = sessionsData.find(s => s.id === sessionIdFromUrl);
           if (sessionToSelect) {
-            setSelectedSession(sessionToSelect);
+            handleSelectSession(sessionToSelect);
           }
-          // Clear the URL param after using it by replacing the current state
           const newUrl = window.location.pathname;
           window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
 
-      } else if (!selectedSession && sessionsData.length > 0) {
-        // Otherwise, smartly update or set the selected session
-        setSelectedSession(sessionsData[0]);
-      } else if (selectedSession) {
-          const updatedSelected = sessionsData.find(s => s.id === selectedSession.id);
+      } else if (currentSelectedId) {
+          const updatedSelected = sessionsData.find(s => s.id === currentSelectedId);
           if (updatedSelected) {
+            // If the selected session still exists, update its data locally
+            // This is important for seeing new messages appear in the session list
             setSelectedSession(updatedSelected);
-          } else if (sessionsData.length > 0) {
-            // If the previously selected session is gone, select the first available one.
-            setSelectedSession(sessionsData[0]);
           } else {
+            // If the selected session was deleted, clear the selection
             setSelectedSession(null);
           }
       }
@@ -87,7 +84,21 @@ export default function AdminChatPage() {
     });
 
     return () => unsubscribe();
-  }, [sessionIdFromUrl]); // Re-run if the URL param changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionIdFromUrl]);
+
+  const handleSelectSession = async (session: ClientChatSession) => {
+    setSelectedSession(session);
+    // Mark the session as read by the admin ONLY when it's clicked.
+    if (session.adminUnread) {
+        try {
+            const sessionRef = doc(db, 'chatSessions', session.id);
+            await updateDoc(sessionRef, { adminUnread: false });
+        } catch (error) {
+            console.error("Error marking session as read:", error);
+        }
+    }
+  };
 
   const handleDelete = async () => {
     if (!sessionToDelete) return;
@@ -137,7 +148,7 @@ export default function AdminChatPage() {
                                 )}
                             >
                                 <button
-                                  onClick={() => setSelectedSession(session)}
+                                  onClick={() => handleSelectSession(session)}
                                   className="flex flex-grow items-center gap-3 overflow-hidden text-left"
                                 >
                                     <Avatar>
