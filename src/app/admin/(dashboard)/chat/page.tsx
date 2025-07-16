@@ -39,7 +39,6 @@ export default function AdminChatPage() {
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const sessionIdFromUrl = useMemo(() => searchParams.get('sessionId'), [searchParams]);
 
   useEffect(() => {
     const sessionsCollection = collection(db, 'chatSessions');
@@ -56,8 +55,9 @@ export default function AdminChatPage() {
       });
       setSessions(sessionsData);
       setLoading(false);
-      
-      // Handle initial selection from URL if it exists
+
+      // Select session from URL if it exists
+      const sessionIdFromUrl = searchParams.get('sessionId');
       if (sessionIdFromUrl) {
           const sessionToSelect = sessionsData.find(s => s.id === sessionIdFromUrl);
           if (sessionToSelect) {

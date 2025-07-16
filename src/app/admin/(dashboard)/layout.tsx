@@ -2,7 +2,7 @@
 "use client";
 
 import AdminNavbar from "@/components/admin/admin-navbar";
-import { useEffect, useState, useRef, createContext, useContext } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -10,12 +10,6 @@ import { db } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { ChatSession } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-
-// 1. Create a context for the unread count
-const UnreadChatContext = createContext<{ count: number }>({ count: 0 });
-
-// Custom hook to use the context
-export const useUnreadChatCount = () => useContext(UnreadChatContext);
 
 export default function AdminDashboardLayout({
   children,
@@ -26,9 +20,9 @@ export default function AdminDashboardLayout({
   const { toast } = useToast();
   const pathname = usePathname();
   const [isVerified, setIsVerified] = useState(false);
-  const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const [showNotificationBadge, setShowNotificationBadge] = useState(false);
+  const notificationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const notifiedSessionIds = useRef(new Set());
-
 
   useEffect(() => {
     const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
@@ -39,22 +33,39 @@ export default function AdminDashboardLayout({
     }
   }, [router]);
   
-  // Centralized listener for unread chats
+  // Centralized listener for new/unread chats
   useEffect(() => {
     if (!isVerified) return;
 
     const sessionsCollection = collection(db, 'chatSessions');
+    // Listen to any session that becomes unread for the admin
     const q = query(sessionsCollection, where('adminUnread', '==', true));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-        setUnreadChatCount(snapshot.size);
+        const changes = snapshot.docChanges();
+        
+        // Only trigger notifications for new messages, not initial data load
+        if (changes.length > 0 && changes.some(c => c.type === 'added' || c.type === 'modified')) {
+            // Trigger the visual badge indicator
+            setShowNotificationBadge(true);
+            
+            // Clear any existing timer to reset the fade-out duration
+            if (notificationTimerRef.current) {
+                clearTimeout(notificationTimerRef.current);
+            }
+            // Set the badge to disappear after 5 seconds
+            notificationTimerRef.current = setTimeout(() => {
+                setShowNotificationBadge(false);
+            }, 5000);
+        }
 
-        // Only show toast notifications if not on the chat page
+        // Handle toast pop-up notifications
         if (pathname !== '/admin/chat') {
-            snapshot.docChanges().forEach((change) => {
+            changes.forEach((change) => {
+                // Show a toast only for newly unread messages
                 if ((change.type === 'added' || change.type === 'modified') && !notifiedSessionIds.current.has(change.doc.id)) {
                     const session = { id: change.doc.id, ...change.doc.data() } as ChatSession;
-                    notifiedSessionIds.current.add(session.id); // Mark as notified
+                    notifiedSessionIds.current.add(session.id); // Mark as notified for this browser session
 
                     const { dismiss } = toast({
                         title: (
@@ -69,7 +80,7 @@ export default function AdminDashboardLayout({
                                 variant="outline"
                                 onClick={() => {
                                     router.push(`/admin/chat?sessionId=${session.id}`);
-                                    // Dismiss the toast after a delay
+                                    // Dismiss the toast after a delay when clicked
                                     setTimeout(() => {
                                         dismiss();
                                         notifiedSessionIds.current.delete(session.id);
@@ -88,7 +99,12 @@ export default function AdminDashboardLayout({
         }
     });
 
-    return () => unsubscribe();
+    return () => {
+        unsubscribe();
+        if (notificationTimerRef.current) {
+            clearTimeout(notificationTimerRef.current);
+        }
+    };
   }, [isVerified, pathname, router, toast]);
 
 
@@ -101,13 +117,11 @@ export default function AdminDashboardLayout({
   }
 
   return (
-    <UnreadChatContext.Provider value={{ count: unreadChatCount }}>
-        <div className="flex min-h-screen flex-col">
-            <AdminNavbar />
-            <main className="flex-1">
-                {children}
-            </main>
-        </div>
-    </UnreadChatContext.Provider>
+    <div className="flex min-h-screen flex-col">
+        <AdminNavbar showNotificationBadge={showNotificationBadge} />
+        <main className="flex-1">
+            {children}
+        </main>
+    </div>
   );
 }

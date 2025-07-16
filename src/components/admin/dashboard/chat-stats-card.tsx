@@ -4,23 +4,32 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { ArrowRight, MessageSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUnreadChatCount } from '@/app/admin/(dashboard)/layout';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Badge } from '@/components/ui/badge';
+
 
 export default function ChatStatsCard() {
-  const { count: unreadCount } = useUnreadChatCount();
+  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // We still need a loading state to show skeletons on initial mount
   useEffect(() => {
-    // The unreadCount will be 0 initially, then update.
-    // We can use its arrival to stop the loading skeleton.
-    if (typeof unreadCount === 'number') {
+    const sessionsCollection = collection(db, 'chatSessions');
+    const q = query(sessionsCollection, where('adminUnread', '==', true));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        setUnreadCount(snapshot.size);
         setLoading(false);
-    }
-  }, [unreadCount]);
+    }, (error) => {
+        console.error("Error fetching unread chat count:", error);
+        setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
 
   if (loading) {
     return (

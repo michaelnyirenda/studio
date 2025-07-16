@@ -19,7 +19,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { useUnreadChatCount } from '@/app/admin/(dashboard)/layout';
 import { Badge } from '../ui/badge';
 
 const navItems = [
@@ -31,10 +30,13 @@ const navItems = [
     { href: '/admin/data-export', label: 'Data Export', icon: FileSpreadsheet },
 ];
 
-export default function AdminNavbar() {
+interface AdminNavbarProps {
+    showNotificationBadge: boolean;
+}
+
+export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { count: unreadChatCount } = useUnreadChatCount();
 
     const handleLogout = () => {
         sessionStorage.removeItem('isAdminLoggedIn');
@@ -67,8 +69,8 @@ export default function AdminNavbar() {
                                         <Link href={item.href} className="relative flex items-center font-semibold text-primary">
                                             <item.icon className="mr-3 h-4 w-4" />
                                             <span>{item.label}</span>
-                                            {item.id === 'chat-nav' && unreadChatCount > 0 && (
-                                                <Badge variant="destructive" className="absolute right-4 top-1/2 -translate-y-1/2">{unreadChatCount}</Badge>
+                                            {item.id === 'chat-nav' && showNotificationBadge && (
+                                                <Badge variant="destructive" className="absolute right-4 top-1/2 -translate-y-1/2 transition-all duration-300 animate-in fade-in zoom-in">+1 New</Badge>
                                             )}
                                         </Link>
                                     </DropdownMenuItem>
@@ -94,8 +96,8 @@ export default function AdminNavbar() {
                                 >
                                     <item.icon className="h-5 w-5" />
                                     <span>{item.label}</span>
-                                     {item.id === 'chat-nav' && unreadChatCount > 0 && (
-                                        <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0">{unreadChatCount}</Badge>
+                                     {item.id === 'chat-nav' && showNotificationBadge && (
+                                        <Badge variant="destructive" className="absolute -top-2 -right-3 transition-all duration-300 animate-in fade-in zoom-in">+1 New</Badge>
                                     )}
                                 </Link>
                             )
