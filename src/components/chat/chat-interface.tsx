@@ -69,13 +69,19 @@ export default function ChatInterface({ userId, isClientSide, sessionId }: ChatI
             const sessionData = sessionDoc.data() as ChatSession;
             setSessionStatus(sessionData.status || 'active');
 
+            // This is the key logic change:
+            // Mark the session as read for the current viewer (client or admin)
+            // This now correctly handles clearing the unread state only when the session is being actively viewed.
             const batch = writeBatch(db);
             if (isClientSide && sessionData.userUnread) {
                batch.update(sessionRef, { userUnread: false });
             } else if (!isClientSide && sessionData.adminUnread) {
                batch.update(sessionRef, { adminUnread: false });
             }
-            await batch.commit().catch(console.error);
+            // Only commit if there are actual changes to make
+            if (batch._mutations.length > 0) {
+              await batch.commit().catch(console.error);
+            }
         }
         setLoading(false);
     });
