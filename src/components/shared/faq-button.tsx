@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 export default function FaqButton() {
     const pathname = usePathname();
 
-    if (pathname.startsWith('/admin')) {
+    if (pathname.startsWith('/admin') || pathname === '/faq') {
         return null;
     }
 
