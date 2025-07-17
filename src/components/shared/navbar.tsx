@@ -10,10 +10,6 @@ import { cn } from '@/lib/utils';
 export default function Navbar() {
   const pathname = usePathname();
 
-  if (pathname.startsWith('/admin')) {
-    return null;
-  }
-
   const navItems = [
     { href: "/", label: "Home", icon: <Home /> },
     { href: "/forum", label: "Forum", icon: <BookOpenText /> },
@@ -24,7 +20,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed bottom-6 left-0 right-0 z-50 border-t bg-card/90 backdrop-blur-lg">
-      <div className="mx-auto flex h-14 max-w-md items-stretch justify-around">
+      <div className="mx-auto flex h-16 max-w-md items-stretch justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           return (
