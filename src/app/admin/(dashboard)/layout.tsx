@@ -10,6 +10,7 @@ import { db } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { ChatSession } from '@/lib/types';
 import { Button } from '@/components/ui/button';
+import Footer from "@/components/shared/footer";
 
 export default function AdminDashboardLayout({
   children,
@@ -110,6 +111,7 @@ export default function AdminDashboardLayout({
         <main className="flex-1">
             {children}
         </main>
+        <Footer />
     </div>
   );
 }
