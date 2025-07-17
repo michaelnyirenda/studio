@@ -1,4 +1,5 @@
 import CreatePostForm from '@/components/forum/create-post-form';
+import Footer from '@/components/shared/footer';
 import PageHeader from '@/components/shared/page-header';
 
 export default function CreateForumPostPage() {
@@ -9,6 +10,7 @@ export default function CreateForumPostPage() {
         description="Contribute to the #iBreakFree community by sharing your thoughts and expertise."
       />
       <CreatePostForm />
+      <Footer />
     </div>
   );
 }

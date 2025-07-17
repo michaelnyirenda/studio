@@ -7,6 +7,7 @@ import CreatePostForm from '@/components/forum/create-post-form';
 import PageHeader from '@/components/shared/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
+import Footer from '@/components/shared/footer';
 
 interface PostData {
   id: string;
@@ -68,6 +69,7 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
             <Skeleton className="h-40 w-full" />
             <Skeleton className="h-12 w-full mt-4" />
          </Card>
+         <Footer />
        </div>
     );
   }
@@ -76,6 +78,7 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
     return (
         <div className="container mx-auto py-8 px-4 text-center pb-24">
             <h1 className="text-2xl font-bold text-destructive">{error}</h1>
+             <Footer />
         </div>
     );
   }
@@ -87,6 +90,7 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
         description="Refine your message and update the community."
       />
       {post && <CreatePostForm initialData={post} />}
+       <Footer />
     </div>
   );
 }

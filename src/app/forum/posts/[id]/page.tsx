@@ -1,4 +1,3 @@
-
 // src/app/forum/posts/[id]/page.tsx
 "use client";
 
