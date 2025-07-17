@@ -18,6 +18,11 @@ export default function Navbar() {
     { href: "/chat", label: "Chat", icon: <MessageSquare /> },
   ];
 
+  // Do not render the client navbar on any admin pages.
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <nav className="fixed bottom-5 left-0 right-0 z-50 h-20 border-t bg-card/90 backdrop-blur-lg">
       <div className="mx-auto flex h-full max-w-md items-stretch justify-around">
