@@ -25,12 +25,12 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen">
           <AnimatedBackground />
-          <div className="flex-grow z-10">
-            <main className="pb-24">
+          <div className="flex-grow flex flex-col z-10">
+            <main className="flex-grow pb-20">
               {children}
             </main>
+            <Footer />
           </div>
-          <Footer />
           <Toaster />
           <FaqButton />
           <Navbar />
