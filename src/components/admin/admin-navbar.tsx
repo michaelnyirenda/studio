@@ -45,15 +45,15 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-20 items-center justify-between">
+            <div className="container flex h-16 items-center justify-between">
                 
                 {/* Left Aligned Items */}
-                <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-3">
                      {/* Mobile Menu Trigger */}
                     <div className="md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="h-12 w-12 rounded-lg border-2 border-primary">
+                                <Button variant="outline" size="icon" className="h-10 w-10 rounded-md border-2 border-primary">
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">Open navigation menu</span>
                                 </Button>
@@ -80,7 +80,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden items-center gap-x-6 text-sm font-medium md:flex">
+                    <nav className="hidden items-center gap-x-2 text-sm font-medium md:flex">
                         {navItems.map((item) => {
                             const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
                             return (
@@ -88,16 +88,16 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        'relative flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors border-2',
+                                        'relative flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors border-2',
                                         isActive
                                             ? 'bg-secondary text-primary font-bold border-primary/20'
                                             : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-primary/20'
                                     )}
                                 >
-                                    <item.icon className="h-5 w-5" />
+                                    <item.icon className="h-4 w-4" />
                                     <span>{item.label}</span>
                                      {item.id === 'chat-nav' && showNotificationBadge && (
-                                        <Badge variant="destructive" className="absolute -top-2 -right-3 transition-all duration-300 animate-in fade-in zoom-in">1 New</Badge>
+                                        <Badge variant="destructive" className="absolute -top-2 -right-2 transition-all duration-300 animate-in fade-in zoom-in text-xs">New</Badge>
                                     )}
                                 </Link>
                             )
@@ -110,7 +110,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full border-2 border-primary">
-                               <Avatar className="h-9 w-9">
+                               <Avatar className="h-8 w-8">
                                     <AvatarFallback>AD</AvatarFallback>
                                 </Avatar>
                                 <div className="hidden md:flex flex-col items-start leading-tight">
@@ -130,7 +130,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild className="w-full py-2.5 text-base">
+                            <DropdownMenuItem asChild className="w-full py-2 text-base">
                                 <Link href="/admin/user-management" className="cursor-pointer flex items-center font-bold">
                                     <UserCog className="mr-3 h-5 w-5" />
                                     <span>User Management</span>

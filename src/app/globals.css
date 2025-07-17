@@ -8,6 +8,9 @@ body {
 }
 
 @layer base {
+  html {
+    @apply text-[14px];
+  }
   :root {
     --background: 10 30% 96%; /* Very light, warm gray */
     --foreground: 10 10% 20%;   /* Very dark, slightly warm gray */
