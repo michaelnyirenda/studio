@@ -25,7 +25,7 @@ export default function FaqButton() {
                         aria-label="Frequently Asked Questions"
                         className={cn(
                             "fixed h-16 w-16 p-0 rounded-full shadow-2xl bg-card hover:bg-secondary border-4 border-primary z-50 flex items-center justify-center group",
-                            "bottom-24 right-4", // Mobile position
+                            "bottom-28 right-4", // Mobile position
                             "md:top-8 md:right-8"   // Desktop position
                         )}
                         >
