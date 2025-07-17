@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -23,7 +22,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/90 backdrop-blur-lg">
+    <nav className="fixed bottom-8 left-0 right-0 z-50 border-t bg-card/90 backdrop-blur-lg">
       <div className="mx-auto flex h-20 max-w-md items-stretch justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
