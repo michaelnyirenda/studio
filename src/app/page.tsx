@@ -7,6 +7,7 @@ import PageHeader from "@/components/shared/page-header";
 import { ArrowRight, BookOpenText, ClipboardList, MessageSquare, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
+import Footer from '@/components/shared/footer';
 
 interface FeatureCardProps {
   title: string;
@@ -107,6 +108,7 @@ export default function Home() {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -1,10 +1,10 @@
-
 // src/app/faq/page.tsx
 "use client";
 
 import PageHeader from "@/components/shared/page-header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
+import Footer from "@/components/shared/footer";
 
 const faqs = [
     {
@@ -61,6 +61,7 @@ export default function FaqPage() {
                     </Accordion>
                 </CardContent>
             </Card>
+            <Footer />
         </div>
     );
 }

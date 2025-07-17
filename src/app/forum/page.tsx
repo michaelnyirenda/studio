@@ -10,6 +10,7 @@ import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firesto
 import { db } from '@/lib/firebase';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import Footer from '@/components/shared/footer';
 
 interface Post {
   id: string;
@@ -134,6 +135,7 @@ export default function ForumPage() {
           ))
         )}
       </div>
+      <Footer />
     </div>
   );
 }

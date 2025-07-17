@@ -11,6 +11,7 @@ import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import Footer from '@/components/shared/footer';
 
 interface Post {
   id: string;
@@ -247,6 +248,7 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
            <ContentRenderer content={post.content} />
         </CardContent>
       </Card>
+      <Footer />
     </div>
   );
 }

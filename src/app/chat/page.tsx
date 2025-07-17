@@ -10,6 +10,7 @@ import { Loader2, MessageSquare, XCircle, AlertTriangle } from 'lucide-react';
 import { startChatAction, closeChatAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Footer from '@/components/shared/footer';
 
 interface ActiveSession {
     id: string;
@@ -99,6 +100,7 @@ export default function ChatPage() {
                     </>
                 )}
             </div>
+            <Footer />
         </div>
     );
 }

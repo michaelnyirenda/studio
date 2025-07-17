@@ -4,7 +4,6 @@ import { Toaster } from "@/components/ui/toaster";
 import Navbar from '@/components/shared/navbar';
 import AnimatedBackground from '@/components/shared/AnimatedBackground';
 import FaqButton from '@/components/shared/faq-button';
-import Footer from '@/components/shared/footer';
 
 export const metadata: Metadata = {
   title: '#iBreakFree',
@@ -28,7 +27,6 @@ export default function RootLayout({
           <main className="flex-grow z-10">
             {children}
           </main>
-          <Footer />
           <Toaster />
           <FaqButton />
           <Navbar />

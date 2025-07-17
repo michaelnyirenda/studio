@@ -9,6 +9,7 @@ import StiScreeningForm from '@/components/sti-screening/sti-screening-form';
 import ScreeningTypeCard from '@/components/hiv-screening/screening-type-card';
 import { Button } from '@/components/ui/button';
 import { ShieldCheck, ShieldAlert, Pill, ArrowLeft, TestTube2 } from 'lucide-react';
+import Footer from '@/components/shared/footer';
 
 type ScreeningType = 'hiv' | 'gbv' | 'prep' | 'sti' | null;
 
@@ -78,6 +79,7 @@ export default function ScreeningPage() {
           Back to Screening Selection
         </Button>
         {renderScreeningForm()}
+        <Footer />
       </div>
     );
   }
@@ -126,6 +128,7 @@ export default function ScreeningPage() {
           imageHint="laboratory test"
         />
       </div>
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import ReferralsList from '@/components/referrals/referrals-list';
 import PageHeader from '@/components/shared/page-header';
+import Footer from '@/components/shared/footer';
 
 export default function ReferralsPage() {
     return (
@@ -17,6 +18,7 @@ export default function ReferralsPage() {
             }>
                 <ReferralsList />
             </Suspense>
+            <Footer />
         </div>
     );
 }
