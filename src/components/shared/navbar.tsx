@@ -19,8 +19,8 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed bottom-5 left-0 right-0 z-50 border-t bg-card/90 backdrop-blur-lg">
-      <div className="mx-auto flex h-16 max-w-md items-stretch justify-around">
+    <nav className="fixed bottom-5 left-0 right-0 z-50">
+      <div className="mx-auto flex h-20 max-w-md items-stretch justify-around border-t bg-card/90 backdrop-blur-lg">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           return (
@@ -33,7 +33,7 @@ export default function Navbar() {
               <div
                 className={cn(
                   // Use padding for flexible width instead of a fixed width
-                  "flex h-7 items-center justify-center rounded-full px-3 transition-all duration-300",
+                  "flex h-7 items-center justify-center rounded-full px-4 transition-all duration-300",
                   isActive ? "bg-secondary" : ""
                 )}
               >
@@ -45,7 +45,7 @@ export default function Navbar() {
                 })}
               </div>
               <span className={cn(
-                "text-xs font-medium transition-colors",
+                "text-xs font-bold transition-colors",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}>
                 {item.label}
