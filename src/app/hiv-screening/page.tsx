@@ -9,7 +9,6 @@ import StiScreeningForm from '@/components/sti-screening/sti-screening-form';
 import ScreeningTypeCard from '@/components/hiv-screening/screening-type-card';
 import { Button } from '@/components/ui/button';
 import { ShieldCheck, ShieldAlert, Pill, ArrowLeft, TestTube2 } from 'lucide-react';
-import Footer from '@/components/shared/footer';
 
 type ScreeningType = 'hiv' | 'gbv' | 'prep' | 'sti' | null;
 
@@ -73,19 +72,18 @@ export default function ScreeningPage() {
 
   if (selectedScreening) {
     return (
-      <div className="container mx-auto py-8 px-4 pb-24">
+      <div className="container mx-auto py-8 px-4">
         <Button variant="ghost" onClick={handleBackToSelection} className="mb-4 text-accent hover:text-accent/80 pl-0 font-semibold">
           <ArrowLeft className="mr-2 h-5 w-5" />
           Back to Screening Selection
         </Button>
         {renderScreeningForm()}
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 pb-24">
+    <div className="container mx-auto py-8 px-4">
       <PageHeader
         title="Select Screening Type"
         description="Choose the type of screening you would like to proceed with. All screenings are confidential."
@@ -128,7 +126,6 @@ export default function ScreeningPage() {
           imageHint="laboratory test"
         />
       </div>
-      <Footer />
     </div>
   );
 }

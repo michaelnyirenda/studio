@@ -4,7 +4,6 @@
 import PageHeader from "@/components/shared/page-header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
-import Footer from "@/components/shared/footer";
 
 const faqs = [
     {
@@ -39,7 +38,7 @@ const faqs = [
 
 export default function FaqPage() {
     return (
-        <div className="container mx-auto py-8 px-4 pb-24">
+        <div className="container mx-auto py-8 px-4">
             <PageHeader
                 title="Frequently Asked Questions"
                 description="Find answers to common questions about using the #iBreakFree platform."
@@ -61,7 +60,6 @@ export default function FaqPage() {
                     </Accordion>
                 </CardContent>
             </Card>
-            <Footer />
         </div>
     );
 }

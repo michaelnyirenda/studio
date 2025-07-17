@@ -10,7 +10,6 @@ import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firesto
 import { db } from '@/lib/firebase';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import Footer from '@/components/shared/footer';
 
 interface Post {
   id: string;
@@ -64,7 +63,7 @@ export default function ForumPage() {
   }, []);
 
   return (
-    <div className="container mx-auto py-8 px-4 relative pb-24">
+    <div className="container mx-auto py-8 px-4 relative">
       <PageHeader
         title="Community Forum"
         description="Browse discussions, share insights, and connect with others."
@@ -135,7 +134,6 @@ export default function ForumPage() {
           ))
         )}
       </div>
-      <Footer />
     </div>
   );
 }

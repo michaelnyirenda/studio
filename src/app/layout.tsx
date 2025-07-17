@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Navbar from '@/components/shared/navbar';
 import AnimatedBackground from '@/components/shared/AnimatedBackground';
 import FaqButton from '@/components/shared/faq-button';
+import Footer from '@/components/shared/footer';
 
 export const metadata: Metadata = {
   title: '#iBreakFree',
@@ -22,11 +23,14 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased min-h-screen flex flex-col">
+      <body className="font-body antialiased flex flex-col min-h-screen">
           <AnimatedBackground />
-          <main className="flex-grow z-10">
-            {children}
-          </main>
+          <div className="flex-grow z-10">
+            <main className="pb-24">
+              {children}
+            </main>
+          </div>
+          <Footer />
           <Toaster />
           <FaqButton />
           <Navbar />

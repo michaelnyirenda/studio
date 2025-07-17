@@ -10,7 +10,6 @@ import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import Footer from '@/components/shared/footer';
 
 interface Post {
   id: string;
@@ -212,7 +211,7 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl pb-24">
+    <div className="container mx-auto py-8 px-4 max-w-4xl">
       <Link href="/forum" passHref>
         <Button variant="ghost" className="mb-6 text-accent hover:text-accent/80 pl-0 font-semibold">
           <ArrowLeft className="mr-2 h-5 w-5" />
@@ -247,7 +246,6 @@ export default function ForumPostPage({ params }: { params: { id: string } }) {
            <ContentRenderer content={post.content} />
         </CardContent>
       </Card>
-      <Footer />
     </div>
   );
 }

@@ -2,11 +2,10 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import ReferralsList from '@/components/referrals/referrals-list';
 import PageHeader from '@/components/shared/page-header';
-import Footer from '@/components/shared/footer';
 
 export default function ReferralsPage() {
     return (
-        <div className="container mx-auto py-8 px-4 pb-24">
+        <div className="container mx-auto py-8 px-4">
             <PageHeader
                 title="Your Referrals"
                 description="Complete pending referrals and view your referral history."
@@ -18,7 +17,6 @@ export default function ReferralsPage() {
             }>
                 <ReferralsList />
             </Suspense>
-            <Footer />
         </div>
     );
 }

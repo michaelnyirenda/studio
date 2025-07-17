@@ -7,7 +7,6 @@ import PageHeader from "@/components/shared/page-header";
 import { ArrowRight, BookOpenText, ClipboardList, MessageSquare, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
-import Footer from '@/components/shared/footer';
 
 interface FeatureCardProps {
   title: string;
@@ -96,7 +95,7 @@ export default function Home() {
   ];
 
   return (
-     <div className="container mx-auto px-4 pt-8 pb-24">
+     <div className="container mx-auto px-4 pt-8">
       <div className="flex flex-col items-center">
         <PageHeader
           title={<>Welcome to <span className="font-cursive text-5xl">#iBreakFree</span></>}
@@ -108,7 +107,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
