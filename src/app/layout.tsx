@@ -25,7 +25,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
           <AnimatedBackground />
-          <div className="relative z-10 flex min-h-screen flex-col">
+          <div className="relative flex min-h-screen flex-col">
             <main className="flex-grow pb-40">
               {children}
             </main>
