@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import CreatePostForm from '@/components/forum/create-post-form';
-import PageHeader from '@/components/shared/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 
@@ -56,10 +55,6 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
   if (loading) {
     return (
        <div className="container mx-auto py-8 px-4">
-        <PageHeader
-            title="Edit Post"
-            description="Loading post details..."
-        />
          <Card className="w-full max-w-2xl mx-auto p-6 space-y-6">
             <Skeleton className="h-8 w-1/4" />
             <Skeleton className="h-10 w-full" />
@@ -82,10 +77,6 @@ export default function EditForumPostPage({ params }: { params: { id: string } }
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <PageHeader
-        title="Edit Post"
-        description="Refine your message and update the community."
-      />
       {post && <CreatePostForm initialData={post} />}
     </div>
   );
