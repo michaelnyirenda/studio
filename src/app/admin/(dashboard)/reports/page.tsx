@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
-import { BarChart as LucideBarChart, Loader2, CalendarIcon } from 'lucide-react';
+import { BarChart as LucideBarChart, Loader2, CalendarIcon, MoreHorizontal, Trash2 } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart as ShadBarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
@@ -24,6 +24,20 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import type { DateRange } from 'react-day-picker';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { deleteScreeningAction } from './actions';
+
 
 // Import new analytics tab components
 import HivAnalyticsTab from '@/components/admin/reports/hiv-analytics-tab';
@@ -95,6 +109,9 @@ export default function ScreeningDataPage() {
     from: subDays(new Date(), 29),
     to: new Date(),
   });
+  const [screeningToDelete, setScreeningToDelete] = useState<Screening | null>(null);
+  const { toast } = useToast();
+
 
   useEffect(() => {
     const fetchAllScreenings = async () => {
@@ -190,6 +207,22 @@ export default function ScreeningDataPage() {
   const handleViewDetails = (screening: Screening) => {
     setSelectedScreening(screening);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!screeningToDelete) return;
+
+    const result = await deleteScreeningAction(screeningToDelete.id, screeningToDelete.screeningType);
+    
+    if (result.success) {
+      toast({ title: "Success", description: result.message });
+      // Optimistically update the UI by removing the deleted screening from the state
+      setAllScreenings(prev => prev.filter(s => s.id !== screeningToDelete.id));
+    } else {
+      toast({ title: "Error", description: result.message, variant: "destructive" });
+    }
+    
+    setScreeningToDelete(null); // Close the dialog
   };
   
   if (loading) {
@@ -354,7 +387,26 @@ export default function ScreeningDataPage() {
                           <TableCell>{screening.keyResult}</TableCell>
                           <TableCell>{screening.referred}</TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="sm" onClick={() => handleViewDetails(screening)}>View Details</Button>
+                             <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleViewDetails(screening)}>
+                                    View Details
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-destructive focus:text-destructive"
+                                    onClick={() => setScreeningToDelete(screening)}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Record
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ))
@@ -407,6 +459,24 @@ export default function ScreeningDataPage() {
            )}
         </DialogContent>
       </Dialog>
+      
+      <AlertDialog open={!!screeningToDelete} onOpenChange={(open) => !open && setScreeningToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the screening record for "{screeningToDelete?.userName}" (ID: {screeningToDelete?.id}).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Yes, delete record
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
