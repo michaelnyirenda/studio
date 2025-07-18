@@ -89,7 +89,7 @@ export default function ForumManagementPage() {
           title="Forum Management"
           description="Create, edit, and delete forum posts."
         />
-         <Link href="/forum/create" passHref>
+         <Link href="/admin/forum/create" passHref>
           <Button size="lg">
             <Plus className="mr-2 h-5 w-5" />
             Create Post
