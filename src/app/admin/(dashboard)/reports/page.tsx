@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs, query, Timestamp } from 'firebase/firestore';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
-import { BarChart as LucideBarChart, Loader2 } from 'lucide-react';
+import { BarChart as LucideBarChart, Loader2, CalendarIcon } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart as ShadBarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
@@ -20,6 +20,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import ScreeningDetailsDisplay from '@/components/referrals/screening-details-display';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import type { DateRange } from 'react-day-picker';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 // Import new analytics tab components
 import HivAnalyticsTab from '@/components/admin/reports/hiv-analytics-tab';
@@ -87,6 +91,10 @@ export default function ScreeningDataPage() {
   const [filters, setFilters] = useState({ search: '', type: 'all_types', result: 'any_result' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedScreening, setSelectedScreening] = useState<Screening | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 29),
+    to: new Date(),
+  });
 
   useEffect(() => {
     const fetchAllScreenings = async () => {
@@ -130,8 +138,21 @@ export default function ScreeningDataPage() {
     fetchAllScreenings();
   }, []);
 
-  const filteredScreenings = useMemo(() => {
+  const dateFilteredScreenings = useMemo(() => {
+    if (!dateRange?.from) return allScreenings;
+    const fromDate = dateRange.from;
+    const toDate = dateRange.to ? new Date(dateRange.to) : new Date();
+    toDate.setHours(23, 59, 59, 999); // Include all of the 'to' date
+
     return allScreenings.filter(s => {
+      const screeningDate = new Date(s.date);
+      return screeningDate >= fromDate && screeningDate <= toDate;
+    });
+  }, [allScreenings, dateRange]);
+
+
+  const filteredScreenings = useMemo(() => {
+    return dateFilteredScreenings.filter(s => {
       const searchMatch = s.userName.toLowerCase().includes(filters.search.toLowerCase()) || s.id.toLowerCase().includes(filters.search.toLowerCase()) || (s.phoneNumber && s.phoneNumber.includes(filters.search)) || (s.email && s.email.toLowerCase().includes(filters.search.toLowerCase()));
       const typeMatch = filters.type === 'all_types' || s.screeningType.toLowerCase() === filters.type;
       const resultMatch = filters.result === 'any_result' || 
@@ -139,10 +160,10 @@ export default function ScreeningDataPage() {
                           (filters.result === 'referred' && s.referred === 'Yes');
       return searchMatch && typeMatch && resultMatch;
     });
-  }, [allScreenings, filters]);
+  }, [dateFilteredScreenings, filters]);
 
   const summaryChartData = useMemo(() => {
-    const monthlyCounts = allScreenings.reduce((acc, screening) => {
+    const monthlyCounts = dateFilteredScreenings.reduce((acc, screening) => {
       const date = new Date(screening.date);
       const month = format(date, 'MMM');
       if (!acc[month]) {
@@ -157,14 +178,14 @@ export default function ScreeningDataPage() {
 
     const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return Object.values(monthlyCounts).sort((a, b) => monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month));
-  }, [allScreenings]);
+  }, [dateFilteredScreenings]);
 
   const { hivScreenings, gbvScreenings, prepScreenings, stiScreenings } = useMemo(() => ({
-    hivScreenings: allScreenings.filter(s => s.screeningType === 'HIV'),
-    gbvScreenings: allScreenings.filter(s => s.screeningType === 'GBV'),
-    prepScreenings: allScreenings.filter(s => s.screeningType === 'PrEP'),
-    stiScreenings: allScreenings.filter(s => s.screeningType === 'STI'),
-  }), [allScreenings]);
+    hivScreenings: dateFilteredScreenings.filter(s => s.screeningType === 'HIV'),
+    gbvScreenings: dateFilteredScreenings.filter(s => s.screeningType === 'GBV'),
+    prepScreenings: dateFilteredScreenings.filter(s => s.screeningType === 'PrEP'),
+    stiScreenings: dateFilteredScreenings.filter(s => s.screeningType === 'STI'),
+  }), [dateFilteredScreenings]);
 
   const handleViewDetails = (screening: Screening) => {
     setSelectedScreening(screening);
@@ -230,10 +251,10 @@ export default function ScreeningDataPage() {
               <CardDescription>Browse and filter individual screening records.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                <Input placeholder="Search by name, ID, phone, or email..." className="flex-grow" value={filters.search} onChange={(e) => setFilters(f => ({...f, search: e.target.value}))}/>
+              <div className="flex flex-col sm:flex-row gap-2 mb-4 items-center flex-wrap">
+                <Input placeholder="Search..." className="flex-grow min-w-[200px]" value={filters.search} onChange={(e) => setFilters(f => ({...f, search: e.target.value}))}/>
                 <Select value={filters.type} onValueChange={(value) => setFilters(f => ({...f, type: value}))}>
-                  <SelectTrigger className="w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full sm:w-[150px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all_types">All Types</SelectItem>
                     <SelectItem value="hiv">HIV</SelectItem>
@@ -250,6 +271,49 @@ export default function ScreeningDataPage() {
                     <SelectItem value="referred">Referred</SelectItem>
                   </SelectContent>
                 </Select>
+                <div className="flex items-center gap-2">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                            id="date"
+                            variant={"outline"}
+                            className={cn(
+                                "w-full sm:w-[260px] justify-start text-left font-normal",
+                                !dateRange && "text-muted-foreground"
+                            )}
+                            >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.from ? (
+                                dateRange.to ? (
+                                <>
+                                    {format(dateRange.from, "LLL dd, y")} -{" "}
+                                    {format(dateRange.to, "LLL dd, y")}
+                                </>
+                                ) : (
+                                format(dateRange.from, "LLL dd, y")
+                                )
+                            ) : (
+                                <span>Pick a date range</span>
+                            )}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={dateRange?.from}
+                            selected={dateRange}
+                            onSelect={setDateRange}
+                            numberOfMonths={2}
+                            />
+                             <div className="flex gap-2 p-2 border-t">
+                                <Button variant="ghost" size="sm" onClick={() => setDateRange({from: subDays(new Date(), 6), to: new Date()})}>Last 7 Days</Button>
+                                <Button variant="ghost" size="sm" onClick={() => setDateRange({from: subDays(new Date(), 29), to: new Date()})}>Last 30 Days</Button>
+                                <Button variant="ghost" size="sm" onClick={() => setDateRange({from: subDays(new Date(), 89), to: new Date()})}>Last 90 Days</Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                </div>
               </div>
               <div className="overflow-x-auto">
                 <Table>
@@ -296,13 +360,13 @@ export default function ScreeningDataPage() {
                       ))
                     ) : (
                        <TableRow>
-                        <TableCell colSpan={6} className="text-center h-24">No screening records found.</TableCell>
+                        <TableCell colSpan={6} className="text-center h-24">No screening records found for the selected criteria.</TableCell>
                        </TableRow>
                     )}
                   </TableBody>
                 </Table>
               </div>
-              <p className="text-xs text-muted-foreground mt-2 text-center">Showing {filteredScreenings.length} of {allScreenings.length} screening records.</p>
+              <p className="text-xs text-muted-foreground mt-2 text-center">Showing {filteredScreenings.length} of {allScreenings.length} total screening records.</p>
             </CardContent>
           </Card>
         </TabsContent>
