@@ -84,12 +84,20 @@ export default function ForumManagementPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 relative">
-      <PageHeader
-        title="Forum Management"
-        description="Create, edit, and delete forum posts."
-      />
+      <div className="flex justify-between items-center mb-8">
+        <PageHeader
+          title="Forum Management"
+          description="Create, edit, and delete forum posts."
+        />
+         <Link href="/forum/create" passHref>
+          <Button size="lg" className="bg-accent hover:bg-accent/90">
+            <Plus className="mr-2 h-5 w-5" />
+            Create Post
+          </Button>
+        </Link>
+      </div>
       
-      <div className="grid gap-8 mt-8 mb-24 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {loading ? (
            Array.from({ length: 3 }).map((_, index) => (
             <Card key={index} className="shadow-lg overflow-hidden flex flex-col">
@@ -176,16 +184,6 @@ export default function ForumManagementPage() {
           ))
         )}
       </div>
-
-      <Link href="/forum/create" passHref>
-        <Button
-          aria-label="Create new post"
-          className="fixed bottom-8 right-8 h-16 px-6 rounded-2xl shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground z-50 flex items-center"
-        >
-          <Plus className="mr-2 h-6 w-6" />
-          <span className="text-lg font-semibold">Create Post</span>
-        </Button>
-      </Link>
 
       <AlertDialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>
         <AlertDialogContent>
