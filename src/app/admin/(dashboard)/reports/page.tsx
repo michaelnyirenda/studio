@@ -252,7 +252,7 @@ export default function ScreeningDataPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-2 mb-4 items-center flex-wrap">
-                <Input placeholder="Search..." className="flex-grow min-w-[200px]" value={filters.search} onChange={(e) => setFilters(f => ({...f, search: e.target.value}))}/>
+                <Input placeholder="Search by name, ID, phone, or email..." className="flex-grow min-w-[200px]" value={filters.search} onChange={(e) => setFilters(f => ({...f, search: e.target.value}))}/>
                 <Select value={filters.type} onValueChange={(value) => setFilters(f => ({...f, type: value}))}>
                   <SelectTrigger className="w-full sm:w-[150px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
