@@ -41,18 +41,18 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
     const router = useRouter();
 
     const handleLogout = async () => {
-        // Clear both Firebase Auth state and sessionStorage
         try {
             await signOut(auth);
         } catch (error) {
             console.error("Error signing out:", error);
         }
-        sessionStorage.removeItem('isAdminLoggedIn');
         router.push('/admin/login');
     };
 
-    const adminEmail = auth.currentUser?.email || 'Admin User';
-    const avatarFallback = adminEmail.substring(0, 2).toUpperCase();
+    const adminUser = auth.currentUser;
+    const displayName = adminUser?.displayName || adminUser?.email || 'Admin';
+    const email = adminUser?.email;
+    const avatarFallback = (displayName.substring(0, 2) || 'AD').toUpperCase();
 
 
     return (
@@ -126,7 +126,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                                     <AvatarFallback>{avatarFallback}</AvatarFallback>
                                 </Avatar>
                                 <div className="hidden md:flex flex-col items-start leading-tight">
-                                    <span className="text-sm font-medium">{adminEmail}</span>
+                                    <span className="text-sm font-medium">{displayName}</span>
                                 </div>
                                 <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
                             </Button>
@@ -134,7 +134,8 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                         <DropdownMenuContent className="w-56 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" align="end" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none truncate">{adminEmail}</p>
+                                    <p className="text-sm font-medium leading-none truncate">{displayName}</p>
+                                    <p className="text-xs leading-none text-muted-foreground truncate">{email}</p>
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
