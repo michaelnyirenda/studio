@@ -50,8 +50,8 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
     };
 
     const adminUser = auth.currentUser;
-    const displayName = adminUser?.displayName || adminUser?.email || 'Admin';
-    const email = adminUser?.email;
+    const displayName = adminUser?.displayName || 'Admin';
+    const email = adminUser?.email || 'No email';
     const avatarFallback = (displayName.substring(0, 2) || 'AD').toUpperCase();
 
 
