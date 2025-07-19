@@ -12,7 +12,7 @@ interface PageHeaderProps {
 const PageHeader: FC<PageHeaderProps> = ({ title, description, className }) => {
   return (
     <div className={cn(
-      "text-center", // Default alignment
+      "text-center mb-8", // Default alignment and add margin-bottom
       className
     )}>
       <h1 className="text-3xl font-bold tracking-tight font-headline text-primary">{title}</h1>
