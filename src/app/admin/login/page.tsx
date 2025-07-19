@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import Footer from '@/components/shared/footer';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import {
   Dialog,
@@ -29,6 +29,7 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(true);
   const [error, setError] = useState('');
 
   // State for reset password dialog
@@ -36,13 +37,25 @@ export default function AdminLoginPage() {
   const [resetEmail, setResetEmail] = useState('');
   const [isResetting, setIsResetting] = useState(false);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // If user is already logged in, redirect to dashboard
+        router.replace('/admin/dashboard');
+      } else {
+        // If no user, stop showing the loading spinner and show the form
+        setVerifying(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // Standard Firebase Authentication
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast({ title: 'Success', description: 'Logged in successfully.' });
@@ -91,7 +104,6 @@ export default function AdminLoginPage() {
         if (authError.code === 'auth/invalid-email') {
             errorMessage = "The email address is not valid.";
         } else if (authError.code === 'auth/user-not-found') {
-            // To prevent user enumeration, we can show a generic message.
             errorMessage = `If an account exists for ${resetEmail}, a password reset link has been sent.`;
              toast({
                 title: "Check Your Email",
@@ -108,6 +120,13 @@ export default function AdminLoginPage() {
     }
   }
 
+  if (verifying) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 px-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 px-4">
