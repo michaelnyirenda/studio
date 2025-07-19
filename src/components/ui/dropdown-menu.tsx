@@ -85,7 +85,8 @@ const DropdownMenuItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      "focus:[.text-destructive]:bg-destructive/10",
+      // Add specific override for destructive items
+      "[&.text-destructive]:focus:bg-destructive/10 [&.text-destructive]:focus:text-destructive",
       inset && "pl-8",
       className
     )}
@@ -200,5 +201,3 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
 }
-
-    

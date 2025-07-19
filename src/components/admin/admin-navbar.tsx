@@ -145,7 +145,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                                     <span>User Management</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout} className="w-full py-2.5 text-base text-destructive focus:text-destructive cursor-pointer flex items-center font-bold">
+                            <DropdownMenuItem onClick={handleLogout} className="w-full py-2.5 text-base text-destructive cursor-pointer flex items-center font-bold">
                                 <LogOut className="mr-3 h-5 w-5" />
                                 <span>Log out</span>
                             </DropdownMenuItem>
