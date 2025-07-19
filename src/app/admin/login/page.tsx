@@ -26,14 +26,6 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError('');
 
-    // Special case for the hardcoded demo user for testing
-    if (email === 'admin@ibreakfree.com' && password === 'password') {
-      sessionStorage.setItem('isAdminLoggedIn', 'true');
-      toast({ title: 'Success', description: 'Logged in as demo user.' });
-      router.push('/admin/dashboard');
-      return;
-    }
-    
     // Standard Firebase Authentication
     try {
       await signInWithEmailAndPassword(auth, email, password);

@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { ChatSession } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import Footer from "@/components/shared/footer";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function AdminDashboardLayout({
   children,
@@ -29,13 +29,7 @@ export default function AdminDashboardLayout({
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         // If the user is not logged in, redirect to the login page
-        // But keep the old sessionStorage logic as a fallback for the hardcoded user
-        const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
-        if (isLoggedIn !== 'true') {
-          router.replace('/admin/login');
-        } else {
-          setIsVerified(true);
-        }
+        router.replace('/admin/login');
       } else {
         setIsVerified(true);
       }
