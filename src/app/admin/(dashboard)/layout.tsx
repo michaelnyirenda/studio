@@ -6,11 +6,12 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { ChatSession } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import Footer from "@/components/shared/footer";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function AdminDashboardLayout({
   children,
@@ -25,12 +26,22 @@ export default function AdminDashboardLayout({
   const notifiedSessionIds = useRef(new Set());
 
   useEffect(() => {
-    const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
-    if (isLoggedIn !== 'true') {
-      router.replace('/admin/login');
-    } else {
-      setIsVerified(true);
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // If the user is not logged in, redirect to the login page
+        // But keep the old sessionStorage logic as a fallback for the hardcoded user
+        const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
+        if (isLoggedIn !== 'true') {
+          router.replace('/admin/login');
+        } else {
+          setIsVerified(true);
+        }
+      } else {
+        setIsVerified(true);
+      }
+    });
+
+    return () => unsubscribe();
   }, [router]);
   
   useEffect(() => {
@@ -42,7 +53,6 @@ export default function AdminDashboardLayout({
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const hasUnread = !snapshot.empty;
       
-      // Show badge if there are unread messages AND we are not on the chat page.
       if (hasUnread && pathname !== '/admin/chat') {
         setShowNotificationBadge(true);
       } else {
@@ -51,7 +61,6 @@ export default function AdminDashboardLayout({
       
       const changes = snapshot.docChanges();
 
-      // Handle toast pop-up notifications for new messages
       if (pathname !== '/admin/chat') {
           changes.forEach((change) => {
               if ((change.type === 'added' || change.type === 'modified') && !notifiedSessionIds.current.has(change.doc.id)) {
@@ -89,7 +98,6 @@ export default function AdminDashboardLayout({
     return () => unsubscribe();
   }, [isVerified, pathname, router, toast]);
 
-  // Effect to hide badge when navigating to the chat page
   useEffect(() => {
     if (pathname === '/admin/chat') {
       setShowNotificationBadge(false);

@@ -5,144 +5,232 @@ import { useState, useEffect } from 'react';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Search, Filter, UserPlus, MoreHorizontal, Edit3, Trash2, ShieldCheck, UserCog } from 'lucide-react';
+import { MoreHorizontal, Trash2, KeyRound, UserPlus, Loader2, UserCog } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  getAllAdmins,
+  createAdminUser,
+  deleteAdminUser,
+  changeAdminPassword,
+  AdminUser,
+} from './actions';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  lastActive: string;
-  status: string;
-}
 
 export default function UserManagementPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
+  const [userToUpdate, setUserToUpdate] = useState<AdminUser | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+
+  const { toast } = useToast();
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const adminUsers = await getAllAdmins();
+      setUsers(adminUsers);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch admin users.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // In a real app, you would fetch users from your database here, e.g., from a 'users' collection in Firestore.
-    // For this prototype, we'll simulate an empty user list as the database integration for users is not complete.
-    setUsers([]);
-    setLoading(false);
+    fetchUsers();
   }, []);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const result = await createAdminUser(newUserEmail, newUserPassword);
+      if (result.success) {
+        toast({ title: 'Success', description: `Admin user ${newUserEmail} created.` });
+        setIsDialogOpen(false);
+        setNewUserEmail('');
+        setNewUserPassword('');
+        fetchUsers(); // Refresh the list
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setIsSubmitting(true);
+    try {
+      const result = await deleteAdminUser(userToDelete.uid);
+      if (result.success) {
+        toast({ title: 'Success', description: `Admin user ${userToDelete.email} deleted.` });
+        setUserToDelete(null);
+        fetchUsers(); // Refresh the list
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userToUpdate || !newPassword) return;
+    setIsSubmitting(true);
+    try {
+      const result = await changeAdminPassword(userToUpdate.uid, newPassword);
+      if (result.success) {
+        toast({ title: 'Success', description: `Password for ${userToUpdate.email} updated.` });
+        setUserToUpdate(null);
+        setNewPassword('');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
 
   return (
     <div className="container mx-auto py-8 px-4">
       <PageHeader
         title="User Account Management"
-        description="Oversee user accounts, roles, permissions, and activity."
+        description="Oversee and manage administrator accounts for the platform."
       />
       
       <Card className="shadow-xl mt-8">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-primary flex items-center justify-between">
-            <span>User List</span>
-            <Button>
-              <UserPlus className="mr-2 h-5 w-5" /> Add New User
-            </Button>
+            <span className="flex items-center gap-2">
+              <UserCog /> Admin Users
+            </span>
+             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserPlus className="mr-2 h-5 w-5" /> Add New Admin
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Create New Admin User</DialogTitle>
+                  <DialogDescription>
+                    Enter the email and password for the new admin account.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleCreateUser}>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="email" className="text-right">Email</Label>
+                      <Input id="email" type="email" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="password" className="text-right">Password</Label>
+                      <Input id="password" type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} className="col-span-3" required minLength={6} />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Create User
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </CardTitle>
-          <CardDescription>View, search, filter, and manage all platform users.</CardDescription>
+          <CardDescription>Create, update, and remove administrator accounts.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center">
-            <div className="relative flex-grow w-full sm:w-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input placeholder="Search by name, email, or ID..." className="pl-10 w-full" />
-            </div>
-            <Select defaultValue="all_roles">
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Filter by Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all_roles">All Roles</SelectItem>
-                <SelectItem value="user">User</SelectItem>
-                <SelectItem value="moderator">Moderator</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="super_admin">Super Admin</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select defaultValue="all_statuses">
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Filter by Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all_statuses">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="pending_activation">Pending Activation</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" className="w-full sm:w-auto">
-              <Filter className="mr-2 h-4 w-4" /> Apply Filters
-            </Button>
-          </div>
-
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Active</TableHead>
+                  <TableHead>User ID (UID)</TableHead>
+                  <TableHead>Created On</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
+                  Array.from({ length: 3 }).map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
-                      <TableCell><Skeleton className="h-6 w-[90px] rounded-full" /></TableCell>
-                      <TableCell><Skeleton className="h-6 w-[120px] rounded-lg" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[250px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
                       <TableCell className="text-right"><Skeleton className="h-8 w-[32px] rounded-md" /></TableCell>
                     </TableRow>
                   ))
                 ) : users.length > 0 ? (
                   users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={user.role === 'Admin' || user.role === 'Super Admin' ? 'default' : user.role === 'Moderator' ? 'secondary' : 'outline'}
-                      >
-                        {user.role === 'Admin' && <UserCog className="mr-1 h-3 w-3"/>}
-                        {user.role === 'Moderator' && <ShieldCheck className="mr-1 h-3 w-3"/>}
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                       <Badge variant={user.status === 'Active' ? 'outline' : 'destructive'} className={user.status === 'Active' ? 'border-green-500 text-green-700' : ''}>
-                        {user.status}
-                       </Badge>
-                    </TableCell>
-                    <TableCell>{user.lastActive}</TableCell>
+                  <TableRow key={user.uid}>
+                    <TableCell className="font-medium">{user.email}</TableCell>
+                    <TableCell className="font-mono text-xs">{user.uid}</TableCell>
+                    <TableCell>{user.createdOn}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
+                          <Button variant="ghost" className="h-8 w-8 p-0" disabled={user.email === 'admin@ibreakfree.com'}>
                             <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
+                             {user.email !== 'admin@ibreakfree.com' && <MoreHorizontal className="h-4 w-4" />}
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem><Edit3 className="mr-2 h-4 w-4" /> Edit User</DropdownMenuItem>
-                          <DropdownMenuItem>View Activity Log</DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          {user.role !== 'Super Admin' && <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete User</DropdownMenuItem>}
+                           <DropdownMenuItem onClick={() => setUserToUpdate(user)}>
+                              <KeyRound className="mr-2 h-4 w-4" /> Change Password
+                           </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive" onClick={() => setUserToDelete(user)}>
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete User
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -150,23 +238,62 @@ export default function UserManagementPage() {
                 ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      No users found.
+                    <TableCell colSpan={4} className="h-24 text-center">
+                      No admin users found.
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-between mt-6">
-            <p className="text-sm text-muted-foreground">Showing {users.length} of {users.length} users.</p>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled>Previous</Button>
-              <Button variant="outline" size="sm" disabled>Next</Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
+
+      {/* Alert Dialog for Deleting User */}
+      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the admin user "{userToDelete?.email}". This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive hover:bg-destructive/90" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Yes, delete user
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Dialog for Updating Password */}
+      <Dialog open={!!userToUpdate} onOpenChange={(open) => !open && setUserToUpdate(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter a new password for {userToUpdate?.email}. The user will be logged out and will need to sign in again.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleUpdatePassword}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="new-password" className="text-right">New Password</Label>
+                <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="col-span-3" required minLength={6} />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Update Password
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

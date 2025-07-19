@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -9,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import Footer from '@/components/shared/footer';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -18,25 +21,47 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // Placeholder for actual authentication logic.
-    // In a real application, you would use Firebase Auth or another service.
-    setTimeout(() => {
-      if (email === 'admin@ibreakfree.com' && password === 'password') {
-        toast({ title: 'Success', description: 'Logged in successfully.' });
-        // Set a flag in session storage to indicate login
-        sessionStorage.setItem('isAdminLoggedIn', 'true');
-        router.push('/admin/dashboard');
-      } else {
-        setError('Invalid email or password.');
-        toast({ title: 'Login Failed', description: 'Invalid email or password.', variant: 'destructive' });
+    // Special case for the hardcoded demo user for testing
+    if (email === 'admin@ibreakfree.com' && password === 'password') {
+      sessionStorage.setItem('isAdminLoggedIn', 'true');
+      toast({ title: 'Success', description: 'Logged in as demo user.' });
+      router.push('/admin/dashboard');
+      return;
+    }
+    
+    // Standard Firebase Authentication
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      sessionStorage.removeItem('isAdminLoggedIn'); // Clean up old session storage
+      toast({ title: 'Success', description: 'Logged in successfully.' });
+      router.push('/admin/dashboard');
+    } catch (authError: any) {
+        let errorMessage = 'An unknown error occurred.';
+        switch (authError.code) {
+            case 'auth/invalid-email':
+                errorMessage = 'Please enter a valid email address.';
+                break;
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
+                errorMessage = 'Invalid email or password.';
+                break;
+            case 'auth/too-many-requests':
+                errorMessage = 'Too many failed login attempts. Please try again later.';
+                break;
+            default:
+                console.error('Login error:', authError);
+        }
+      setError(errorMessage);
+      toast({ title: 'Login Failed', description: errorMessage, variant: 'destructive' });
+    } finally {
         setLoading(false);
-      }
-    }, 1000);
+    }
   };
 
   return (
@@ -54,7 +79,7 @@ export default function AdminLoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@ibreakfree.com"
+                  placeholder="admin@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -65,7 +90,6 @@ export default function AdminLoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -77,10 +101,6 @@ export default function AdminLoginPage() {
                 {loading ? 'Logging in...' : 'Login'}
               </Button>
             </form>
-            <div className="mt-4 text-center text-xs text-muted-foreground">
-                <p>This is a placeholder login for demonstration.</p>
-                <p>Use <strong>admin@ibreakfree.com</strong> and <strong>password</strong>.</p>
-              </div>
           </CardContent>
         </Card>
       </div>

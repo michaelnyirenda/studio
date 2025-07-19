@@ -20,6 +20,8 @@ import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
 
 const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -38,10 +40,20 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
     const pathname = usePathname();
     const router = useRouter();
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        // Clear both Firebase Auth state and sessionStorage
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
         sessionStorage.removeItem('isAdminLoggedIn');
         router.push('/admin/login');
     };
+
+    const adminEmail = auth.currentUser?.email || 'Admin User';
+    const avatarFallback = adminEmail.substring(0, 2).toUpperCase();
+
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -111,10 +123,10 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative flex items-center gap-2 p-1 h-auto rounded-full border-2 border-primary">
                                <Avatar className="h-8 w-8">
-                                    <AvatarFallback>AD</AvatarFallback>
+                                    <AvatarFallback>{avatarFallback}</AvatarFallback>
                                 </Avatar>
                                 <div className="hidden md:flex flex-col items-start leading-tight">
-                                    <span className="text-sm font-medium">Admin User</span>
+                                    <span className="text-sm font-medium">{adminEmail}</span>
                                 </div>
                                 <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
                             </Button>
@@ -122,7 +134,7 @@ export default function AdminNavbar({ showNotificationBadge }: AdminNavbarProps)
                         <DropdownMenuContent className="w-56 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" align="end" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none">Admin User</p>
+                                    <p className="text-sm font-medium leading-none truncate">{adminEmail}</p>
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
