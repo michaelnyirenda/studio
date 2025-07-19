@@ -88,11 +88,6 @@ export async function deleteAdminUser(uid: string): Promise<{ success: boolean; 
   
   try {
     const auth = await getAdminAuth();
-    const user = await auth.getUser(uid);
-    // As a safeguard, prevent deletion of the main demo admin account
-    if (user.email === 'admin@ibreakfree.com') {
-        return { success: false, error: 'The primary demo admin cannot be deleted.' };
-    }
     await auth.deleteUser(uid);
     return { success: true };
   } catch (error: any) {

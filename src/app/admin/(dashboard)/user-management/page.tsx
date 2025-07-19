@@ -64,10 +64,10 @@ export default function UserManagementPage() {
     try {
       const adminUsers = await getAllAdmins();
       setUsers(adminUsers);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: 'Failed to fetch admin users.',
+        description: error.message || 'Failed to fetch admin users.',
         variant: 'destructive',
       });
     } finally {
@@ -219,9 +219,9 @@ export default function UserManagementPage() {
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0" disabled={user.email === 'admin@ibreakfree.com'}>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
                             <span className="sr-only">Open menu</span>
-                             {user.email !== 'admin@ibreakfree.com' && <MoreHorizontal className="h-4 w-4" />}
+                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
