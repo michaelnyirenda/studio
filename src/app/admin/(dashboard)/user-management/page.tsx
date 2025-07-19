@@ -256,6 +256,7 @@ export default function UserManagementPage() {
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Created On</TableHead>
+                  <TableHead>Last Logged In</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -266,6 +267,7 @@ export default function UserManagementPage() {
                       <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
                       <TableCell className="text-right"><Skeleton className="h-8 w-[32px] rounded-md" /></TableCell>
                     </TableRow>
                   ))
@@ -275,6 +277,7 @@ export default function UserManagementPage() {
                     <TableCell className="font-medium">{user.displayName}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.createdOn}</TableCell>
+                    <TableCell>{user.lastSignIn}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -300,7 +303,7 @@ export default function UserManagementPage() {
                 ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center">
+                    <TableCell colSpan={5} className="h-24 text-center">
                       No admin users found.
                     </TableCell>
                   </TableRow>

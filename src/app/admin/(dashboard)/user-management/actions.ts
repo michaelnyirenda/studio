@@ -14,6 +14,7 @@ export interface AdminUser {
   email: string | undefined;
   displayName: string | undefined;
   createdOn: string;
+  lastSignIn: string;
 }
 
 /**
@@ -40,6 +41,9 @@ export async function getAllAdmins(): Promise<AdminUser[]> {
       createdOn: userRecord.metadata.creationTime 
         ? format(new Date(userRecord.metadata.creationTime), 'PP') 
         : 'N/A',
+      lastSignIn: userRecord.metadata.lastSignInTime
+        ? format(new Date(userRecord.metadata.lastSignInTime), 'PPpp')
+        : 'Never',
     }));
   } catch (error: any) {
     console.error('Error fetching admin users:', error.message);
