@@ -399,7 +399,7 @@ export default function ScreeningDataPage() {
                                     View Details
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    className="text-destructive focus:text-destructive"
+                                    className="text-destructive"
                                     onClick={() => setScreeningToDelete(screening)}
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -480,3 +480,5 @@ export default function ScreeningDataPage() {
     </div>
   );
 }
+
+    

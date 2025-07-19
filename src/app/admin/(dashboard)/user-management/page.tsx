@@ -293,7 +293,7 @@ export default function UserManagementPage() {
                            <DropdownMenuItem onClick={() => openChangePasswordDialog(user)}>
                               <KeyRound className="mr-2 h-4 w-4" /> Change Password
                            </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive" onClick={() => setUserToDelete(user)}>
+                          <DropdownMenuItem className="text-destructive" onClick={() => setUserToDelete(user)}>
                             <Trash2 className="mr-2 h-4 w-4" /> Delete User
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -396,3 +396,5 @@ export default function UserManagementPage() {
     </div>
   );
 }
+
+    

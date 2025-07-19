@@ -1,3 +1,4 @@
+
 // src/app/admin/forum-management/page.tsx
 "use client";
 
@@ -136,7 +137,7 @@ export default function ForumManagementPage() {
                          <span>Edit</span>
                        </Link>
                      </DropdownMenuItem>
-                     <DropdownMenuItem onClick={() => setPostToDelete(post)} className="text-destructive focus:text-destructive cursor-pointer flex items-center">
+                     <DropdownMenuItem onClick={() => setPostToDelete(post)} className="text-destructive cursor-pointer flex items-center">
                        <Trash2 className="mr-2 h-4 w-4" />
                        <span>Delete</span>
                      </DropdownMenuItem>
@@ -205,3 +206,5 @@ export default function ForumManagementPage() {
     </div>
   );
 }
+
+    
