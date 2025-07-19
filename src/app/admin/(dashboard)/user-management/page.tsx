@@ -1,12 +1,12 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import PageHeader from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { MoreHorizontal, Trash2, KeyRound, UserPlus, Loader2, UserCog } from 'lucide-react';
+import { MoreHorizontal, Trash2, KeyRound, UserPlus, Loader2, UserCog, Edit } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
@@ -42,6 +42,7 @@ import {
   createAdminUser,
   deleteAdminUser,
   changeAdminPassword,
+  updateAdminUser,
   AdminUser,
 } from './actions';
 
@@ -49,13 +50,20 @@ import {
 export default function UserManagementPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserPassword, setNewUserPassword] = useState('');
-  const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
-  const [userToUpdate, setUserToUpdate] = useState<AdminUser | null>(null);
+  
+  // State for dialogs
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+
+  // State for forms
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
+  const [userToEdit, setUserToEdit] = useState<AdminUser | null>(null);
   const [newPassword, setNewPassword] = useState('');
+  
+  const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { toast } = useToast();
 
@@ -77,19 +85,40 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     fetchUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const result = await createAdminUser(newUserEmail, newUserPassword);
+      const result = await createAdminUser(newUser.email, newUser.password, newUser.name);
       if (result.success) {
-        toast({ title: 'Success', description: `Admin user ${newUserEmail} created.` });
-        setIsDialogOpen(false);
-        setNewUserEmail('');
-        setNewUserPassword('');
+        toast({ title: 'Success', description: `Admin user ${newUser.email} created.` });
+        setIsAddUserOpen(false);
+        setNewUser({ name: '', email: '', password: '' });
         fetchUsers(); // Refresh the list
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userToEdit) return;
+    setIsSubmitting(true);
+    try {
+      const result = await updateAdminUser(userToEdit.uid, userToEdit.email || '', userToEdit.displayName || '');
+      if (result.success) {
+        toast({ title: 'Success', description: `User ${userToEdit.email} updated.` });
+        setIsEditUserOpen(false);
+        setUserToEdit(null);
+        fetchUsers(); // Refresh
       } else {
         throw new Error(result.error);
       }
@@ -119,15 +148,16 @@ export default function UserManagementPage() {
     }
   };
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userToUpdate || !newPassword) return;
+    if (!userToEdit || !newPassword) return;
     setIsSubmitting(true);
     try {
-      const result = await changeAdminPassword(userToUpdate.uid, newPassword);
+      const result = await changeAdminPassword(userToEdit.uid, newPassword);
       if (result.success) {
-        toast({ title: 'Success', description: `Password for ${userToUpdate.email} updated.` });
-        setUserToUpdate(null);
+        toast({ title: 'Success', description: `Password for ${userToEdit.email} updated.` });
+        setIsChangePasswordOpen(false);
+        setUserToEdit(null);
         setNewPassword('');
       } else {
         throw new Error(result.error);
@@ -138,7 +168,23 @@ export default function UserManagementPage() {
       setIsSubmitting(false);
     }
   };
+  
+  const openEditDialog = (user: AdminUser) => {
+    setUserToEdit(user);
+    setIsEditUserOpen(true);
+  };
+  
+  const openChangePasswordDialog = (user: AdminUser) => {
+    setUserToEdit(user);
+    setIsChangePasswordOpen(true);
+  };
 
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => 
+      (user.displayName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (user.email?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    );
+  }, [users, searchQuery]);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -149,11 +195,14 @@ export default function UserManagementPage() {
       
       <Card className="shadow-xl mt-8">
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-primary flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <UserCog /> Admin Users
-            </span>
-             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+            <div>
+              <CardTitle className="text-xl font-bold text-primary flex items-center gap-2">
+                <UserCog /> Admin Users
+              </CardTitle>
+              <CardDescription>Create, update, and remove administrator accounts.</CardDescription>
+            </div>
+             <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="mr-2 h-5 w-5" /> Add New Admin
@@ -163,18 +212,22 @@ export default function UserManagementPage() {
                 <DialogHeader>
                   <DialogTitle>Create New Admin User</DialogTitle>
                   <DialogDescription>
-                    Enter the email and password for the new admin account.
+                    Enter the details for the new admin account.
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleCreateUser}>
                   <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="email" className="text-right">Email</Label>
-                      <Input id="email" type="email" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} className="col-span-3" required />
+                     <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name-add" className="text-right">Name</Label>
+                      <Input id="name-add" value={newUser.name} onChange={(e) => setNewUser(s => ({...s, name: e.target.value}))} className="col-span-3" required />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="password" className="text-right">Password</Label>
-                      <Input id="password" type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} className="col-span-3" required minLength={6} />
+                      <Label htmlFor="email-add" className="text-right">Email</Label>
+                      <Input id="email-add" type="email" value={newUser.email} onChange={(e) => setNewUser(s => ({...s, email: e.target.value}))} className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="password-add" className="text-right">Password</Label>
+                      <Input id="password-add" type="password" value={newUser.password} onChange={(e) => setNewUser(s => ({...s, password: e.target.value}))} className="col-span-3" required minLength={6} />
                     </div>
                   </div>
                   <DialogFooter>
@@ -186,16 +239,22 @@ export default function UserManagementPage() {
                 </form>
               </DialogContent>
             </Dialog>
-          </CardTitle>
-          <CardDescription>Create, update, and remove administrator accounts.</CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
+           <div className="mb-4">
+            <Input 
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>User ID (UID)</TableHead>
                   <TableHead>Created On</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -204,17 +263,17 @@ export default function UserManagementPage() {
                 {loading ? (
                   Array.from({ length: 3 }).map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-[250px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
                       <TableCell className="text-right"><Skeleton className="h-8 w-[32px] rounded-md" /></TableCell>
                     </TableRow>
                   ))
-                ) : users.length > 0 ? (
-                  users.map((user) => (
+                ) : filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
                   <TableRow key={user.uid}>
-                    <TableCell className="font-medium">{user.email}</TableCell>
-                    <TableCell className="font-mono text-xs">{user.uid}</TableCell>
+                    <TableCell className="font-medium">{user.displayName}</TableCell>
+                    <TableCell>{user.email}</TableCell>
                     <TableCell>{user.createdOn}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -225,7 +284,10 @@ export default function UserManagementPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                           <DropdownMenuItem onClick={() => setUserToUpdate(user)}>
+                           <DropdownMenuItem onClick={() => openEditDialog(user)}>
+                              <Edit className="mr-2 h-4 w-4" /> Edit User
+                           </DropdownMenuItem>
+                           <DropdownMenuItem onClick={() => openChangePasswordDialog(user)}>
                               <KeyRound className="mr-2 h-4 w-4" /> Change Password
                            </DropdownMenuItem>
                           <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive" onClick={() => setUserToDelete(user)}>
@@ -267,17 +329,51 @@ export default function UserManagementPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Dialog for Editing User */}
+      <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Update the details for {userToEdit?.displayName}.
+            </DialogDescription>
+          </DialogHeader>
+          {userToEdit && (
+            <form onSubmit={handleUpdateUser}>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name-edit" className="text-right">Name</Label>
+                  <Input id="name-edit" value={userToEdit.displayName || ''} onChange={(e) => setUserToEdit(u => u ? {...u, displayName: e.target.value} : null)} className="col-span-3" required />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email-edit" className="text-right">Email</Label>
+                  <Input id="email-edit" type="email" value={userToEdit.email || ''} onChange={(e) => setUserToEdit(u => u ? {...u, email: e.target.value} : null)} className="col-span-3" required />
+                </div>
+              </div>
+              <DialogFooter>
+                 <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
 
       {/* Dialog for Updating Password */}
-      <Dialog open={!!userToUpdate} onOpenChange={(open) => !open && setUserToUpdate(null)}>
+      <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Change Password</DialogTitle>
             <DialogDescription>
-              Enter a new password for {userToUpdate?.email}. The user will be logged out and will need to sign in again.
+              Enter a new password for {userToEdit?.email}. The user will be logged out and will need to sign in again.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleUpdatePassword}>
+          <form onSubmit={handleChangePassword}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="new-password" className="text-right">New Password</Label>
